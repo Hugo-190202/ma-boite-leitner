@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leitner App</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// Icônes Lucide en SVG inline
+function CheckCircle({ size=24, color="currentColor", style, ...p }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>;
+}
+function XCircle({ size=24, color="currentColor", style, ...p }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>;
+}
+function RotateCcw({ size=24, color="currentColor", style, ...p }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.45"/></svg>;
+}
+function Clock({ size=24, color="currentColor", style, ...p }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+}
+function BookOpen({ size=24, color="currentColor", style, ...p }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+}
+function Zap({ size=24, color="currentColor", style, ...p }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+}
+
+// ─── DÉPARTEMENTS ───
+const DEPARTEMENTS = [
+  {num:"01",nom:"Ain",chef:"Bourg-en-Bresse",region:"Auvergne-Rhône-Alpes"},
+  {num:"03",nom:"Allier",chef:"Moulins",region:"Auvergne-Rhône-Alpes"},
+  {num:"07",nom:"Ardèche",chef:"Privas",region:"Auvergne-Rhône-Alpes"},
+  {num:"15",nom:"Cantal",chef:"Aurillac",region:"Auvergne-Rhône-Alpes"},
+  {num:"26",nom:"Drôme",chef:"Valence",region:"Auvergne-Rhône-Alpes"},
+  {num:"38",nom:"Isère",chef:"Grenoble",region:"Auvergne-Rhône-Alpes"},
+  {num:"42",nom:"Loire",chef:"Saint-Étienne",region:"Auvergne-Rhône-Alpes"},
+  {num:"43",nom:"Haute-Loire",chef:"Le Puy-en-Velay",region:"Auvergne-Rhône-Alpes"},
+  {num:"63",nom:"Puy-de-Dôme",chef:"Clermont-Ferrand",region:"Auvergne-Rhône-Alpes"},
+  {num:"69",nom:"Rhône",chef:"Lyon",region:"Auvergne-Rhône-Alpes"},
+  {num:"73",nom:"Savoie",chef:"Chambéry",region:"Auvergne-Rhône-Alpes"},
+  {num:"74",nom:"Haute-Savoie",chef:"Annecy",region:"Auvergne-Rhône-Alpes"},
+  {num:"21",nom:"Côte-d'Or",chef:"Dijon",region:"Bourgogne-Franche-Comté"},
+  {num:"25",nom:"Doubs",chef:"Besançon",region:"Bourgogne-Franche-Comté"},
+  {num:"39",nom:"Jura",chef:"Lons-le-Saunier",region:"Bourgogne-Franche-Comté"},
+  {num:"58",nom:"Nièvre",chef:"Nevers",region:"Bourgogne-Franche-Comté"},
+  {num:"70",nom:"Haute-Saône",chef:"Vesoul",region:"Bourgogne-Franche-Comté"},
+  {num:"71",nom:"Saône-et-Loire",chef:"Mâcon",region:"Bourgogne-Franche-Comté"},
+  {num:"89",nom:"Yonne",chef:"Auxerre",region:"Bourgogne-Franche-Comté"},
+  {num:"90",nom:"Territoire de Belfort",chef:"Belfort",region:"Bourgogne-Franche-Comté"},
+  {num:"22",nom:"Côtes-d'Armor",chef:"Saint-Brieuc",region:"Bretagne"},
+  {num:"29",nom:"Finistère",chef:"Quimper",region:"Bretagne"},
+  {num:"35",nom:"Ille-et-Vilaine",chef:"Rennes",region:"Bretagne"},
+  {num:"56",nom:"Morbihan",chef:"Vannes",region:"Bretagne"},
+  {num:"18",nom:"Cher",chef:"Bourges",region:"Centre-Val de Loire"},
+  {num:"28",nom:"Eure-et-Loir",chef:"Chartres",region:"Centre-Val de Loire"},
+  {num:"36",nom:"Indre",chef:"Châteauroux",region:"Centre-Val de Loire"},
+  {num:"37",nom:"Indre-et-Loire",chef:"Tours",region:"Centre-Val de Loire"},
+  {num:"41",nom:"Loir-et-Cher",chef:"Blois",region:"Centre-Val de Loire"},
+  {num:"45",nom:"Loiret",chef:"Orléans",region:"Centre-Val de Loire"},
+  {num:"2A",nom:"Corse-du-Sud",chef:"Ajaccio",region:"Corse"},
+  {num:"2B",nom:"Haute-Corse",chef:"Bastia",region:"Corse"},
+  {num:"08",nom:"Ardennes",chef:"Charleville-Mézières",region:"Grand Est"},
+  {num:"10",nom:"Aube",chef:"Troyes",region:"Grand Est"},
+  {num:"51",nom:"Marne",chef:"Châlons-en-Champagne",region:"Grand Est"},
+  {num:"52",nom:"Haute-Marne",chef:"Chaumont",region:"Grand Est"},
+  {num:"54",nom:"Meurthe-et-Moselle",chef:"Nancy",region:"Grand Est"},
+  {num:"55",nom:"Meuse",chef:"Bar-le-Duc",region:"Grand Est"},
+  {num:"57",nom:"Moselle",chef:"Metz",region:"Grand Est"},
+  {num:"67",nom:"Bas-Rhin",chef:"Strasbourg",region:"Grand Est"},
+  {num:"68",nom:"Haut-Rhin",chef:"Colmar",region:"Grand Est"},
+  {num:"88",nom:"Vosges",chef:"Épinal",region:"Grand Est"},
+  {num:"02",nom:"Aisne",chef:"Laon",region:"Hauts-de-France"},
+  {num:"59",nom:"Nord",chef:"Lille",region:"Hauts-de-France"},
+  {num:"60",nom:"Oise",chef:"Beauvais",region:"Hauts-de-France"},
+  {num:"62",nom:"Pas-de-Calais",chef:"Arras",region:"Hauts-de-France"},
+  {num:"80",nom:"Somme",chef:"Amiens",region:"Hauts-de-France"},
+  {num:"75",nom:"Paris",chef:"Paris",region:"Île-de-France"},
+  {num:"77",nom:"Seine-et-Marne",chef:"Melun",region:"Île-de-France"},
+  {num:"78",nom:"Yvelines",chef:"Versailles",region:"Île-de-France"},
+  {num:"91",nom:"Essonne",chef:"Évry-Courcouronnes",region:"Île-de-France"},
+  {num:"92",nom:"Hauts-de-Seine",chef:"Nanterre",region:"Île-de-France"},
+  {num:"93",nom:"Seine-Saint-Denis",chef:"Bobigny",region:"Île-de-France"},
+  {num:"94",nom:"Val-de-Marne",chef:"Créteil",region:"Île-de-France"},
+  {num:"95",nom:"Val-d'Oise",chef:"Cergy",region:"Île-de-France"},
+  {num:"14",nom:"Calvados",chef:"Caen",region:"Normandie"},
+  {num:"27",nom:"Eure",chef:"Évreux",region:"Normandie"},
+  {num:"50",nom:"Manche",chef:"Saint-Lô",region:"Normandie"},
+  {num:"61",nom:"Orne",chef:"Alençon",region:"Normandie"},
+  {num:"76",nom:"Seine-Maritime",chef:"Rouen",region:"Normandie"},
+  {num:"16",nom:"Charente",chef:"Angoulême",region:"Nouvelle-Aquitaine"},
+  {num:"17",nom:"Charente-Maritime",chef:"La Rochelle",region:"Nouvelle-Aquitaine"},
+  {num:"19",nom:"Corrèze",chef:"Tulle",region:"Nouvelle-Aquitaine"},
+  {num:"23",nom:"Creuse",chef:"Guéret",region:"Nouvelle-Aquitaine"},
+  {num:"24",nom:"Dordogne",chef:"Périgueux",region:"Nouvelle-Aquitaine"},
+  {num:"33",nom:"Gironde",chef:"Bordeaux",region:"Nouvelle-Aquitaine"},
+  {num:"40",nom:"Landes",chef:"Mont-de-Marsan",region:"Nouvelle-Aquitaine"},
+  {num:"47",nom:"Lot-et-Garonne",chef:"Agen",region:"Nouvelle-Aquitaine"},
+  {num:"64",nom:"Pyrénées-Atlantiques",chef:"Pau",region:"Nouvelle-Aquitaine"},
+  {num:"79",nom:"Deux-Sèvres",chef:"Niort",region:"Nouvelle-Aquitaine"},
+  {num:"86",nom:"Vienne",chef:"Poitiers",region:"Nouvelle-Aquitaine"},
+  {num:"87",nom:"Haute-Vienne",chef:"Limoges",region:"Nouvelle-Aquitaine"},
+  {num:"09",nom:"Ariège",chef:"Foix",region:"Occitanie"},
+  {num:"11",nom:"Aude",chef:"Carcassonne",region:"Occitanie"},
+  {num:"12",nom:"Aveyron",chef:"Rodez",region:"Occitanie"},
+  {num:"30",nom:"Gard",chef:"Nîmes",region:"Occitanie"},
+  {num:"31",nom:"Haute-Garonne",chef:"Toulouse",region:"Occitanie"},
+  {num:"32",nom:"Gers",chef:"Auch",region:"Occitanie"},
+  {num:"34",nom:"Hérault",chef:"Montpellier",region:"Occitanie"},
+  {num:"46",nom:"Lot",chef:"Cahors",region:"Occitanie"},
+  {num:"48",nom:"Lozère",chef:"Mende",region:"Occitanie"},
+  {num:"65",nom:"Hautes-Pyrénées",chef:"Tarbes",region:"Occitanie"},
+  {num:"66",nom:"Pyrénées-Orientales",chef:"Perpignan",region:"Occitanie"},
+  {num:"81",nom:"Tarn",chef:"Albi",region:"Occitanie"},
+  {num:"82",nom:"Tarn-et-Garonne",chef:"Montauban",region:"Occitanie"},
+  {num:"44",nom:"Loire-Atlantique",chef:"Nantes",region:"Pays de la Loire"},
+  {num:"49",nom:"Maine-et-Loire",chef:"Angers",region:"Pays de la Loire"},
+  {num:"53",nom:"Mayenne",chef:"Laval",region:"Pays de la Loire"},
+  {num:"72",nom:"Sarthe",chef:"Le Mans",region:"Pays de la Loire"},
+  {num:"85",nom:"Vendée",chef:"La Roche-sur-Yon",region:"Pays de la Loire"},
+  {num:"04",nom:"Alpes-de-Haute-Provence",chef:"Digne-les-Bains",region:"Provence-Alpes-Côte d'Azur"},
+  {num:"05",nom:"Hautes-Alpes",chef:"Gap",region:"Provence-Alpes-Côte d'Azur"},
+  {num:"06",nom:"Alpes-Maritimes",chef:"Nice",region:"Provence-Alpes-Côte d'Azur"},
+  {num:"13",nom:"Bouches-du-Rhône",chef:"Marseille",region:"Provence-Alpes-Côte d'Azur"},
+  {num:"83",nom:"Var",chef:"Toulon",region:"Provence-Alpes-Côte d'Azur"},
+  {num:"84",nom:"Vaucluse",chef:"Avignon",region:"Provence-Alpes-Côte d'Azur"},
+  {num:"971",nom:"Guadeloupe",chef:"Basse-Terre",region:"Outre-mer"},
+  {num:"972",nom:"Martinique",chef:"Fort-de-France",region:"Outre-mer"},
+  {num:"973",nom:"Guyane",chef:"Cayenne",region:"Outre-mer"},
+  {num:"974",nom:"La Réunion",chef:"Saint-Denis",region:"Outre-mer"},
+  {num:"976",nom:"Mayotte",chef:"Mamoudzou",region:"Outre-mer"},
+];
+
+// ─── CAPITALES ───
+const CAPITALES_RAW = [
+  {pays:"Albanie",capitale:"Tirana",continent:"Europe"},{pays:"Allemagne",capitale:"Berlin",continent:"Europe"},{pays:"Andorre",capitale:"Andorre-la-Vieille",continent:"Europe"},{pays:"Autriche",capitale:"Vienne",continent:"Europe"},{pays:"Belgique",capitale:"Bruxelles",continent:"Europe"},{pays:"Biélorussie",capitale:"Minsk",continent:"Europe"},{pays:"Bosnie-Herzégovine",capitale:"Sarajevo",continent:"Europe"},{pays:"Bulgarie",capitale:"Sofia",continent:"Europe"},{pays:"Chypre",capitale:"Nicosie",continent:"Europe"},{pays:"Croatie",capitale:"Zagreb",continent:"Europe"},{pays:"Danemark",capitale:"Copenhague",continent:"Europe"},{pays:"Espagne",capitale:"Madrid",continent:"Europe"},{pays:"Estonie",capitale:"Tallinn",continent:"Europe"},{pays:"Finlande",capitale:"Helsinki",continent:"Europe"},{pays:"France",capitale:"Paris",continent:"Europe"},{pays:"Grèce",capitale:"Athènes",continent:"Europe"},{pays:"Hongrie",capitale:"Budapest",continent:"Europe"},{pays:"Irlande",capitale:"Dublin",continent:"Europe"},{pays:"Islande",capitale:"Reykjavik",continent:"Europe"},{pays:"Italie",capitale:"Rome",continent:"Europe"},{pays:"Kosovo",capitale:"Pristina",continent:"Europe"},{pays:"Lettonie",capitale:"Riga",continent:"Europe"},{pays:"Liechtenstein",capitale:"Vaduz",continent:"Europe"},{pays:"Lituanie",capitale:"Vilnius",continent:"Europe"},{pays:"Luxembourg",capitale:"Luxembourg",continent:"Europe"},{pays:"Macédoine du Nord",capitale:"Skopje",continent:"Europe"},{pays:"Malte",capitale:"La Valette",continent:"Europe"},{pays:"Moldavie",capitale:"Chișinău",continent:"Europe"},{pays:"Monaco",capitale:"Monaco",continent:"Europe"},{pays:"Monténégro",capitale:"Podgorica",continent:"Europe"},{pays:"Norvège",capitale:"Oslo",continent:"Europe"},{pays:"Pays-Bas",capitale:"Amsterdam",continent:"Europe"},{pays:"Pologne",capitale:"Varsovie",continent:"Europe"},{pays:"Portugal",capitale:"Lisbonne",continent:"Europe"},{pays:"République tchèque",capitale:"Prague",continent:"Europe"},{pays:"Roumanie",capitale:"Bucarest",continent:"Europe"},{pays:"Royaume-Uni",capitale:"Londres",continent:"Europe"},{pays:"Russie",capitale:"Moscou",continent:"Europe"},{pays:"Saint-Marin",capitale:"Saint-Marin",continent:"Europe"},{pays:"Serbie",capitale:"Belgrade",continent:"Europe"},{pays:"Slovaquie",capitale:"Bratislava",continent:"Europe"},{pays:"Slovénie",capitale:"Ljubljana",continent:"Europe"},{pays:"Suède",capitale:"Stockholm",continent:"Europe"},{pays:"Suisse",capitale:"Berne",continent:"Europe"},{pays:"Ukraine",capitale:"Kiev",continent:"Europe"},{pays:"Vatican",capitale:"Vatican",continent:"Europe"},
+  {pays:"Afrique du Sud",capitale:"Pretoria",continent:"Afrique"},{pays:"Algérie",capitale:"Alger",continent:"Afrique"},{pays:"Angola",capitale:"Luanda",continent:"Afrique"},{pays:"Bénin",capitale:"Porto-Novo",continent:"Afrique"},{pays:"Botswana",capitale:"Gaborone",continent:"Afrique"},{pays:"Burkina Faso",capitale:"Ouagadougou",continent:"Afrique"},{pays:"Burundi",capitale:"Gitega",continent:"Afrique"},{pays:"Cameroun",capitale:"Yaoundé",continent:"Afrique"},{pays:"Cap-Vert",capitale:"Praia",continent:"Afrique"},{pays:"Centrafrique",capitale:"Bangui",continent:"Afrique"},{pays:"Comores",capitale:"Moroni",continent:"Afrique"},{pays:"Congo",capitale:"Brazzaville",continent:"Afrique"},{pays:"Côte d'Ivoire",capitale:"Yamoussoukro",continent:"Afrique"},{pays:"Djibouti",capitale:"Djibouti",continent:"Afrique"},{pays:"Égypte",capitale:"Le Caire",continent:"Afrique"},{pays:"Érythrée",capitale:"Asmara",continent:"Afrique"},{pays:"Éthiopie",capitale:"Addis-Abeba",continent:"Afrique"},{pays:"Gabon",capitale:"Libreville",continent:"Afrique"},{pays:"Gambie",capitale:"Banjul",continent:"Afrique"},{pays:"Ghana",capitale:"Accra",continent:"Afrique"},{pays:"Guinée",capitale:"Conakry",continent:"Afrique"},{pays:"Guinée-Bissau",capitale:"Bissau",continent:"Afrique"},{pays:"Guinée équatoriale",capitale:"Malabo",continent:"Afrique"},{pays:"Kenya",capitale:"Nairobi",continent:"Afrique"},{pays:"Lesotho",capitale:"Maseru",continent:"Afrique"},{pays:"Liberia",capitale:"Monrovia",continent:"Afrique"},{pays:"Libye",capitale:"Tripoli",continent:"Afrique"},{pays:"Madagascar",capitale:"Antananarivo",continent:"Afrique"},{pays:"Malawi",capitale:"Lilongwe",continent:"Afrique"},{pays:"Mali",capitale:"Bamako",continent:"Afrique"},{pays:"Maroc",capitale:"Rabat",continent:"Afrique"},{pays:"Maurice",capitale:"Port-Louis",continent:"Afrique"},{pays:"Mauritanie",capitale:"Nouakchott",continent:"Afrique"},{pays:"Mozambique",capitale:"Maputo",continent:"Afrique"},{pays:"Namibie",capitale:"Windhoek",continent:"Afrique"},{pays:"Niger",capitale:"Niamey",continent:"Afrique"},{pays:"Nigeria",capitale:"Abuja",continent:"Afrique"},{pays:"Ouganda",capitale:"Kampala",continent:"Afrique"},{pays:"RD Congo",capitale:"Kinshasa",continent:"Afrique"},{pays:"Rwanda",capitale:"Kigali",continent:"Afrique"},{pays:"São Tomé-et-Príncipe",capitale:"São Tomé",continent:"Afrique"},{pays:"Sénégal",capitale:"Dakar",continent:"Afrique"},{pays:"Sierra Leone",capitale:"Freetown",continent:"Afrique"},{pays:"Somalie",capitale:"Mogadiscio",continent:"Afrique"},{pays:"Soudan",capitale:"Khartoum",continent:"Afrique"},{pays:"Soudan du Sud",capitale:"Djouba",continent:"Afrique"},{pays:"Tanzanie",capitale:"Dodoma",continent:"Afrique"},{pays:"Tchad",capitale:"N'Djamena",continent:"Afrique"},{pays:"Togo",capitale:"Lomé",continent:"Afrique"},{pays:"Tunisie",capitale:"Tunis",continent:"Afrique"},{pays:"Zimbabwe",capitale:"Harare",continent:"Afrique"},
+  {pays:"Argentine",capitale:"Buenos Aires",continent:"Amériques"},{pays:"Bahamas",capitale:"Nassau",continent:"Amériques"},{pays:"Barbade",capitale:"Bridgetown",continent:"Amériques"},{pays:"Belize",capitale:"Belmopan",continent:"Amériques"},{pays:"Bolivie",capitale:"Sucre",continent:"Amériques"},{pays:"Brésil",capitale:"Brasília",continent:"Amériques"},{pays:"Canada",capitale:"Ottawa",continent:"Amériques"},{pays:"Chili",capitale:"Santiago",continent:"Amériques"},{pays:"Colombie",capitale:"Bogotá",continent:"Amériques"},{pays:"Costa Rica",capitale:"San José",continent:"Amériques"},{pays:"Cuba",capitale:"La Havane",continent:"Amériques"},{pays:"Équateur",capitale:"Quito",continent:"Amériques"},{pays:"États-Unis",capitale:"Washington",continent:"Amériques"},{pays:"Guatemala",capitale:"Guatemala City",continent:"Amériques"},{pays:"Guyana",capitale:"Georgetown",continent:"Amériques"},{pays:"Haïti",capitale:"Port-au-Prince",continent:"Amériques"},{pays:"Honduras",capitale:"Tegucigalpa",continent:"Amériques"},{pays:"Jamaïque",capitale:"Kingston",continent:"Amériques"},{pays:"Mexique",capitale:"Mexico",continent:"Amériques"},{pays:"Nicaragua",capitale:"Managua",continent:"Amériques"},{pays:"Panama",capitale:"Panama City",continent:"Amériques"},{pays:"Paraguay",capitale:"Asunción",continent:"Amériques"},{pays:"Pérou",capitale:"Lima",continent:"Amériques"},{pays:"République dominicaine",capitale:"Saint-Domingue",continent:"Amériques"},{pays:"Salvador",capitale:"San Salvador",continent:"Amériques"},{pays:"Suriname",capitale:"Paramaribo",continent:"Amériques"},{pays:"Trinité-et-Tobago",capitale:"Port of Spain",continent:"Amériques"},{pays:"Uruguay",capitale:"Montevideo",continent:"Amériques"},{pays:"Venezuela",capitale:"Caracas",continent:"Amériques"},
+  {pays:"Afghanistan",capitale:"Kaboul",continent:"Asie"},{pays:"Arabie saoudite",capitale:"Riyad",continent:"Asie"},{pays:"Arménie",capitale:"Erevan",continent:"Asie"},{pays:"Azerbaïdjan",capitale:"Bakou",continent:"Asie"},{pays:"Bahreïn",capitale:"Manama",continent:"Asie"},{pays:"Bangladesh",capitale:"Dacca",continent:"Asie"},{pays:"Bhoutan",capitale:"Thimphou",continent:"Asie"},{pays:"Cambodge",capitale:"Phnom Penh",continent:"Asie"},{pays:"Chine",capitale:"Pékin",continent:"Asie"},{pays:"Corée du Nord",capitale:"Pyongyang",continent:"Asie"},{pays:"Corée du Sud",capitale:"Séoul",continent:"Asie"},{pays:"Émirats arabes unis",capitale:"Abou Dabi",continent:"Asie"},{pays:"Géorgie",capitale:"Tbilissi",continent:"Asie"},{pays:"Inde",capitale:"New Delhi",continent:"Asie"},{pays:"Indonésie",capitale:"Jakarta",continent:"Asie"},{pays:"Irak",capitale:"Bagdad",continent:"Asie"},{pays:"Iran",capitale:"Téhéran",continent:"Asie"},{pays:"Israël",capitale:"Jérusalem",continent:"Asie"},{pays:"Japon",capitale:"Tokyo",continent:"Asie"},{pays:"Jordanie",capitale:"Amman",continent:"Asie"},{pays:"Kazakhstan",capitale:"Astana",continent:"Asie"},{pays:"Koweït",capitale:"Koweït City",continent:"Asie"},{pays:"Laos",capitale:"Vientiane",continent:"Asie"},{pays:"Liban",capitale:"Beyrouth",continent:"Asie"},{pays:"Malaisie",capitale:"Kuala Lumpur",continent:"Asie"},{pays:"Mongolie",capitale:"Oulan-Bator",continent:"Asie"},{pays:"Myanmar",capitale:"Naypyidaw",continent:"Asie"},{pays:"Népal",capitale:"Katmandou",continent:"Asie"},{pays:"Oman",capitale:"Mascate",continent:"Asie"},{pays:"Ouzbékistan",capitale:"Tachkent",continent:"Asie"},{pays:"Pakistan",capitale:"Islamabad",continent:"Asie"},{pays:"Philippines",capitale:"Manille",continent:"Asie"},{pays:"Qatar",capitale:"Doha",continent:"Asie"},{pays:"Singapour",capitale:"Singapour",continent:"Asie"},{pays:"Sri Lanka",capitale:"Sri Jayawardenepura Kotte",continent:"Asie"},{pays:"Syrie",capitale:"Damas",continent:"Asie"},{pays:"Thaïlande",capitale:"Bangkok",continent:"Asie"},{pays:"Turquie",capitale:"Ankara",continent:"Asie"},{pays:"Vietnam",capitale:"Hanoï",continent:"Asie"},{pays:"Yémen",capitale:"Sanaa",continent:"Asie"},
+  {pays:"Australie",capitale:"Canberra",continent:"Océanie"},{pays:"Fidji",capitale:"Suva",continent:"Océanie"},{pays:"Nouvelle-Zélande",capitale:"Wellington",continent:"Océanie"},{pays:"Papouasie-Nouvelle-Guinée",capitale:"Port Moresby",continent:"Océanie"},{pays:"Samoa",capitale:"Apia",continent:"Océanie"},{pays:"Tonga",capitale:"Nuku'alofa",continent:"Océanie"},{pays:"Vanuatu",capitale:"Port-Vila",continent:"Océanie"},
+];
+
+// ─── COURANTS PHILOSOPHIQUES ───
+const COURANTS = [
+  {nom:"Anarchisme",definition:"Courant politique et philosophique qui rejette toute forme d'autorité contraignante — État, hiérarchie, domination — au profit d'une organisation sociale libre et volontaire fondée sur la coopération.",auteurs:"Proudhon, Bakounine, Kropotkine, Emma Goldman",periode:"XIXe–XXe s.",tags:["politique","société"]},
+  {nom:"Cynisme",definition:"École grecque antique qui prône le retour à la nature, le mépris des conventions sociales et des richesses, et la vie conforme à la vertu comme seule voie vers le bonheur.",auteurs:"Diogène de Sinope, Antisthène, Cratès de Thèbes",periode:"IVe s. av. J.-C.",tags:["antique","éthique"]},
+  {nom:"Empirisme",definition:"Courant épistémologique selon lequel toute connaissance provient de l'expérience sensible. L'esprit est une 'table rase' à la naissance ; c'est l'observation et l'expérience qui construisent nos idées.",auteurs:"Locke, Hume, Berkeley, Francis Bacon, J.S. Mill",periode:"XVIIe–XVIIIe s.",tags:["épistémologie","connaissance"]},
+  {nom:"Épicurisme",definition:"Philosophie du bonheur fondée sur la recherche du plaisir modéré et l'absence de douleur (ataraxie). Le sage épicurien cultive les plaisirs simples, l'amitié et la sérénité face à la mort.",auteurs:"Épicure, Lucrèce",periode:"IVe s. av. J.-C.",tags:["éthique","bonheur","antique"]},
+  {nom:"Existentialisme",definition:"Courant affirmant que l'existence précède l'essence : l'être humain n'a pas de nature fixée, il se définit par ses choix et ses actes. L'homme est condamné à être libre et pleinement responsable.",auteurs:"Sartre, Simone de Beauvoir, Camus, Heidegger, Kierkegaard",periode:"XIXe–XXe s.",tags:["liberté","existence"]},
+  {nom:"Féminisme",definition:"Mouvement philosophique et politique qui défend l'égalité des droits entre les sexes, analyse et combat les structures de domination patriarcale, et repense les catégories de genre et de pouvoir.",auteurs:"Simone de Beauvoir, Mary Wollstonecraft, Judith Butler, Olympe de Gouges",periode:"XVIIIe s. – présent",tags:["politique","genre"]},
+  {nom:"Humanisme",definition:"Courant de la Renaissance plaçant l'être humain au centre de la réflexion, valorisant les lettres antiques, la raison, la dignité humaine et la curiosité intellectuelle contre le dogmatisme médiéval.",auteurs:"Érasme, Montaigne, Pico della Mirandola, Thomas More, Rabelais",periode:"XVe–XVIe s.",tags:["Renaissance","dignité"]},
+  {nom:"Idéalisme",definition:"Doctrine selon laquelle la réalité est fondamentalement d'ordre mental ou spirituel. L'esprit, les idées ou la conscience sont premiers ; le monde matériel n'existe que dans et par la représentation.",auteurs:"Platon, Kant, Hegel, Fichte, Berkeley",periode:"Antiquité – XIXe s.",tags:["métaphysique","connaissance"]},
+  {nom:"Libéralisme",definition:"Philosophie politique valorisant la liberté individuelle, les droits naturels, l'État de droit et l'économie de marché. L'État doit être limité afin de garantir les libertés civiles et politiques des individus.",auteurs:"Locke, Adam Smith, J.S. Mill, Tocqueville, Montesquieu",periode:"XVIIe–XIXe s.",tags:["politique","liberté"]},
+  {nom:"Les Lumières",definition:"Mouvement intellectuel européen du XVIIIe siècle qui place la raison, le progrès, la tolérance et l'émancipation au cœur de la réflexion, contre l'obscurantisme religieux et le despotisme.",auteurs:"Voltaire, Rousseau, Diderot, Montesquieu, Kant, Condorcet",periode:"XVIIIe s.",tags:["raison","progrès","politique"]},
+  {nom:"Marxisme",definition:"Théorie sociale, économique et politique fondée sur l'analyse matérialiste de l'histoire, la lutte des classes et la critique du capitalisme, visant l'émancipation du prolétariat.",auteurs:"Marx, Engels, Gramsci, Althusser, Lénine",periode:"XIXe–XXe s.",tags:["politique","économie"]},
+  {nom:"Matérialisme",definition:"Doctrine métaphysique affirmant que seule la matière existe et que tous les phénomènes — y compris la pensée et la conscience — sont des manifestations de processus matériels.",auteurs:"Démocrite, Épicure, La Mettrie, Marx, Diderot",periode:"Antiquité – XIXe s.",tags:["métaphysique","ontologie"]},
+  {nom:"Mécanisme",definition:"Conception selon laquelle la nature et les êtres vivants fonctionnent comme des machines, régis par des lois physiques et causales, sans finalité intrinsèque ni principe vital.",auteurs:"Descartes, Hobbes, La Mettrie, Galilée, Newton",periode:"XVIIe–XVIIIe s.",tags:["science","nature"]},
+  {nom:"Phénoménologie",definition:"Méthode philosophique qui part de la description rigoureuse des phénomènes tels qu'ils apparaissent à la conscience, en suspendant les présupposés théoriques pour revenir aux choses mêmes.",auteurs:"Husserl, Heidegger, Merleau-Ponty, Sartre",periode:"XXe s.",tags:["conscience","méthode"]},
+  {nom:"Platonisme",definition:"Philosophie fondée sur la théorie des Idées : le monde sensible n'est qu'une copie imparfaite du monde intelligible des Idées éternelles et parfaites, accessibles par la raison et la dialectique.",auteurs:"Platon, Plotin, Porphyre",periode:"IVe s. av. J.-C. – Ve s. ap. J.-C.",tags:["antique","métaphysique"]},
+  {nom:"Positivisme",definition:"Courant affirmant que seule la connaissance scientifique, fondée sur l'observation et l'expérience vérifiable, est légitime. La philosophie doit s'aligner sur la méthode des sciences positives.",auteurs:"Auguste Comte, J.S. Mill, Ernst Mach",periode:"XIXe s.",tags:["science","épistémologie"]},
+  {nom:"Pyrrhonisme",definition:"Forme radicale de scepticisme antique prônant la suspension du jugement face à toute affirmation, ce qui conduit à l'ataraxie (tranquillité de l'âme).",auteurs:"Pyrrhon d'Élis, Sextus Empiricus, Timon de Phlionte",periode:"IVe–IIe s. av. J.-C.",tags:["antique","scepticisme"]},
+  {nom:"Rationalisme",definition:"Courant épistémologique selon lequel la raison est la source principale de la connaissance. Les vérités nécessaires sont connues a priori, indépendamment de l'expérience sensible.",auteurs:"Descartes, Spinoza, Leibniz, Kant",periode:"XVIIe–XVIIIe s.",tags:["épistémologie","raison"]},
+  {nom:"Scepticisme",definition:"Attitude philosophique qui met en doute la possibilité d'atteindre une connaissance certaine. Le sceptique suspend son jugement ou relativise toute prétention à la vérité absolue.",auteurs:"Pyrrhon, Sextus Empiricus, Montaigne, Hume",periode:"IVe s. av. J.-C. – présent",tags:["épistémologie","doute"]},
+  {nom:"Socialisme",definition:"Doctrine politique et économique prônant une organisation plus juste de la société par la maîtrise collective des moyens de production, la redistribution des richesses et la solidarité sociale.",auteurs:"Saint-Simon, Fourier, Proudhon, Jaurès, Marx",periode:"XIXe–XXe s.",tags:["politique","économie"]},
+  {nom:"Stoïcisme",definition:"École philosophique enseignant que le bonheur réside dans la vertu et la maîtrise de soi. Le sage stoïcien accepte ce qui ne dépend pas de lui et cultive la raison et l'impassibilité.",auteurs:"Zénon de Kition, Épictète, Marc Aurèle, Sénèque",periode:"IVe s. av. J.-C. – IIe s. ap. J.-C.",tags:["antique","éthique","bonheur"]},
+  {nom:"Structuralisme",definition:"Courant des sciences humaines analysant les phénomènes culturels et sociaux comme des systèmes de relations structurelles, en mettant l'accent sur les structures plutôt que sur les sujets.",auteurs:"Saussure, Lévi-Strauss, Althusser, Barthes, Lacan",periode:"XXe s.",tags:["langage","société"]},
+  {nom:"Utilitarisme",definition:"Théorie éthique selon laquelle la valeur morale d'une action se mesure à ses conséquences : est bon ce qui maximise le bonheur ou l'utilité du plus grand nombre.",auteurs:"Bentham, J.S. Mill, Peter Singer, Sidgwick",periode:"XVIIIe–XIXe s.",tags:["éthique","politique"]},
+  {nom:"Vitalisme",definition:"Doctrine affirmant que les organismes vivants sont animés par un principe vital irréductible à la seule matière. La vie possède une spécificité que la science ne peut entièrement réduire.",auteurs:"Bergson, Hans Driesch, Bichat",periode:"XVIIIe–XXe s.",tags:["biologie","métaphysique"]},
+  {nom:"Communisme",definition:"Doctrine politique et économique visant à supprimer la propriété privée des moyens de production pour instaurer une société sans classes où les biens sont partagés selon les besoins de chacun.",auteurs:"Marx, Engels, Lénine, Rosa Luxemburg",periode:"XIXe–XXe s.",tags:["politique","économie"]},
+  {nom:"Libertarisme",definition:"Philosophie politique affirmant la souveraineté absolue de l'individu sur sa personne et ses biens. Toute contrainte étatique non consentie est illégitime ; seul le marché libre s'impose.",auteurs:"Nozick, Murray Rothbard, Hayek",periode:"XXe s.",tags:["politique","liberté"]},
+  {nom:"Réalisme",definition:"Position affirmant que le monde extérieur existe indépendamment de notre perception ou de notre pensée. S'oppose à l'idéalisme.",auteurs:"Aristote, Thomas d'Aquin, Hilary Putnam, John Searle",periode:"Antiquité – présent",tags:["métaphysique","ontologie"]},
+  {nom:"Phénoménologie",definition:"Méthode philosophique qui part de la description rigoureuse des phénomènes tels qu'ils apparaissent à la conscience, en suspendant les présupposés théoriques pour revenir aux choses mêmes.",auteurs:"Husserl, Heidegger, Merleau-Ponty, Sartre",periode:"XXe s.",tags:["conscience","méthode"]},
+];
+
+// ─── CONSTANTES ───
+const REGION_COLORS = {
+  "Auvergne-Rhône-Alpes":"#c0392b","Bourgogne-Franche-Comté":"#8e44ad","Bretagne":"#2980b9",
+  "Centre-Val de Loire":"#16a085","Corse":"#d35400","Grand Est":"#e67e22","Hauts-de-France":"#27ae60",
+  "Île-de-France":"#e91e8c","Normandie":"#1a6b8a","Nouvelle-Aquitaine":"#6c3483","Occitanie":"#b7770d",
+  "Pays de la Loire":"#1e8449","Provence-Alpes-Côte d'Azur":"#1a5276","Outre-mer":"#7d6608",
+};
+const CONTINENT_COLORS = {
+  "Europe":"#2471a3","Afrique":"#1e8449","Amériques":"#a93226","Asie":"#b7770d","Océanie":"#6c3483",
+};
+const REGIONS_LIST = [...new Set(DEPARTEMENTS.map(d => d.region))];
+const CONTINENTS = [...new Set(CAPITALES_RAW.map(c => c.continent))];
+
+// ─── HELPERS ───
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function normalize(s) { return s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[-']/g," ").replace(/\s+/g," "); }
+function isCorrect(i,a) { return normalize(i)===normalize(a); }
+
+function getDeptCardFrontBack(card) {
+  const d = card.dir;
+  if (d==="num-to-nom")  return {front:card.num,  back:card.nom,  frontLabel:"Numéro",      backLabel:"Département"};
+  if (d==="nom-to-num")  return {front:card.nom,  back:card.num,  frontLabel:"Département", backLabel:"Numéro"};
+  if (d==="nom-to-chef") return {front:card.nom,  back:card.chef, frontLabel:"Département", backLabel:"Chef-lieu"};
+  if (d==="chef-to-nom") return {front:card.chef, back:card.nom,  frontLabel:"Chef-lieu",   backLabel:"Département"};
+  if (d==="num-to-chef") return {front:card.num,  back:card.chef, frontLabel:"Numéro",      backLabel:"Chef-lieu"};
+  return {front:card.num, back:card.nom, frontLabel:"Numéro", backLabel:"Département"};
+}
+function getCapCardFrontBack(card) {
+  if (card.dir==="pays-to-cap") return {front:card.pays,     back:card.capitale, frontLabel:"Pays",     backLabel:"Capitale"};
+  return                               {front:card.capitale, back:card.pays,     frontLabel:"Capitale", backLabel:"Pays"};
+}
+function resolveDeptDirs(subject, dir) {
+  if (subject==="num-nom") { if (dir==="mixed") return ["num-to-nom","nom-to-num"]; return [dir]; }
+  if (subject==="chef")    { if (dir==="mixed") return ["nom-to-chef","chef-to-nom","num-to-chef"]; return [dir]; }
+  return ["num-to-nom"];
+}
+
+const DEPT_SUBJECTS = [{id:"num-nom",label:"Numéro ↔ Nom",icon:"🔢"},{id:"chef",label:"Chef-lieu",icon:"🏛️"}];
+const DEPT_DIRS_NUM_NOM = [{id:"num-to-nom",label:"N° → Nom",icon:"🔢"},{id:"nom-to-num",label:"Nom → N°",icon:"🗺️"},{id:"mixed",label:"Mixte",icon:"🔀"}];
+const DEPT_DIRS_CHEF = [{id:"nom-to-chef",label:"Nom → Chef-lieu",icon:"🗺️"},{id:"chef-to-nom",label:"Chef-lieu → Nom",icon:"🏛️"},{id:"num-to-chef",label:"N° → Chef-lieu",icon:"🔢"},{id:"mixed",label:"Mixte",icon:"🔀"}];
+const PHILO_DIRS = [{id:"nom-to-back",label:"Nom → Déf. + Auteurs",icon:"🧠"},{id:"back-to-nom",label:"Déf. + Auteurs → Nom",icon:"📖"}];
+const CAP_DIRS = [{id:"pays-to-cap",label:"Pays → Capitale",icon:"🌍"},{id:"cap-to-pays",label:"Capitale → Pays",icon:"🏙️"},{id:"mixed",label:"Mixte",icon:"🔀"}];
+const MAIN_MODES = [
+  {id:"departements",label:"Départements français",icon:"🗺️",color:"#1a3a6b"},
+  {id:"capitales",   label:"Capitales du monde",   icon:"🌍",color:"#1a3b1a"},
+  {id:"philo",       label:"Courants philosophiques",icon:"🧠",color:"#2d1a4a"},
+];
+
+// ─── LEITNER ───
+const LEITNER_REGIONS = ["Bretagne","Corse","Grand Est","Hauts-de-France","Île-de-France","Normandie","Provence-Alpes-Côte d'Azur"];
+const LEITNER_CARDS = DEPARTEMENTS.filter(d => LEITNER_REGIONS.includes(d.region)).map(d => ({id:d.num, num:d.num, nom:d.nom, region:d.region}));
+const LEITNER_BOXES = [
+  {n:1,color:"#c0392b",desc:"Tous les jours",intervalDays:1},
+  {n:2,color:"#e67e22",desc:"Tous les 3 jours",intervalDays:3},
+  {n:3,color:"#f1c40f",desc:"Toutes les semaines",intervalDays:7},
+  {n:4,color:"#27ae60",desc:"Toutes les 2 semaines",intervalDays:14},
+  {n:5,color:"#2980b9",desc:"Tous les mois",intervalDays:30},
+];
+function initLeitnerState() {
+  const cards = {};
+  LEITNER_CARDS.forEach(c => { cards[c.id] = {box:1, lastReviewedDate:null}; });
+  return {cards, session:1, customCards:[]};
+}
+function getLeitnerDueCards(state) {
+  const today = new Date().toISOString().slice(0,10);
+  const allCards = [...LEITNER_CARDS, ...(state.customCards||[])];
+  return allCards.filter(c => {
+    const s = state.cards[c.id];
+    if (!s || !s.lastReviewedDate) return true;
+    const box = LEITNER_BOXES.find(b => b.n===s.box);
+    const diffDays = Math.floor((new Date(today)-new Date(s.lastReviewedDate))/86400000);
+    return diffDays >= box.intervalDays;
+  });
+}
+function addCardsToLeitnerStorage(deck, configType) {
+  let state;
+  try { state = JSON.parse(localStorage.getItem("leitner_state"))||initLeitnerState(); }
+  catch { state = initLeitnerState(); }
+  const newState = {...state, cards:{...state.cards}, customCards:[...(state.customCards||[])]};
+  const defaultIds = new Set(LEITNER_CARDS.map(c=>c.id));
+  const existingCustomIds = new Set(newState.customCards.map(c=>c.id));
+  const seen = new Set();
+  let added = 0;
+  deck.forEach(card => {
+    let id, customCard;
+    if (configType==='dept') {
+      id = card.num;
+      if (!defaultIds.has(id) && !existingCustomIds.has(id))
+        customCard = {id, type:'dept', num:card.num, nom:card.nom, region:card.region};
+    } else if (configType==='cap') {
+      id = 'cap_'+card.pays;
+      if (!existingCustomIds.has(id))
+        customCard = {id, type:'cap', pays:card.pays, capitale:card.capitale, continent:card.continent};
+    } else if (configType==='philo') {
+      id = 'philo_'+card.nom;
+      if (!existingCustomIds.has(id))
+        customCard = {id, type:'philo', nom:card.nom, definition:card.definition, auteurs:card.auteurs};
+    }
+    if (id && !seen.has(id) && !newState.cards[id]) {
+      seen.add(id); newState.cards[id] = {box:1, lastReviewedDate:null};
+      if (customCard) newState.customCards.push(customCard);
+      added++;
+    }
+  });
+  try { localStorage.setItem("leitner_state", JSON.stringify(newState)); } catch {}
+  return added;
+}
+function countNewLeitnerCards(deck, configType) {
+  let state;
+  try { state = JSON.parse(localStorage.getItem("leitner_state"))||initLeitnerState(); }
+  catch { state = initLeitnerState(); }
+  const seen = new Set(); let count = 0;
+  deck.forEach(card => {
+    let id;
+    if (configType==='dept') id = card.num;
+    else if (configType==='cap') id = 'cap_'+card.pays;
+    else if (configType==='philo') id = 'philo_'+card.nom;
+    if (id && !seen.has(id) && !state.cards[id]) { seen.add(id); count++; }
+  });
+  return count;
+}
+
+// ─── HOME ───
+function HomeScreen({onSelectMode}) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
+      <div className="text-center mb-8">
+        <div className="text-6xl mb-4">🌐</div>
+        <h1 className="text-white text-4xl font-black">GéoFlash</h1>
+        <p className="text-blue-300 mt-2">Apprends la géographie en t'amusant</p>
+      </div>
+      <div className="w-full max-w-sm grid gap-4">
+        <button onClick={()=>onSelectMode("leitner")}
+          className="rounded-3xl p-5 text-left hover:scale-105 active:scale-95 transition-all shadow-xl"
+          style={{background:"linear-gradient(135deg,#1a3a5c,#2471a3)"}}>
+          <div className="flex items-center gap-4">
+            <span style={{fontSize:32}}>📦</span>
+            <div><h2 className="text-white text-lg font-black">Boîte de Leitner</h2><p className="text-blue-200 text-sm">Révision espacée intelligente</p></div>
+          </div>
+        </button>
+        {MAIN_MODES.map(m=>(
+          <button key={m.id} onClick={()=>onSelectMode(m.id)}
+            className="rounded-3xl p-5 text-left hover:scale-105 active:scale-95 transition-all shadow-xl"
+            style={{background:`linear-gradient(135deg,${m.color}dd,${m.color})`}}>
+            <div className="flex items-center gap-4">
+              <span style={{fontSize:32}}>{m.icon}</span>
+              <div>
+                <h2 className="text-white text-lg font-black">{m.label}</h2>
+                <p className="text-white/60 text-sm">{m.id==="departements"?"Numéros, noms et chefs-lieux":m.id==="capitales"?"Pays et capitales du monde":"Définitions & auteurs clés"}</p>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── GAME MODE SELECT ───
+function GameModeScreen({category, onSelect, onBack}) {
+  const isPhilo = category==="philo";
+  const bg = isPhilo ? "linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)" : "linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)";
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:bg}}>
+      <div className="w-full max-w-sm">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">← Accueil</button>
+        <h1 className="text-white text-3xl font-black mb-1">{MAIN_MODES.find(m=>m.id===category)?.icon} {MAIN_MODES.find(m=>m.id===category)?.label}</h1>
+        <p className="text-white/50 mb-8">Choisis ton mode de jeu</p>
+        <div className="grid gap-4">
+          <button onClick={()=>onSelect("lesson")}
+            className="rounded-3xl p-6 text-left hover:scale-105 transition-all shadow-xl"
+            style={{background:"linear-gradient(135deg,#1a6b3c,#27AE60)"}}>
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 rounded-2xl p-3"><BookOpen size={28} className="text-white"/></div>
+              <div>
+                <h2 className="text-white text-xl font-black">Mode Leçon</h2>
+                <p className="text-green-200 text-sm">{isPhilo?"Fiches de révision complètes":"Apprends à ton rythme"}</p>
+              </div>
+            </div>
+          </button>
+          <button onClick={()=>onSelect("challenge")}
+            className="rounded-3xl p-6 text-left hover:scale-105 transition-all shadow-xl"
+            style={{background:isPhilo?"linear-gradient(135deg,#2d1a4a,#7c3aed)":"linear-gradient(135deg,#7b1a1a,#E74C3C)"}}>
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 rounded-2xl p-3"><Zap size={28} className="text-white"/></div>
+              <div>
+                <h2 className="text-white text-xl font-black">Mode Défi</h2>
+                <p className="text-white/70 text-sm">{isPhilo?"Flashcards nom ↔ définition + auteurs":"Contre la montre"}</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SETUP DÉPARTEMENTS ───
+function SetupDept({gameMode, onStart, onBack}) {
+  const [selRegions,setSelRegions]=useState([]);
+  const [subject,setSubject]=useState("num-nom");
+  const [dir,setDir]=useState("num-to-nom");
+  const accent = gameMode==="lesson"?"#27AE60":"#E74C3C";
+  const totalDeps = selRegions.reduce((s,r)=>s+DEPARTEMENTS.filter(d=>d.region===r).length,0);
+  const dirs = subject==="chef" ? DEPT_DIRS_CHEF : DEPT_DIRS_NUM_NOM;
+  const handleSubject = s => { setSubject(s); setDir(s==="chef"?"nom-to-chef":"num-to-nom"); };
+  const toggle = r => setSelRegions(p=>p.includes(r)?p.filter(x=>x!==r):[...p,r]);
+  return (
+    <div className="min-h-screen flex flex-col items-center p-4 pt-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
+      <div className="w-full max-w-md">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-4">← Retour</button>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="rounded-2xl p-2" style={{background:accent}}>{gameMode==="lesson"?<BookOpen size={20} className="text-white"/>:<Zap size={20} className="text-white"/>}</div>
+          <h1 className="text-white text-2xl font-black">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-white/70 text-xs uppercase tracking-widest">Régions</p>
+            {selRegions.length>0&&<p className="text-white/50 text-xs">{selRegions.length} rég. · {totalDeps} dép.</p>}
+          </div>
+          <div className="rounded-xl overflow-hidden border border-white/20 max-h-48 overflow-y-auto">
+            {REGIONS_LIST.map((r,i)=>{
+              const sel=selRegions.includes(r); const count=DEPARTEMENTS.filter(d=>d.region===r).length;
+              return(<button key={r} onClick={()=>toggle(r)} className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all"
+                style={{background:sel?(REGION_COLORS[r]||"#555"):i%2===0?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)",borderBottom:i<REGIONS_LIST.length-1?"1px solid rgba(255,255,255,0.08)":"none"}}>
+                <div style={{width:16,height:16,borderRadius:4,flexShrink:0,background:sel?"rgba(255,255,255,0.9)":"transparent",border:sel?"none":"1.5px solid rgba(255,255,255,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {sel&&<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke={REGION_COLORS[r]||"#555"} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+                <span className="text-white text-sm font-medium flex-1">{r}</span>
+                <span className="text-white/40 text-xs">{count}</span>
+              </button>);
+            })}
+          </div>
+          <button onClick={()=>setSelRegions([...REGIONS_LIST])} className="w-full mt-2 py-2 rounded-xl text-white/70 hover:text-white text-xs font-semibold" style={{background:"rgba(255,255,255,0.06)"}}>
+            {selRegions.length===REGIONS_LIST.length?"✓ Toute la France":"🗺️ Toute la France"} ({DEPARTEMENTS.length})
+          </button>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-3">
+          <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Catégorie</p>
+          <div className="grid grid-cols-2 gap-2">
+            {DEPT_SUBJECTS.map(({id,label,icon})=>(
+              <button key={id} onClick={()=>handleSubject(id)} className="py-3 rounded-xl text-white text-sm font-semibold transition-all"
+                style={{background:subject===id?accent:"rgba(255,255,255,0.06)",border:subject===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Sens</p>
+          <div className={`grid gap-2 grid-cols-${Math.min(dirs.length,3)}`}>
+            {dirs.map(({id,label,icon})=>(
+              <button key={id} onClick={()=>setDir(id)} className="py-3 rounded-xl text-white text-sm font-semibold transition-all"
+                style={{background:dir===id?accent:"rgba(255,255,255,0.06)",border:dir===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button onClick={()=>selRegions.length&&onStart({type:"dept",regions:selRegions,subject,dir})} disabled={!selRegions.length}
+          className="w-full py-4 rounded-2xl text-white font-black text-lg transition-all"
+          style={{background:selRegions.length?accent:"rgba(255,255,255,0.1)",opacity:selRegions.length?1:0.4}}>
+          {gameMode==="lesson"?"Commencer →":"Lancer le défi →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SETUP CAPITALES ───
+function SetupCapitales({gameMode, onStart, onBack}) {
+  const [selConts,setSelConts]=useState([]);
+  const [dir,setDir]=useState("pays-to-cap");
+  const accent = gameMode==="lesson"?"#27AE60":"#E74C3C";
+  const totalPays = selConts.reduce((s,c)=>s+CAPITALES_RAW.filter(x=>x.continent===c).length,0);
+  const toggle = c => setSelConts(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);
+  return (
+    <div className="min-h-screen flex flex-col items-center p-4 pt-6" style={{background:"linear-gradient(160deg,#0f2010 0%,#0f2f1a 100%)"}}>
+      <div className="w-full max-w-md">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-4">← Retour</button>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="rounded-2xl p-2" style={{background:accent}}>{gameMode==="lesson"?<BookOpen size={20} className="text-white"/>:<Zap size={20} className="text-white"/>}</div>
+          <h1 className="text-white text-2xl font-black">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"} · Capitales</h1>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-white/70 text-xs uppercase tracking-widest">Continents</p>
+            {selConts.length>0&&<p className="text-white/50 text-xs">{selConts.length} cont. · {totalPays} pays</p>}
+          </div>
+          <div className="rounded-xl overflow-hidden border border-white/20">
+            {CONTINENTS.map((c,i)=>{
+              const sel=selConts.includes(c); const count=CAPITALES_RAW.filter(x=>x.continent===c).length; const col=CONTINENT_COLORS[c]||"#555";
+              return(<button key={c} onClick={()=>toggle(c)} className="w-full flex items-center gap-3 px-3 py-3 text-left transition-all"
+                style={{background:sel?col:i%2===0?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)",borderBottom:i<CONTINENTS.length-1?"1px solid rgba(255,255,255,0.08)":"none"}}>
+                <div style={{width:16,height:16,borderRadius:4,flexShrink:0,background:sel?"rgba(255,255,255,0.9)":"transparent",border:sel?"none":"1.5px solid rgba(255,255,255,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {sel&&<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke={col} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+                <span className="text-white text-sm font-medium flex-1">{c}</span>
+                <span className="text-white/40 text-xs">{count} pays</span>
+              </button>);
+            })}
+          </div>
+          <button onClick={()=>setSelConts([...CONTINENTS])} className="w-full mt-2 py-2 rounded-xl text-white/70 hover:text-white text-xs font-semibold" style={{background:"rgba(255,255,255,0.06)"}}>
+            {selConts.length===CONTINENTS.length?"✓ Monde entier":"🌍 Monde entier"} ({CAPITALES_RAW.length})
+          </button>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Sens</p>
+          <div className="grid grid-cols-3 gap-2">
+            {CAP_DIRS.map(({id,label,icon})=>(
+              <button key={id} onClick={()=>setDir(id)} className="py-3 rounded-xl text-white text-sm font-semibold transition-all"
+                style={{background:dir===id?accent:"rgba(255,255,255,0.06)",border:dir===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button onClick={()=>selConts.length&&onStart({type:"cap",continents:selConts,dir})} disabled={!selConts.length}
+          className="w-full py-4 rounded-2xl text-white font-black text-lg transition-all"
+          style={{background:selConts.length?accent:"rgba(255,255,255,0.1)",opacity:selConts.length?1:0.4}}>
+          {gameMode==="lesson"?"Commencer →":"Lancer le défi →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SETUP PHILO ───
+function SetupPhilo({gameMode, onStart, onBack}) {
+  const [dir,setDir]=useState("nom-to-back");
+  const accent = gameMode==="lesson"?"#27AE60":"#7c3aed";
+  return (
+    <div className="min-h-screen flex flex-col items-center p-4 pt-6" style={{background:"linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)"}}>
+      <div className="w-full max-w-md">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-4">← Retour</button>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="rounded-2xl p-2" style={{background:accent}}>{gameMode==="lesson"?<BookOpen size={20} className="text-white"/>:<Zap size={20} className="text-white"/>}</div>
+          <h1 className="text-white text-2xl font-black">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"} · Philosophie</h1>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <p className="text-white font-semibold">{COURANTS.length} courants philosophiques</p>
+          <p className="text-white/50 text-xs mt-1">De l'Antiquité au XXe siècle</p>
+        </div>
+        {gameMode==="challenge" && (
+          <div className="bg-white/10 rounded-2xl p-4 mb-4">
+            <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Mode de révision</p>
+            <div className="grid gap-2">
+              {PHILO_DIRS.map(({id,label,icon})=>(
+                <button key={id} onClick={()=>setDir(id)} className="py-3 px-4 rounded-xl text-white text-sm font-semibold text-left transition-all"
+                  style={{background:dir===id?accent:"rgba(255,255,255,0.06)",border:dir===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
+                  {icon} {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <button onClick={()=>onStart({type:"philo",dir,gameMode})}
+          className="w-full py-4 rounded-2xl text-white font-black text-lg transition-all hover:scale-105"
+          style={{background:accent}}>
+          {gameMode==="lesson"?"Commencer les fiches →":"Lancer le défi →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── PHILO FICHE (mode leçon) ───
+function PhiloFicheScreen({onBack, onEnd}) {
+  const [deck]=useState(()=>shuffle(COURANTS));
+  const [idx,setIdx]=useState(0);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+
+  const go = (delta) => {
+    const next = idx+delta;
+    if (next<0) return;
+    if (next>=deck.length) { onEnd({deck, config:{type:'philo'}, mode:'lesson'}); return; }
+    setAnimating(true);
+    setTimeout(()=>{setIdx(next);setTimeout(()=>setAnimating(false),50);},180);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{if(e.key==="ArrowRight")go(1);if(e.key==="ArrowLeft")go(-1);};
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[idx]);
+
+  return (
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)"}}>
+      <div className="flex items-center justify-between px-5 pt-6 pb-3">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Retour</button>
+        <span className="text-white/70 font-mono text-sm">{idx+1} / {deck.length}</span>
+      </div>
+      <div className="px-5 mb-4">
+        <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
+          <div className="h-full bg-purple-400 rounded-full transition-all duration-500" style={{width:`${((idx+1)/deck.length)*100}%`}}/>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{opacity:animating?0:1,transition:"opacity 0.15s"}}>
+        <div className="max-w-md mx-auto flex flex-col gap-3">
+          <div className="rounded-2xl p-5" style={{background:"#5b21b6"}}>
+            <p className="text-purple-300 text-xs uppercase tracking-widest mb-1">Courant philosophique</p>
+            <h2 className="text-white font-black text-3xl">{card.nom}</h2>
+            <p className="text-purple-300 text-sm mt-1">🕰️ {card.periode}</p>
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {card.tags.map(t=><span key={t} className="text-xs px-2.5 py-1 rounded-full bg-white/20 text-white/80">{t}</span>)}
+            </div>
+          </div>
+          <div className="rounded-2xl p-5 bg-white">
+            <p className="text-xs uppercase tracking-widest font-bold mb-2 text-purple-600">📖 Définition</p>
+            <p className="text-gray-800 text-sm leading-relaxed">{card.definition}</p>
+          </div>
+          <div className="rounded-2xl p-5" style={{background:"rgba(255,255,255,0.1)"}}>
+            <p className="text-xs uppercase tracking-widest font-bold mb-3 text-purple-300">✍️ Auteurs clés</p>
+            <div className="flex flex-wrap gap-2">
+              {card.auteurs.split(", ").map(a=><span key={a} className="bg-white/15 text-white text-sm px-3 py-1.5 rounded-full font-medium">{a}</span>)}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="px-4 pb-6 pt-2">
+        <div className="max-w-md mx-auto grid grid-cols-2 gap-3">
+          <button onClick={()=>go(-1)} disabled={idx===0}
+            className="py-4 rounded-2xl text-white font-bold transition-all"
+            style={{background:idx===0?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.18)",opacity:idx===0?0.4:1}}>
+            ← Précédent
+          </button>
+          <button onClick={()=>go(1)}
+            className="py-4 rounded-2xl text-white font-bold hover:scale-105 transition-all"
+            style={{background:"#5b21b6"}}>
+            {idx+1>=deck.length?"Terminé ✓":"Suivant →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── PHILO DÉFI (flashcard 2 blocs) ───
+function PhiloDefiScreen({config, onBack, onEnd}) {
+  const [deck]=useState(()=>shuffle(COURANTS).map(c=>({...c,dir:config.dir==="mixed"?["nom-to-back","back-to-nom"][Math.floor(Math.random()*2)]:config.dir})));
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [scores,setScores]=useState([]);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+  const isNomFront=card.dir==="nom-to-back";
+
+  const next=knew=>{
+    const ns=[...scores,knew];
+    if(idx+1>=deck.length){onEnd({deck,scores:ns,config,mode:"challenge"});return;}
+    setScores(ns);setAnimating(true);
+    setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{
+      if(["ArrowUp","ArrowDown"," "].includes(e.key)){e.preventDefault();if(!flipped)setFlipped(true);}
+      if(flipped&&e.key==="ArrowRight")next(true);
+      if(flipped&&e.key==="ArrowLeft")next(false);
+    };
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[flipped,idx,scores]);
+
+  return(
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)"}}>
+      <div className="flex items-center justify-between px-5 pt-6 pb-3">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Config</button>
+        <div className="flex items-center gap-3">
+          <span className="text-green-400 font-bold text-sm flex items-center gap-1"><CheckCircle size={14}/>{scores.filter(Boolean).length}</span>
+          <span className="text-red-400 font-bold text-sm flex items-center gap-1"><XCircle size={14}/>{scores.filter(x=>!x).length}</span>
+        </div>
+        <span className="text-white/70 font-mono text-sm">{idx+1}/{deck.length}</span>
+      </div>
+      <div className="px-5 mb-4">
+        <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
+          <div className="h-full bg-purple-400 rounded-full transition-all duration-500" style={{width:`${(idx/deck.length)*100}%`}}/>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col px-4 pb-6 gap-3 overflow-y-auto" style={{opacity:animating?0:1,transition:"opacity 0.15s"}}>
+        {/* Bloc question */}
+        <div className="rounded-2xl p-5 shadow-lg" style={{background:flipped?"rgba(255,255,255,0.06)":"white"}}>
+          <p className="text-xs uppercase tracking-widest font-bold mb-2" style={{color:flipped?"rgba(255,255,255,0.35)":"#7c3aed"}}>
+            {isNomFront?"Courant":"Définition & Auteurs"}
+          </p>
+          {isNomFront
+            ? <p className="font-black text-3xl" style={{color:flipped?"rgba(255,255,255,0.4)":"#1a0d2e"}}>{card.nom}</p>
+            : <div>
+                <p className="text-sm leading-relaxed mb-2" style={{color:flipped?"rgba(255,255,255,0.4)":"#1a2a4a"}}>{card.definition}</p>
+                <p className="text-xs italic" style={{color:flipped?"rgba(255,255,255,0.3)":"#6b7280"}}>✍️ {card.auteurs}</p>
+              </div>
+          }
+        </div>
+
+        {/* Bouton révéler ou réponse */}
+        {!flipped
+          ? <button onClick={()=>setFlipped(true)}
+              className="rounded-2xl p-4 text-center border-2 border-dashed border-white/25 transition-all hover:bg-white/5"
+              style={{background:"rgba(255,255,255,0.03)"}}>
+              <p className="text-white/60 text-sm">👆 Appuyer pour révéler</p>
+              <p className="text-white/30 text-xs mt-1">{isNomFront?"Définition & auteurs":"Nom du courant"}</p>
+            </button>
+          : <div className="rounded-2xl p-5 shadow-lg" style={{background:"#5b21b6"}}>
+              <p className="text-xs uppercase tracking-widest font-bold mb-3 text-purple-300">
+                {isNomFront?"Définition & Auteurs":"Courant"}
+              </p>
+              {isNomFront
+                ? <div>
+                    <p className="text-white text-sm leading-relaxed mb-3">{card.definition}</p>
+                    <div className="border-t border-white/20 pt-3">
+                      <p className="text-purple-300 text-xs uppercase tracking-widest mb-1">Auteurs clés</p>
+                      <p className="text-white text-sm font-semibold">{card.auteurs}</p>
+                    </div>
+                    {card.periode&&<p className="text-purple-300 text-xs mt-2">🕰️ {card.periode}</p>}
+                  </div>
+                : <p className="text-white font-black text-3xl">{card.nom}</p>
+              }
+            </div>
+        }
+
+        {/* Boutons réponse */}
+        {flipped&&(
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={()=>next(false)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#dc2626"}}><XCircle size={18}/> À revoir</button>
+            <button onClick={()=>next(true)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#16a34a"}}><CheckCircle size={18}/> Je savais !</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── LESSON (dept + cap) ───
+function LessonScreen({config, onBack, onEnd}) {
+  const [deck]=useState(()=>{
+    const base = config.type==="dept"
+      ? shuffle(DEPARTEMENTS.filter(d=>config.regions.includes(d.region)))
+      : shuffle(CAPITALES_RAW.filter(c=>config.continents.includes(c.continent)));
+    const dirs = config.type==="dept"
+      ? resolveDeptDirs(config.subject,config.dir)
+      : config.dir==="mixed"?["pays-to-cap","cap-to-pays"]:[config.dir];
+    return base.map(d=>({...d,dir:dirs[Math.floor(Math.random()*dirs.length)]}));
+  });
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [scores,setScores]=useState([]);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+  const color=config.type==="dept"?(REGION_COLORS[card.region]||"#4A90D9"):(CONTINENT_COLORS[card.continent]||"#4A90D9");
+  const {front,back,frontLabel,backLabel}=config.type==="dept"?getDeptCardFrontBack(card):getCapCardFrontBack(card);
+
+  const next=knew=>{
+    const ns=[...scores,knew];
+    if(idx+1>=deck.length){onEnd({deck,scores:ns,config,mode:"lesson"});return;}
+    setScores(ns);setAnimating(true);
+    setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+  };
+  useEffect(()=>{
+    const fn=e=>{
+      if(["ArrowUp","ArrowDown"," "].includes(e.key)){e.preventDefault();if(!flipped)setFlipped(true);}
+      if(flipped&&e.key==="ArrowRight")next(true);
+      if(flipped&&e.key==="ArrowLeft")next(false);
+    };
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[flipped,idx,scores]);
+
+  return(
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:`linear-gradient(135deg,${color}99 0%,#0f1f3d 100%)`}}>
+      <div className="w-full max-w-md">
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Config</button>
+          <div className="text-center">
+            <p className="text-white font-bold text-sm">{config.type==="dept"?card.region:card.continent}</p>
+            <p className="text-white/50 text-xs">{frontLabel} → {backLabel}</p>
+          </div>
+          <span className="text-white/70 font-mono text-sm">{idx+1}/{deck.length}</span>
+        </div>
+        <div className="h-2 bg-white/20 rounded-full mb-6 overflow-hidden">
+          <div className="h-full bg-white rounded-full transition-all duration-500" style={{width:`${(idx/deck.length)*100}%`}}/>
+        </div>
+        <div style={{perspective:"1000px"}} onClick={()=>!flipped&&setFlipped(true)}>
+          <div className="relative w-full cursor-pointer select-none transition-all duration-500"
+            style={{transformStyle:"preserve-3d",transform:flipped?"rotateY(180deg)":"rotateY(0)",height:240,opacity:animating?0:1}}>
+            <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 bg-white" style={{backfaceVisibility:"hidden"}}>
+              <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{color}}>{frontLabel}</p>
+              <p className="font-black text-center text-gray-800" style={{fontSize:front.length>18?"1.6rem":front.length>10?"2.2rem":"3.2rem",lineHeight:1.1}}>{front}</p>
+              {!flipped&&<p className="text-gray-400 text-sm mt-6">Cliquer ou ↑↓ pour révéler</p>}
+            </div>
+            <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8" style={{backfaceVisibility:"hidden",transform:"rotateY(180deg)",background:color}}>
+              <p className="text-xs uppercase tracking-widest font-semibold mb-3 text-white/70">{backLabel}</p>
+              <p className="font-black text-white text-center" style={{fontSize:back.length>20?"1.6rem":back.length>10?"2.2rem":"3rem",lineHeight:1.1}}>{back}</p>
+            </div>
+          </div>
+        </div>
+        {flipped
+          ?<div className="grid grid-cols-2 gap-4 mt-6">
+            <button onClick={()=>next(false)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#E74C3C"}}><XCircle size={20}/> À revoir</button>
+            <button onClick={()=>next(true)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#27AE60"}}><CheckCircle size={20}/> Je savais !</button>
+          </div>
+          :<div className="h-16 flex items-center justify-center"><p className="text-white/30 text-xs">← À revoir | Je savais → (après révélation)</p></div>
+        }
+      </div>
+    </div>
+  );
+}
+
+// ─── CHALLENGE (dept + cap) ───
+function ChallengeScreen({config, onBack, onEnd}) {
+  const [deck]=useState(()=>{
+    const base = config.type==="dept"
+      ? shuffle(DEPARTEMENTS.filter(d=>config.regions.includes(d.region)))
+      : shuffle(CAPITALES_RAW.filter(c=>config.continents.includes(c.continent)));
+    const dirs = config.type==="dept"
+      ? resolveDeptDirs(config.subject,config.dir)
+      : config.dir==="mixed"?["pays-to-cap","cap-to-pays"]:[config.dir];
+    return base.map(d=>({...d,dir:dirs[Math.floor(Math.random()*dirs.length)]}));
+  });
+  const [idx,setIdx]=useState(0);
+  const [input,setInput]=useState("");
+  const [feedback,setFeedback]=useState(null);
+  const [scores,setScores]=useState([]);
+  const [elapsed,setElapsed]=useState(0);
+  const [animating,setAnimating]=useState(false);
+  const inputRef=useRef(null);
+  const timerRef=useRef(null);
+  const card=deck[idx];
+  const color=config.type==="dept"?(REGION_COLORS[card.region]||"#E74C3C"):(CONTINENT_COLORS[card.continent]||"#E74C3C");
+  const {front,back,frontLabel,backLabel}=config.type==="dept"?getDeptCardFrontBack(card):getCapCardFrontBack(card);
+
+  useEffect(()=>{timerRef.current=setInterval(()=>setElapsed(e=>e+1),1000);return()=>clearInterval(timerRef.current);},[]);
+  useEffect(()=>{if(inputRef.current&&!feedback)inputRef.current.focus();},[idx,feedback]);
+  const fmt=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+
+  const submit=()=>{
+    if(feedback||!input.trim())return;
+    const ok=isCorrect(input,back);
+    setFeedback(ok?"correct":"wrong");
+    setTimeout(()=>{
+      const ns=[...scores,ok];
+      if(idx+1>=deck.length){clearInterval(timerRef.current);onEnd({deck,scores:ns,config,mode:"challenge",elapsed});return;}
+      setScores(ns);setAnimating(true);
+      setTimeout(()=>{setInput("");setFeedback(null);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+    },900);
+  };
+
+  return(
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(135deg,#3d0f0f 0%,#1a0a2b 100%)"}}>
+      <div className="w-full max-w-md">
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Config</button>
+          <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+            <Clock size={16} className="text-red-400"/>
+            <span className="text-white font-mono font-bold text-lg">{fmt(elapsed)}</span>
+          </div>
+          <span className="text-white/70 font-mono text-sm">{idx+1}/{deck.length}</span>
+        </div>
+        <div className="h-2 bg-white/20 rounded-full mb-4 overflow-hidden">
+          <div className="h-full bg-red-500 rounded-full transition-all duration-500" style={{width:`${(idx/deck.length)*100}%`}}/>
+        </div>
+        <div className="flex justify-center gap-6 mb-4">
+          <div className="flex items-center gap-1.5 text-green-400 font-bold text-sm"><CheckCircle size={15}/> {scores.filter(Boolean).length}</div>
+          <div className="flex items-center gap-1.5 text-red-400 font-bold text-sm"><XCircle size={15}/> {scores.filter(x=>!x).length}</div>
+        </div>
+        <div className="w-full rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 mb-4 transition-all"
+          style={{background:feedback==="correct"?"#1a6b3c":feedback==="wrong"?"#6b1a1a":"white",minHeight:160,opacity:animating?0:1}}>
+          <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{color:feedback?"rgba(255,255,255,0.6)":"#E74C3C"}}>{frontLabel}</p>
+          <p className="font-black text-center" style={{color:feedback?"white":"#1a2a4a",fontSize:front.length>18?"1.6rem":front.length>10?"2.2rem":"3rem",lineHeight:1.15}}>{front}</p>
+          {feedback==="wrong"&&<p className="text-white/80 text-sm mt-3">✅ {backLabel} : <strong>{back}</strong></p>}
+          {feedback==="correct"&&<p className="text-green-200 text-sm mt-3 font-semibold">✓ Correct !</p>}
+        </div>
+        <p className="text-white/50 text-xs text-center mb-2">→ {backLabel}</p>
+        <div className="flex gap-2">
+          <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&submit()} disabled={!!feedback}
+            placeholder={`Tapez ${backLabel.toLowerCase()}…`}
+            className="flex-1 rounded-2xl px-4 py-4 text-base font-semibold outline-none transition-all"
+            style={{background:"rgba(255,255,255,0.1)",color:"white",border:feedback==="correct"?"2px solid #27AE60":feedback==="wrong"?"2px solid #E74C3C":"2px solid rgba(255,255,255,0.2)"}}/>
+          <button onClick={submit} disabled={!!feedback||!input.trim()}
+            className="px-5 py-4 rounded-2xl text-white font-black transition-all hover:scale-105"
+            style={{background:input.trim()&&!feedback?"#E74C3C":"rgba(255,255,255,0.1)"}}>OK</button>
+        </div>
+        <p className="text-white/30 text-xs text-center mt-3">Entrée pour valider · Accents facultatifs</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── RESULT ───
+function ResultScreen({data, onRetry, onHome}) {
+  const {deck,scores,config,mode,elapsed}=data;
+  const [leitnerAdded, setLeitnerAdded] = useState(null);
+  const newLeitnerCount = useState(()=> mode==='lesson' ? countNewLeitnerCards(deck, config.type) : 0)[0];
+  const known=scores.filter(Boolean).length;
+  const pct=Math.round((known/deck.length)*100);
+  const toReview=deck.filter((_,i)=>!scores[i]);
+  const fmt=s=>s?`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`:null;
+  const emoji=pct>=90?"🏆":pct>=70?"🎉":pct>=50?"👍":"📚";
+  return(
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-3">{emoji}</div>
+          <h2 className="text-white text-5xl font-black">{pct}%</h2>
+          <p className="text-blue-200 text-lg mt-1">{known} / {deck.length} correctes</p>
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+            <span className="text-white/40 text-xs px-2 py-1 rounded-full bg-white/10">{config.type==="dept"?"🗺️ Départements":config.type==="philo"?"🧠 Philosophie":"🌍 Capitales"}</span>
+            <span className="text-white/40 text-xs px-2 py-1 rounded-full bg-white/10">{mode==="lesson"?"Leçon":"Défi"}</span>
+            {elapsed&&<span className="text-white/40 text-xs px-2 py-1 rounded-full bg-white/10 flex items-center gap-1"><Clock size={10}/>{fmt(elapsed)}</span>}
+          </div>
+        </div>
+        {toReview.length>0&&(
+          <div className="bg-white/10 rounded-2xl p-4 mb-5">
+            <p className="text-white font-semibold mb-3 text-sm">À revoir ({toReview.length}) :</p>
+            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+              {toReview.map((d,i)=>(
+                <span key={i} className="bg-red-500/25 text-white text-xs px-3 py-1 rounded-full">
+                  {config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:`${d.pays} → ${d.capitale}`}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="grid gap-3">
+          {mode==='lesson' && (
+            leitnerAdded !== null
+              ? <div className="py-3 rounded-2xl text-center text-white/60 text-sm bg-white/10">✓ {leitnerAdded} carte{leitnerAdded>1?"s":""} ajoutée{leitnerAdded>1?"s":""} à la Boîte de Leitner</div>
+              : newLeitnerCount > 0
+                ? <button onClick={()=>setLeitnerAdded(addCardsToLeitnerStorage(deck,config.type))}
+                    className="py-4 rounded-2xl text-white font-black transition-all hover:scale-105" style={{background:"#2471a3"}}>
+                    📦 Envoyer dans la Boîte de Leitner ({newLeitnerCount} nouvelle{newLeitnerCount>1?"s":""} carte{newLeitnerCount>1?"s":""})
+                  </button>
+                : <div className="py-3 rounded-2xl text-center text-white/30 text-xs bg-white/5">Toutes ces cartes sont déjà dans la Boîte de Leitner</div>
+          )}
+          {toReview.length>0&&(
+            <button onClick={()=>onRetry(toReview)} className="py-4 rounded-2xl text-white font-black transition-all hover:scale-105" style={{background:"#E74C3C"}}>
+              🔄 Retravailler les erreurs ({toReview.length})
+            </button>
+          )}
+          <button onClick={()=>onRetry(null)} className="py-4 rounded-2xl text-white font-black transition-all hover:scale-105" style={{background:mode==="lesson"?"#27AE60":"#C0392B"}}>
+            <RotateCcw size={16} className="inline mr-2"/>Recommencer
+          </button>
+          <button onClick={onHome} className="py-4 rounded-2xl text-white/80 font-bold bg-white/10 hover:bg-white/20 transition-all">← Accueil</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── LEITNER COMPONENT ───
+
+function LeitnerScreen({onBack}) {
+  const [state,setState]=useState(()=>{try{const s=localStorage.getItem("leitner_state");return s?JSON.parse(s):initLeitnerState();}catch{return initLeitnerState();}});
+  const [view,setView]=useState("home");
+  const [sessionDeck,setSessionDeck]=useState([]);
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [animating,setAnimating]=useState(false);
+
+  const save=s=>{setState(s);try{localStorage.setItem("leitner_state",JSON.stringify(s));}catch{}};
+  const startSession=()=>{
+    const due=shuffle(getLeitnerDueCards(state)).map(c=>{
+      const t=c.type||'dept';
+      let _side;
+      if(t==='cap') _side=Math.random()<0.5?"pays-to-cap":"cap-to-pays";
+      else if(t==='philo') _side=Math.random()<0.5?"nom-to-back":"back-to-nom";
+      else _side=Math.random()<0.5?"num-to-nom":"nom-to-num";
+      return{...c,_side};
+    });
+    if(due.length===0){setView("nodues");return;}
+    setSessionDeck(due);setIdx(0);setFlipped(false);setView("session");
+  };
+
+  const handleAnswer=knew=>{
+    const card=sessionDeck[idx];
+    const today=new Date().toISOString().slice(0,10);
+    const newState={...state,cards:{...state.cards}};
+    const cur=newState.cards[card.id]||{box:1,lastReviewedDate:null};
+    newState.cards[card.id]={box:knew?Math.min(cur.box+1,5):Math.max(cur.box-1,1),lastReviewedDate:today};
+    if(idx+1>=sessionDeck.length){newState.session=state.session+1;save(newState);setView("done");return;}
+    save(newState);setAnimating(true);
+    setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{
+      if(view!=="session")return;
+      if(["ArrowUp","ArrowDown"," "].includes(e.key)){e.preventDefault();if(!flipped)setFlipped(true);}
+      if(flipped&&e.key==="ArrowRight")handleAnswer(true);
+      if(flipped&&e.key==="ArrowLeft")handleAnswer(false);
+    };
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[view,flipped,idx]);
+
+  const allLeitnerCards=[...LEITNER_CARDS,...(state.customCards||[])];
+  const boxCounts=LEITNER_BOXES.map(b=>({...b,count:allLeitnerCards.filter(c=>(state.cards[c.id]?.box||1)===b.n).length}));
+  const dueCount=getLeitnerDueCards(state).length;
+  const totalCards=allLeitnerCards.length;
+  const today=new Date().toISOString().slice(0,10);
+  const todayFR=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const nextReviewIn=(()=>{
+    let soonest=null;
+    allLeitnerCards.forEach(c=>{
+      const s=state.cards[c.id];
+      if(!s||!s.lastReviewedDate)return;
+      const box=LEITNER_BOXES.find(b=>b.n===s.box);
+      const diffDays=Math.floor((new Date(today)-new Date(s.lastReviewedDate))/86400000);
+      if(diffDays<box.intervalDays){
+        const left=box.intervalDays-diffDays;
+        if(soonest===null||left<soonest)soonest=left;
+      }
+    });
+    return soonest;
+  })();
+  const nextReviewDate=nextReviewIn!=null?(()=>{const d=new Date();d.setDate(d.getDate()+nextReviewIn);return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});})():null;
+
+  if(view==="home") return(
+    <div className="min-h-screen flex flex-col items-center p-5 pt-8" style={{background:"linear-gradient(160deg,#0d1f35 0%,#1a2a4a 100%)"}}>
+      <div className="w-full max-w-md">
+        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-5">← Accueil</button>
+        <div className="flex items-center gap-3 mb-1"><span style={{fontSize:32}}>📦</span><h1 className="text-white text-2xl font-black">Boîte de Leitner</h1></div>
+        <p className="text-blue-300 text-sm">Session #{state.session} · {totalCards} cartes</p>
+        <div className="flex items-center gap-2 mt-1 mb-4">
+          <span style={{fontSize:13}}>📅</span>
+          <p className="text-white/50 text-xs" style={{textTransform:'capitalize'}}>{todayFR}</p>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-3 mb-4">
+          <div className="grid grid-cols-5 gap-1">
+            {LEITNER_BOXES.map(b=>(
+              <div key={b.n} className="text-center">
+                <div className="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center text-white font-black" style={{background:b.color,fontSize:10}}>{b.n}</div>
+                <p className="text-white/50 text-xs leading-tight">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <p className="text-white/70 text-xs uppercase tracking-widest mb-4">Répartition</p>
+          <div className="flex items-end justify-between gap-2 h-24 mb-2">
+            {boxCounts.map(b=>{const h=Math.max(totalCards>0?(b.count/totalCards)*80:0,b.count>0?6:2);return(
+              <div key={b.n} className="flex-1 flex flex-col items-center gap-1">
+                <span className="text-white font-black text-sm">{b.count}</span>
+                <div className="w-full rounded-t-lg" style={{height:h,background:b.color,opacity:b.count===0?0.2:1}}/>
+              </div>
+            );})}
+          </div>
+          <div className="flex justify-between">{LEITNER_BOXES.map(b=><div key={b.n} className="flex-1 text-center"><p className="text-white/40 text-xs">B{b.n}</p></div>)}</div>
+        </div>
+        <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <p className="text-white/70 text-xs uppercase tracking-widest mb-2">Régions</p>
+          <div className="flex flex-wrap gap-1.5">{LEITNER_REGIONS.map(r=><span key={r} className="text-white text-xs px-2 py-1 rounded-full" style={{background:REGION_COLORS[r]||"#555"}}>{r}</span>)}</div>
+        </div>
+        {dueCount===0&&nextReviewDate&&(
+          <div className="rounded-2xl p-3 mb-3 flex items-center gap-3" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)"}}>
+            <span style={{fontSize:20}}>⏰</span>
+            <div>
+              <p className="text-white/80 text-sm font-bold">Prochaine révision</p>
+              <p className="text-blue-300 text-xs" style={{textTransform:'capitalize'}}>{nextReviewDate} · dans {nextReviewIn} jour{nextReviewIn>1?"s":""}</p>
+            </div>
+          </div>
+        )}
+        <button onClick={startSession} className="w-full py-4 rounded-2xl text-white font-black text-lg mb-3 transition-all hover:scale-105" style={{background:dueCount>0?"#2471a3":"rgba(255,255,255,0.1)"}}>
+          {dueCount>0?`▶ Démarrer (${dueCount} cartes dues)`:"✓ Rien à réviser aujourd'hui"}
+        </button>
+        <button onClick={()=>{if(window.confirm("Remettre toutes les cartes à zéro ?"))save(initLeitnerState());}} className="w-full py-3 rounded-2xl text-white/40 hover:text-white/70 text-sm" style={{background:"rgba(255,255,255,0.04)"}}>
+          🔄 Réinitialiser
+        </button>
+      </div>
+    </div>
+  );
+
+  if(view==="nodues") return(
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0d1f35 0%,#1a2a4a 100%)"}}>
+      <div className="text-center">
+        <div className="text-6xl mb-4">✅</div>
+        <h2 className="text-white text-2xl font-black mb-2">Tout est à jour !</h2>
+        <p className="text-blue-300 mb-8">Aucune carte due pour cette session.</p>
+        <button onClick={()=>setView("home")} className="py-4 px-8 rounded-2xl text-white font-black bg-white/10 hover:bg-white/20 transition-all">← Retour</button>
+      </div>
+    </div>
+  );
+
+  if(view==="session"){
+    const card=sessionDeck[idx];
+    const curBox=state.cards[card.id]?.box||1;
+    const t=card.type||'dept';
+    let front,back,frontLabel,backLabel,color;
+    if(t==='cap'){
+      if(card._side==='pays-to-cap'){front=card.pays;back=card.capitale;frontLabel="Pays";backLabel="Capitale";}
+      else{front=card.capitale;back=card.pays;frontLabel="Capitale";backLabel="Pays";}
+      color=CONTINENT_COLORS[card.continent]||"#2471a3";
+    }else if(t==='philo'){
+      if(card._side==='nom-to-back'){front=card.nom;back=card.definition;frontLabel="Courant";backLabel="Définition";}
+      else{front=card.definition;back=card.nom;frontLabel="Définition";backLabel="Courant";}
+      color="#5b21b6";
+    }else{
+      front=card._side==="num-to-nom"?card.num:card.nom;
+      back=card._side==="num-to-nom"?card.nom:card.num;
+      frontLabel=card._side==="num-to-nom"?"Numéro":"Département";
+      backLabel=card._side==="num-to-nom"?"Département":"Numéro";
+      color=REGION_COLORS[card.region]||"#2471a3";
+    }
+    return(
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:`linear-gradient(135deg,${color}99 0%,#0d1f35 100%)`}}>
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={()=>setView("home")} className="text-white/50 hover:text-white text-sm">← Pause</button>
+            <div className="text-center">
+              <p className="text-white font-bold text-sm">{card.region}</p>
+              <div className="flex items-center justify-center gap-1 mt-0.5">
+                {LEITNER_BOXES.map(b=><div key={b.n} className="w-4 h-4 rounded-full flex items-center justify-center font-black" style={{background:curBox===b.n?b.color:"rgba(255,255,255,0.15)",color:"white",fontSize:8}}>{b.n}</div>)}
+              </div>
+            </div>
+            <span className="text-white/70 font-mono text-sm">{idx+1}/{sessionDeck.length}</span>
+          </div>
+          <div className="h-2 bg-white/20 rounded-full mb-6 overflow-hidden">
+            <div className="h-full bg-white rounded-full transition-all duration-500" style={{width:`${(idx/sessionDeck.length)*100}%`}}/>
+          </div>
+          <div style={{perspective:"1000px"}} onClick={()=>!flipped&&setFlipped(true)}>
+            <div className="relative w-full cursor-pointer select-none transition-all duration-500"
+              style={{transformStyle:"preserve-3d",transform:flipped?"rotateY(180deg)":"rotateY(0)",height:240,opacity:animating?0:1}}>
+              <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 bg-white" style={{backfaceVisibility:"hidden"}}>
+                <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{color}}>{frontLabel}</p>
+                <p className="font-black text-center text-gray-800" style={{fontSize:front.length>25?"1.2rem":front.length>15?"1.8rem":"3.2rem",lineHeight:1.1}}>{front}</p>
+                {!flipped&&<p className="text-gray-400 text-sm mt-6">Cliquer ou ↑↓ pour révéler</p>}
+              </div>
+              <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8" style={{backfaceVisibility:"hidden",transform:"rotateY(180deg)",background:color}}>
+                <p className="text-xs uppercase tracking-widest font-semibold mb-3 text-white/70">{backLabel}</p>
+                <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.2rem":back.length>15?"1.8rem":"3rem",lineHeight:1.1}}>{back}</p>
+                <p className="text-white/50 text-xs mt-2">{card.region}</p>
+              </div>
+            </div>
+          </div>
+          {flipped?(
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              <button onClick={()=>handleAnswer(false)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#E74C3C"}}><XCircle size={20}/> Boîte {Math.max(curBox-1,1)}</button>
+              <button onClick={()=>handleAnswer(true)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#27AE60"}}><CheckCircle size={20}/> Boîte {Math.min(curBox+1,5)}</button>
+            </div>
+          ):(
+            <div className="h-16 flex items-center justify-center"><p className="text-white/30 text-xs">← Descendre | Monter →</p></div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if(view==="done") return(
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0d1f35 0%,#1a2a4a 100%)"}}>
+      <div className="w-full max-w-md text-center">
+        <div className="text-6xl mb-4">🎯</div>
+        <h2 className="text-white text-3xl font-black mb-2">Session terminée !</h2>
+        <p className="text-blue-300 mb-2">{sessionDeck.length} cartes révisées</p>
+        <p className="text-white/40 text-sm mb-8">Session #{state.session-1} complétée</p>
+        <div className="bg-white/10 rounded-2xl p-4 mb-6">
+          <div className="flex items-end justify-between gap-2 h-20 mb-2">
+            {LEITNER_BOXES.map(b=>{const cnt=LEITNER_CARDS.filter(c=>(state.cards[c.id]?.box||1)===b.n).length;const h=Math.max(totalCards>0?(cnt/totalCards)*72:0,cnt>0?6:2);return(
+              <div key={b.n} className="flex-1 flex flex-col items-center gap-1">
+                <span className="text-white font-black text-sm">{cnt}</span>
+                <div className="w-full rounded-t-lg" style={{height:h,background:b.color,opacity:cnt===0?0.2:1}}/>
+              </div>
+            );})}
+          </div>
+          <div className="flex justify-between">{LEITNER_BOXES.map(b=><p key={b.n} className="flex-1 text-center text-white/40 text-xs">B{b.n}</p>)}</div>
+        </div>
+        <button onClick={()=>setView("home")} className="w-full py-4 rounded-2xl text-white font-black bg-white/10 hover:bg-white/20 transition-all">← Retour aux boîtes</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── ROOT ───
+function App() {
+  const [screen,setScreen]=useState("home");
+  const [category,setCategory]=useState(null);
+  const [gameMode,setGameMode]=useState(null);
+  const [playConfig,setPlayConfig]=useState(null);
+  const [resultData,setResultData]=useState(null);
+  const [retryDeck,setRetryDeck]=useState(null);
+
+  const goHome=()=>{setScreen("home");setCategory(null);setGameMode(null);setPlayConfig(null);setResultData(null);setRetryDeck(null);};
+
+  if(screen==="home") return <HomeScreen onSelectMode={c=>{
+    if(c==="leitner"){setScreen("leitner");return;}
+    setCategory(c);setScreen("gamemode");
+  }}/>;
+
+  if(screen==="leitner") return <LeitnerScreen onBack={goHome}/>;
+
+  if(screen==="gamemode") return <GameModeScreen category={category} onSelect={m=>{setGameMode(m);setScreen("setup");}} onBack={goHome}/>;
+
+  if(screen==="setup"){
+    const goBack=()=>setScreen("gamemode");
+    const startPlay=cfg=>{setPlayConfig(cfg);setRetryDeck(null);setScreen("play");};
+    if(category==="departements") return <SetupDept gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
+    if(category==="capitales")    return <SetupCapitales gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
+    if(category==="philo")        return <SetupPhilo gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
+  }
+
+  if(screen==="result") return <ResultScreen data={resultData} onRetry={d=>{setRetryDeck(d);setScreen("play");}} onHome={goHome}/>;
+
+  if(screen==="play"){
+    const k=retryDeck?"retry":"fresh";
+    const cfg=playConfig;
+    // Philo leçon → fiches
+    if(cfg?.type==="philo"&&gameMode==="lesson")
+      return <PhiloFicheScreen key={k} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    // Philo défi → flashcards 2 blocs
+    if(cfg?.type==="philo"&&gameMode==="challenge")
+      return <PhiloDefiScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    // Dept / Cap leçon
+    if(gameMode==="lesson")
+      return <LessonScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    // Dept / Cap défi
+    return <ChallengeScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+  }
+
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
