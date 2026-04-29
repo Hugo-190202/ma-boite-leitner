@@ -41,6 +41,32 @@ function Zap({ size=24, color="currentColor", style, ...p }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...p}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
 }
 
+// ─── SERVICE WORKER & NOTIFICATIONS ───
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+function scheduleNotification() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  navigator.serviceWorker.ready.then(reg => {
+    const next9am = new Date();
+    next9am.setDate(next9am.getDate() + 1);
+    next9am.setHours(9, 0, 0, 0);
+    reg.active?.postMessage({
+      type: 'SCHEDULE',
+      delay: next9am - new Date(),
+      title: '📦 GéoFlash – Révision du jour',
+      body: 'C\'est l\'heure de réviser ta boîte de Leitner !'
+    });
+  });
+}
+async function requestAndScheduleNotifications() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+  scheduleNotification();
+}
+
 // ─── FIREBASE ───
 firebase.initializeApp({
   apiKey: "AIzaSyBKVfRpmF5IrKDAvRJNZkGUqmQNs9zj0Gw",
@@ -1024,7 +1050,7 @@ function LeitnerScreen({onBack}) {
     const newState={...state,cards:{...state.cards}};
     const cur=newState.cards[card.id]||{box:1,lastReviewedDate:null};
     newState.cards[card.id]={box:knew?Math.min(cur.box+1,5):Math.max(cur.box-1,1),lastReviewedDate:today};
-    if(idx+1>=sessionDeck.length){newState.session=state.session+1;save(newState);setView("done");return;}
+    if(idx+1>=sessionDeck.length){newState.session=state.session+1;save(newState);scheduleNotification();setView("done");return;}
     save(newState);setAnimating(true);
     setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
   };
@@ -1240,6 +1266,8 @@ function App() {
     });
     return ()=>unsub();
   },[]);
+
+  useEffect(()=>{ if(user) requestAndScheduleNotifications(); },[user]);
 
   if(authLoading) return <LoadingScreen/>;
   if(!user) return <LoginScreen/>;
