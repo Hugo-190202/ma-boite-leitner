@@ -527,6 +527,9 @@ function initLeitnerState() {
   LEITNER_CARDS.forEach(c => { cards[c.id] = {box:1, lastReviewedDate:null}; });
   return {cards, session:1, customCards:[]};
 }
+function initGuestLeitnerState() {
+  return {cards:{}, session:1, customCards:[]};
+}
 function getLeitnerDueCards(state) {
   const today = new Date().toISOString().slice(0,10);
   const allCards = [...LEITNER_CARDS, ...(state.customCards||[])];
@@ -1528,7 +1531,7 @@ function ResultScreen({data, onRetry, onHome, isGuest}) {
 // ─── LEITNER COMPONENT ───
 
 function LeitnerScreen({onBack,isGuest}) {
-  const [state,setState]=useState(()=>{try{const s=localStorage.getItem("leitner_state");return s?JSON.parse(s):initLeitnerState();}catch{return initLeitnerState();}});
+  const [state,setState]=useState(()=>{if(isGuest)return initGuestLeitnerState();try{const s=localStorage.getItem("leitner_state");return s?JSON.parse(s):initLeitnerState();}catch{return initLeitnerState();}});
   const [view,setView]=useState("home");
   const [sessionDeck,setSessionDeck]=useState([]);
   const [idx,setIdx]=useState(0);
@@ -1604,18 +1607,35 @@ function LeitnerScreen({onBack,isGuest}) {
   // ── Tags dynamiques (régions/continents des cartes actives dans les boîtes) ──
   const activeContentTags=(()=>{
     const activeIds=new Set(Object.entries(state.cards).filter(([,s])=>s.box>0).map(([id])=>id));
-    const types=new Set();
-    allLeitnerCards.forEach(c=>{
-      if(activeIds.has(c.id)) types.add(c.type||'dept');
-    });
-    const TYPE_META={
-      dept:  {label:'Départements',    color:'#1a3a6b'},
-      chef:  {label:'Chefs-lieux',     color:'#0f4c35'},
-      cap:   {label:'Capitales',       color:'#1a3b1a'},
-      philo: {label:'Philosophie',     color:'#5b21b6'},
-      hist:  {label:'Dates historiques',color:'#7d3a00'},
-    };
-    return [...types].sort().map(t=>TYPE_META[t]||{label:t,color:'#555'});
+    const tags=[];
+    const seenLabels=new Set();
+
+    // Départements : tag groupé seulement si toutes les LEITNER_REGIONS sont présentes
+    const activeDeptRegions=new Set(allLeitnerCards.filter(c=>(c.type||'dept')==='dept'&&activeIds.has(c.id)).map(c=>c.region));
+    if(activeDeptRegions.size>0){
+      if(LEITNER_REGIONS.every(r=>activeDeptRegions.has(r))){
+        tags.push({label:'Départements',color:'#1a3a6b'});
+      }else{
+        activeDeptRegions.forEach(r=>{if(!seenLabels.has(r)){seenLabels.add(r);tags.push({label:r,color:REGION_COLORS[r]||'#1a3a6b'});}});
+      }
+    }
+
+    // Chefs-lieux : même logique
+    const activeChefRegions=new Set(allLeitnerCards.filter(c=>c.type==='chef'&&activeIds.has(c.id)).map(c=>c.region));
+    if(activeChefRegions.size>0){
+      if(LEITNER_REGIONS.every(r=>activeChefRegions.has(r))){
+        tags.push({label:'Chefs-lieux',color:'#0f4c35'});
+      }else{
+        activeChefRegions.forEach(r=>{const lbl=r+' – chefs-lieux';if(!seenLabels.has(lbl)){seenLabels.add(lbl);tags.push({label:lbl,color:REGION_COLORS[r]||'#0f4c35'});}});
+      }
+    }
+
+    // Capitales, Philosophie, Dates : toujours un seul tag
+    if(allLeitnerCards.some(c=>c.type==='cap'&&activeIds.has(c.id)))  tags.push({label:'Capitales',       color:'#1a3b1a'});
+    if(allLeitnerCards.some(c=>c.type==='philo'&&activeIds.has(c.id)))tags.push({label:'Philosophie',     color:'#5b21b6'});
+    if(allLeitnerCards.some(c=>c.type==='hist'&&activeIds.has(c.id))) tags.push({label:'Dates historiques',color:'#7d3a00'});
+
+    return tags.sort((a,b)=>a.label.localeCompare(b.label));
   })();
 
   // ── Prochaine révision par boîte (boîtes 1-5 seulement, si des cartes dedans) ──
