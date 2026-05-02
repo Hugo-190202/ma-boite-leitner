@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leitner App</title>
+  <title>GéoFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,7 +16,133 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #060b18;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.45); }
+      50%       { box-shadow: 0 0 0 14px rgba(99,102,241,0); }
+    }
+    @keyframes bgShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes cardPop {
+      0%   { opacity: 0; transform: scale(0.94) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .anim-fadeUp  { animation: fadeUp  0.35s cubic-bezier(.22,.68,0,1.2) both; }
+    .anim-fadeIn  { animation: fadeIn  0.25s ease both; }
+    .anim-cardPop { animation: cardPop 0.3s cubic-bezier(.22,.68,0,1.2) both; }
+
+    /* Stagger helpers */
+    .delay-1 { animation-delay: .06s; }
+    .delay-2 { animation-delay: .12s; }
+    .delay-3 { animation-delay: .18s; }
+    .delay-4 { animation-delay: .24s; }
+    .delay-5 { animation-delay: .30s; }
+
+    /* ── Glassmorphism ── */
+    .glass {
+      background: rgba(255,255,255,0.055);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+    .glass-strong {
+      background: rgba(255,255,255,0.09);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    /* ── Gradient text ── */
+    .grad-text {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Progress bar ── */
+    .progress-fill {
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(.22,.68,0,1.2);
+    }
+    .progress-fill-red {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(.22,.68,0,1.2);
+    }
+    .progress-fill-green {
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(.22,.68,0,1.2);
+    }
+
+    /* ── Buttons ── */
+    .btn-press {
+      transition: transform 130ms ease, box-shadow 130ms ease, opacity 130ms ease;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-press:hover  { transform: translateY(-1px); }
+    .btn-press:active { transform: scale(0.96); }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(255,255,255,0.12);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spinRing 0.8s linear infinite;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+    /* ── Card flip ── */
+    .flip-card-inner {
+      transition: transform 0.55s cubic-bezier(.175,.885,.32,1.275);
+      transform-style: preserve-3d;
+    }
+    .flip-card-inner.flipped { transform: rotateY(180deg); }
+    .flip-card-face {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* ── Checkbox custom ── */
+    .cb-item {
+      transition: background 150ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Mobile safe area ── */
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
   </style>
 </head>
 <body>
@@ -223,8 +352,100 @@ const COURANTS = [
   {nom:"Communisme",definition:"Doctrine politique et économique visant à supprimer la propriété privée des moyens de production pour instaurer une société sans classes où les biens sont partagés selon les besoins de chacun.",auteurs:"Marx, Engels, Lénine, Rosa Luxemburg",periode:"XIXe–XXe s.",tags:["politique","économie"]},
   {nom:"Libertarisme",definition:"Philosophie politique affirmant la souveraineté absolue de l'individu sur sa personne et ses biens. Toute contrainte étatique non consentie est illégitime ; seul le marché libre s'impose.",auteurs:"Nozick, Murray Rothbard, Hayek",periode:"XXe s.",tags:["politique","liberté"]},
   {nom:"Réalisme",definition:"Position affirmant que le monde extérieur existe indépendamment de notre perception ou de notre pensée. S'oppose à l'idéalisme.",auteurs:"Aristote, Thomas d'Aquin, Hilary Putnam, John Searle",periode:"Antiquité – présent",tags:["métaphysique","ontologie"]},
-  {nom:"Phénoménologie",definition:"Méthode philosophique qui part de la description rigoureuse des phénomènes tels qu'ils apparaissent à la conscience, en suspendant les présupposés théoriques pour revenir aux choses mêmes.",auteurs:"Husserl, Heidegger, Merleau-Ponty, Sartre",periode:"XXe s.",tags:["conscience","méthode"]},
 ];
+
+// ─── DATES HISTORIQUES ───
+const DATES_HISTORIQUES = [
+  // Antiquité
+  {id:"hist_-753",date:"-753",evenement:"Fondation légendaire de Rome par Romulus",periode:"Antiquité"},
+  {id:"hist_-509",date:"-509",evenement:"Naissance de la République romaine",periode:"Antiquité"},
+  {id:"hist_-338",date:"-338",evenement:"Philippe II de Macédoine domine la Grèce (bataille de Chéronée)",periode:"Antiquité"},
+  {id:"hist_-52",date:"-52",evenement:"Défaite de Vercingétorix à Alésia face à César",periode:"Antiquité"},
+  {id:"hist_476",date:"476",evenement:"Chute de l'Empire romain d'Occident",periode:"Antiquité"},
+  // Moyen Âge
+  {id:"hist_732",date:"732",evenement:"Bataille de Poitiers : Charles Martel repousse les Arabes",periode:"Moyen Âge"},
+  {id:"hist_800",date:"800",evenement:"Couronnement de Charlemagne à Rome",periode:"Moyen Âge"},
+  {id:"hist_987",date:"987",evenement:"Avènement d'Hugues Capet, fondateur de la dynastie capétienne",periode:"Moyen Âge"},
+  {id:"hist_1066",date:"1066",evenement:"Guillaume le Conquérant envahit l'Angleterre (bataille de Hastings)",periode:"Moyen Âge"},
+  {id:"hist_1096",date:"1096",evenement:"Première croisade lancée par le pape Urbain II",periode:"Moyen Âge"},
+  {id:"hist_1215",date:"1215",evenement:"Magna Carta signée en Angleterre",periode:"Moyen Âge"},
+  {id:"hist_1348",date:"1348",evenement:"La Peste noire ravage l'Europe",periode:"Moyen Âge"},
+  {id:"hist_1431",date:"1431",evenement:"Jeanne d'Arc brûlée vive à Rouen",periode:"Moyen Âge"},
+  {id:"hist_1453a",date:"1453",evenement:"Prise de Constantinople par les Ottomans (fin de l'Empire byzantin)",periode:"Moyen Âge"},
+  {id:"hist_1453b",date:"1453",evenement:"Fin de la guerre de Cent Ans",periode:"Moyen Âge"},
+  // Renaissance & Réforme
+  {id:"hist_1492",date:"1492",evenement:"Christophe Colomb découvre l'Amérique",periode:"Renaissance & Réforme"},
+  {id:"hist_1498",date:"1498",evenement:"Vasco de Gama atteint les Indes par le cap de Bonne-Espérance",periode:"Renaissance & Réforme"},
+  {id:"hist_1517",date:"1517",evenement:"Luther affiche ses 95 thèses — début de la Réforme protestante",periode:"Renaissance & Réforme"},
+  {id:"hist_1572",date:"1572",evenement:"Massacre de la Saint-Barthélemy (guerre de Religion en France)",periode:"Renaissance & Réforme"},
+  {id:"hist_1598",date:"1598",evenement:"Édit de Nantes — Henri IV accorde la liberté de culte aux protestants",periode:"Renaissance & Réforme"},
+  // Ancien Régime
+  {id:"hist_1618",date:"1618",evenement:"Début de la guerre de Trente Ans",periode:"Ancien Régime"},
+  {id:"hist_1643",date:"1643",evenement:"Début du règne personnel de Louis XIV (le Roi-Soleil)",periode:"Ancien Régime"},
+  {id:"hist_1648",date:"1648",evenement:"Traités de Westphalie — fin de la guerre de Trente Ans",periode:"Ancien Régime"},
+  {id:"hist_1685",date:"1685",evenement:"Révocation de l'Édit de Nantes par Louis XIV",periode:"Ancien Régime"},
+  {id:"hist_1715",date:"1715",evenement:"Mort de Louis XIV après 72 ans de règne",periode:"Ancien Régime"},
+  // Révolution & Empire
+  {id:"hist_1789",date:"1789",evenement:"Révolution française — prise de la Bastille (14 juillet)",periode:"Révolution & Empire"},
+  {id:"hist_1792",date:"1792",evenement:"Proclamation de la Première République française",periode:"Révolution & Empire"},
+  {id:"hist_1793",date:"1793",evenement:"Exécution de Louis XVI à la guillotine",periode:"Révolution & Empire"},
+  {id:"hist_1799",date:"1799",evenement:"Coup d'État du 18 Brumaire — Bonaparte prend le pouvoir",periode:"Révolution & Empire"},
+  {id:"hist_1804",date:"1804",evenement:"Sacre de Napoléon Ier à Notre-Dame de Paris",periode:"Révolution & Empire"},
+  {id:"hist_1815",date:"1815",evenement:"Défaite de Waterloo — fin des Cent-Jours et chute de Napoléon",periode:"Révolution & Empire"},
+  // XIXe siècle
+  {id:"hist_1830",date:"1830",evenement:"Révolution de Juillet en France — abdication de Charles X",periode:"XIXe siècle"},
+  {id:"hist_1848a",date:"1848",evenement:"Révolution de Février — proclamation de la IIe République en France",periode:"XIXe siècle"},
+  {id:"hist_1848b",date:"1848",evenement:"Abolition définitive de l'esclavage dans les colonies françaises",periode:"XIXe siècle"},
+  {id:"hist_1871",date:"1871",evenement:"Commune de Paris et proclamation de la IIIe République",periode:"XIXe siècle"},
+  {id:"hist_1894",date:"1894",evenement:"Début de l'affaire Dreyfus",periode:"XIXe siècle"},
+  // Première Guerre mondiale
+  {id:"hist_1914",date:"1914",evenement:"Assassinat de François-Ferdinand à Sarajevo — début de la Première Guerre mondiale",periode:"Première Guerre mondiale"},
+  {id:"hist_1916",date:"1916",evenement:"Bataille de Verdun (la plus longue bataille de la Grande Guerre)",periode:"Première Guerre mondiale"},
+  {id:"hist_1917",date:"1917",evenement:"Révolution russe et entrée des États-Unis dans la guerre",periode:"Première Guerre mondiale"},
+  {id:"hist_1918",date:"1918",evenement:"Armistice du 11 novembre — fin de la Première Guerre mondiale",periode:"Première Guerre mondiale"},
+  {id:"hist_1919",date:"1919",evenement:"Traité de Versailles — paix officielle après la Grande Guerre",periode:"Première Guerre mondiale"},
+  // Entre-deux-guerres
+  {id:"hist_1929",date:"1929",evenement:"Krach de Wall Street — début de la Grande Dépression",periode:"Entre-deux-guerres"},
+  {id:"hist_1933",date:"1933",evenement:"Hitler nommé chancelier d'Allemagne",periode:"Entre-deux-guerres"},
+  {id:"hist_1936",date:"1936",evenement:"Victoire du Front populaire en France (Léon Blum)",periode:"Entre-deux-guerres"},
+  // Seconde Guerre mondiale
+  {id:"hist_1939",date:"1939",evenement:"Invasion de la Pologne par l'Allemagne — début de la Seconde Guerre mondiale",periode:"Seconde Guerre mondiale"},
+  {id:"hist_1940",date:"1940",evenement:"Appel du 18 Juin de De Gaulle et armistice franco-allemand",periode:"Seconde Guerre mondiale"},
+  {id:"hist_1941",date:"1941",evenement:"Attaque de Pearl Harbor — entrée des États-Unis dans la guerre",periode:"Seconde Guerre mondiale"},
+  {id:"hist_1944",date:"1944",evenement:"Débarquement allié en Normandie (D-Day, 6 juin)",periode:"Seconde Guerre mondiale"},
+  {id:"hist_1945",date:"1945",evenement:"Fin de la Seconde Guerre mondiale — bombes atomiques sur Hiroshima et Nagasaki",periode:"Seconde Guerre mondiale"},
+  // France contemporaine
+  {id:"hist_1946",date:"1946",evenement:"Proclamation de la IVe République en France",periode:"France contemporaine"},
+  {id:"hist_1954",date:"1954",evenement:"Défaite de Diên Biên Phu et début de la guerre d'Algérie",periode:"France contemporaine"},
+  {id:"hist_1957",date:"1957",evenement:"Signature du Traité de Rome — création de la CEE",periode:"France contemporaine"},
+  {id:"hist_1958",date:"1958",evenement:"Retour de De Gaulle et naissance de la Ve République",periode:"France contemporaine"},
+  {id:"hist_1962",date:"1962",evenement:"Indépendance de l'Algérie — accords d'Évian",periode:"France contemporaine"},
+  {id:"hist_1968",date:"1968",evenement:"Mai 68 — grèves générales et mouvement étudiant en France",periode:"France contemporaine"},
+  {id:"hist_1981",date:"1981",evenement:"Élection de François Mitterrand — première alternance de la Ve République",periode:"France contemporaine"},
+  {id:"hist_2002",date:"2002",evenement:"Passage à l'euro en France et dans la zone euro",periode:"France contemporaine"},
+  // Monde contemporain
+  {id:"hist_1947",date:"1947",evenement:"Plan Marshall — aide américaine à la reconstruction de l'Europe",periode:"Monde contemporain"},
+  {id:"hist_1948",date:"1948",evenement:"Déclaration universelle des droits de l'homme et création d'Israël",periode:"Monde contemporain"},
+  {id:"hist_1961",date:"1961",evenement:"Construction du mur de Berlin",periode:"Monde contemporain"},
+  {id:"hist_1962b",date:"1962",evenement:"Crise des missiles de Cuba",periode:"Monde contemporain"},
+  {id:"hist_1969",date:"1969",evenement:"Premier homme sur la Lune (Apollo 11 — Neil Armstrong)",periode:"Monde contemporain"},
+  {id:"hist_1989",date:"1989",evenement:"Chute du mur de Berlin",periode:"Monde contemporain"},
+  {id:"hist_1991",date:"1991",evenement:"Dissolution de l'URSS",periode:"Monde contemporain"},
+  {id:"hist_2001",date:"2001",evenement:"Attentats du 11 septembre aux États-Unis",periode:"Monde contemporain"},
+];
+const PERIODES_HIST = [...new Set(DATES_HISTORIQUES.map(d => d.periode))];
+const PHILO_GROUPES = {
+  "Antiquité":      ["Cynisme","Épicurisme","Matérialisme","Platonisme","Pyrrhonisme","Réalisme","Scepticisme","Stoïcisme"],
+  "Renaissance":    ["Humanisme"],
+  "Époque moderne": ["Empirisme","Idéalisme","Libéralisme","Les Lumières","Mécanisme","Rationalisme"],
+  "XIXe–XXe s.":   ["Anarchisme","Communisme","Existentialisme","Féminisme","Marxisme","Positivisme","Socialisme","Utilitarisme","Vitalisme"],
+  "XXe s.":         ["Libertarisme","Phénoménologie","Structuralisme"],
+};
+const PERIODES_PHILO = Object.keys(PHILO_GROUPES);
+const PHILO_ERA_COLORS = {
+  "Antiquité":"#7d5a00","Renaissance":"#5a3a10","Époque moderne":"#1a4a5a",
+  "XIXe–XXe s.":"#5a1a4a","XXe s.":"#1a3a5a",
+};
 
 // ─── CONSTANTES ───
 const REGION_COLORS = {
@@ -235,6 +456,12 @@ const REGION_COLORS = {
 };
 const CONTINENT_COLORS = {
   "Europe":"#2471a3","Afrique":"#1e8449","Amériques":"#a93226","Asie":"#b7770d","Océanie":"#6c3483",
+};
+const PERIODE_COLORS = {
+  "Antiquité":"#7d5a00","Moyen Âge":"#4a3f7a","Renaissance & Réforme":"#6b4e12",
+  "Ancien Régime":"#7a3a00","Révolution & Empire":"#8a1a00","XIXe siècle":"#1a5c3a",
+  "Première Guerre mondiale":"#5a5500","Entre-deux-guerres":"#4a2a6a",
+  "Seconde Guerre mondiale":"#6a2000","France contemporaine":"#1a4a6a","Monde contemporain":"#1a2a6a",
 };
 const REGIONS_LIST = [...new Set(DEPARTEMENTS.map(d => d.region))];
 const CONTINENTS = [...new Set(CAPITALES_RAW.map(c => c.continent))];
@@ -261,6 +488,10 @@ function getCapCardFrontBack(card) {
   if (card.dir==="pays-to-cap") return {front:card.pays,     back:card.capitale, frontLabel:"Pays",     backLabel:"Capitale"};
   return                               {front:card.capitale, back:card.pays,     frontLabel:"Capitale", backLabel:"Pays"};
 }
+function getHistCardFrontBack(card) {
+  if (card.dir==="date-to-evt") return {front:card.date, back:card.evenement, frontLabel:"Date", backLabel:"Événement"};
+  return                               {front:card.evenement, back:card.date, frontLabel:"Événement", backLabel:"Date"};
+}
 function resolveDeptDirs(subject, dir) {
   if (subject==="num-nom") { if (dir==="mixed") return ["num-to-nom","nom-to-num"]; return [dir]; }
   if (subject==="chef")    { if (dir==="mixed") return ["nom-to-chef","chef-to-nom","num-to-chef"]; return [dir]; }
@@ -272,9 +503,11 @@ const DEPT_DIRS_NUM_NOM = [{id:"num-to-nom",label:"N° → Nom",icon:"🔢"},{id
 const DEPT_DIRS_CHEF = [{id:"nom-to-chef",label:"Nom → Chef-lieu",icon:"🗺️"},{id:"chef-to-nom",label:"Chef-lieu → Nom",icon:"🏛️"},{id:"num-to-chef",label:"N° → Chef-lieu",icon:"🔢"},{id:"mixed",label:"Mixte",icon:"🔀"}];
 const PHILO_DIRS = [{id:"nom-to-back",label:"Nom → Déf. + Auteurs",icon:"🧠"},{id:"back-to-nom",label:"Déf. + Auteurs → Nom",icon:"📖"}];
 const CAP_DIRS = [{id:"pays-to-cap",label:"Pays → Capitale",icon:"🌍"},{id:"cap-to-pays",label:"Capitale → Pays",icon:"🏙️"},{id:"mixed",label:"Mixte",icon:"🔀"}];
+const HIST_DIRS = [{id:"date-to-evt",label:"Date → Événement",icon:"📅"},{id:"evt-to-date",label:"Événement → Date",icon:"🔢"},{id:"mixed",label:"Mixte",icon:"🔀"}];
 const MAIN_MODES = [
-  {id:"departements",label:"Départements français",icon:"🗺️",color:"#1a3a6b"},
-  {id:"capitales",   label:"Capitales du monde",   icon:"🌍",color:"#1a3b1a"},
+  {id:"departements",label:"Départements français",  icon:"🗺️",color:"#1a3a6b"},
+  {id:"capitales",   label:"Capitales du monde",     icon:"🌍",color:"#1a3b1a"},
+  {id:"dates",       label:"Dates historiques",      icon:"📅",color:"#3d1a00"},
   {id:"philo",       label:"Courants philosophiques",icon:"🧠",color:"#2d1a4a"},
 ];
 
@@ -282,6 +515,7 @@ const MAIN_MODES = [
 const LEITNER_REGIONS = ["Bretagne","Corse","Grand Est","Hauts-de-France","Île-de-France","Normandie","Provence-Alpes-Côte d'Azur"];
 const LEITNER_CARDS = DEPARTEMENTS.filter(d => LEITNER_REGIONS.includes(d.region)).map(d => ({id:d.num, num:d.num, nom:d.nom, region:d.region}));
 const LEITNER_BOXES = [
+  {n:0,color:"#7f8c8d",desc:"Nouvelles cartes",intervalDays:1},
   {n:1,color:"#c0392b",desc:"Tous les jours",intervalDays:1},
   {n:2,color:"#e67e22",desc:"Tous les 3 jours",intervalDays:3},
   {n:3,color:"#f1c40f",desc:"Toutes les semaines",intervalDays:7},
@@ -298,7 +532,9 @@ function getLeitnerDueCards(state) {
   const allCards = [...LEITNER_CARDS, ...(state.customCards||[])];
   return allCards.filter(c => {
     const s = state.cards[c.id];
-    if (!s || !s.lastReviewedDate) return true;
+    if (!s) return true;
+    if (s.box === 0) return false;
+    if (!s.lastReviewedDate) return true;
     const box = LEITNER_BOXES.find(b => b.n===s.box);
     const diffDays = Math.floor((new Date(today)-new Date(s.lastReviewedDate))/86400000);
     return diffDays >= box.intervalDays;
@@ -319,6 +555,10 @@ function addCardsToLeitnerStorage(deck, configType) {
       id = card.num;
       if (!defaultIds.has(id) && !existingCustomIds.has(id))
         customCard = {id, type:'dept', num:card.num, nom:card.nom, region:card.region};
+    } else if (configType==='chef') {
+      id = 'chef_'+card.num;
+      if (!existingCustomIds.has(id))
+        customCard = {id, type:'chef', num:card.num, nom:card.nom, chef:card.chef, region:card.region};
     } else if (configType==='cap') {
       id = 'cap_'+card.pays;
       if (!existingCustomIds.has(id))
@@ -327,9 +567,14 @@ function addCardsToLeitnerStorage(deck, configType) {
       id = 'philo_'+card.nom;
       if (!existingCustomIds.has(id))
         customCard = {id, type:'philo', nom:card.nom, definition:card.definition, auteurs:card.auteurs};
+    } else if (configType==='hist') {
+      id = card.id;
+      if (!existingCustomIds.has(id))
+        customCard = {id, type:'hist', date:card.date, evenement:card.evenement, periode:card.periode};
     }
     if (id && !seen.has(id) && !newState.cards[id]) {
-      seen.add(id); newState.cards[id] = {box:1, lastReviewedDate:null};
+      const today = new Date().toISOString().slice(0,10);
+      seen.add(id); newState.cards[id] = {box:0, lastReviewedDate:today};
       if (customCard) newState.customCards.push(customCard);
       added++;
     }
@@ -347,8 +592,10 @@ function countNewLeitnerCards(deck, configType) {
   deck.forEach(card => {
     let id;
     if (configType==='dept') id = card.num;
+    else if (configType==='chef') id = 'chef_'+card.num;
     else if (configType==='cap') id = 'cap_'+card.pays;
     else if (configType==='philo') id = 'philo_'+card.nom;
+    else if (configType==='hist') id = card.id;
     if (id && !seen.has(id) && !state.cards[id]) { seen.add(id); count++; }
   });
   return count;
@@ -357,69 +604,139 @@ function countNewLeitnerCards(deck, configType) {
 // ─── LOADING / LOGIN ───
 function LoadingScreen() {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
-      <div className="text-center">
-        <div className="text-5xl mb-4">⏳</div>
-        <p className="text-white text-lg">Chargement...</p>
+    <div className="min-h-screen flex items-center justify-center" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="text-center anim-fadeIn">
+        <div className="spinner mx-auto mb-5" style={{animation:"spinRing 0.8s linear infinite"}}/>
+        <p className="text-white/50 text-sm font-medium tracking-wide">Chargement…</p>
       </div>
     </div>
   );
 }
-function LoginScreen() {
+function LoginScreen({onGuestLogin}) {
   const signIn=()=>{
     const provider=new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider).catch(e=>alert("Erreur connexion : "+e.message));
   };
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
-      <div className="text-center mb-10">
-        <div className="text-6xl mb-4">🌐</div>
-        <h1 className="text-white text-4xl font-black">GéoFlash</h1>
-        <p className="text-blue-300 mt-3 max-w-xs">Connecte-toi pour synchroniser tes révisions sur tous tes appareils</p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 60%,#0f1f45 100%)"}}>
+      {/* Orbs décoratifs */}
+      <div style={{position:'absolute',top:'15%',left:'10%',width:280,height:280,borderRadius:'50%',background:'radial-gradient(circle,rgba(99,102,241,0.18) 0%,transparent 70%)',filter:'blur(40px)',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',bottom:'20%',right:'8%',width:220,height:220,borderRadius:'50%',background:'radial-gradient(circle,rgba(139,92,246,0.15) 0%,transparent 70%)',filter:'blur(40px)',pointerEvents:'none'}}/>
+
+      <div className="relative z-10 w-full max-w-sm">
+        {/* Logo */}
+        <div className="text-center mb-10 anim-fadeUp">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-5" style={{background:'linear-gradient(135deg,#4f46e5,#7c3aed)',boxShadow:'0 20px 60px rgba(79,70,229,0.4)'}}>
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <h1 className="text-white text-4xl font-black tracking-tight">GéoFlash</h1>
+          <p className="text-white/45 mt-2 text-sm font-medium">Apprends la géographie en t'amusant</p>
+        </div>
+
+        {/* Card connexion */}
+        <div className="glass-strong rounded-3xl p-7 anim-fadeUp delay-1">
+          <p className="text-white/70 text-sm font-medium text-center mb-5 leading-relaxed">
+            Connecte-toi pour synchroniser tes révisions<br/>sur tous tes appareils
+          </p>
+          <button onClick={signIn} className="btn-press w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-semibold text-gray-800 text-sm"
+            style={{background:'white',boxShadow:'0 4px 24px rgba(0,0,0,0.25)'}}>
+            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continuer avec Google
+          </button>
+
+          {/* Séparateur */}
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px" style={{background:'rgba(255,255,255,0.1)'}}/>
+            <span className="text-white/30 text-xs font-medium">ou</span>
+            <div className="flex-1 h-px" style={{background:'rgba(255,255,255,0.1)'}}/>
+          </div>
+
+          {/* Bouton invité */}
+          <button onClick={onGuestLogin} className="btn-press w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-2xl font-semibold text-white/60 text-sm"
+            style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',cursor:'pointer'}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Continuer en invité
+          </button>
+          <p className="text-white/25 text-xs text-center mt-3 leading-relaxed">
+            La progression ne sera pas sauvegardée en mode invité
+          </p>
+        </div>
       </div>
-      <button onClick={signIn} className="flex items-center gap-3 bg-white text-gray-800 font-bold py-4 px-8 rounded-2xl hover:scale-105 transition-all shadow-xl">
-        <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Se connecter avec Google
-      </button>
     </div>
   );
 }
 
 // ─── HOME ───
-function HomeScreen({onSelectMode, user}) {
+const HOME_ICONS = {
+  leitner: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>,
+  departements: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>,
+  capitales: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+  dates: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  philo: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+};
+const HOME_CARD_STYLES = {
+  leitner:     {from:'#1e3a5f', to:'#2563eb', accent:'rgba(59,130,246,0.3)',  sub:'Révision espacée intelligente'},
+  departements:{from:'#1a2e5a', to:'#1d4ed8', accent:'rgba(29,78,216,0.3)',   sub:'Numéros, noms & chefs-lieux'},
+  capitales:   {from:'#14432a', to:'#047857', accent:'rgba(4,120,87,0.3)',    sub:'Pays et capitales du monde'},
+  dates:       {from:'#3d1f00', to:'#c2410c', accent:'rgba(194,65,12,0.3)',   sub:'Évènements & dates clés'},
+  philo:       {from:'#2d1a50', to:'#6d28d9', accent:'rgba(109,40,217,0.3)',  sub:'Courants & auteurs majeurs'},
+};
+
+function HomeScreen({onSelectMode, user, isGuest, onSignIn}) {
+  const allItems = [{id:'leitner',label:'Boîte de Leitner'}, ...MAIN_MODES];
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)",position:'relative'}}>
-      <div style={{position:'absolute',top:16,right:16,display:'flex',alignItems:'center',gap:10}}>
-        {user?.photoURL&&<img src={user.photoURL} style={{width:30,height:30,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.25)'}} alt=""/>}
-        <button onClick={()=>auth.signOut()} className="text-white/40 hover:text-white/70 text-xs transition-all">Déconnexion</button>
-      </div>
-      <div className="text-center mb-8">
-        <div className="text-6xl mb-4">🌐</div>
-        <h1 className="text-white text-4xl font-black">GéoFlash</h1>
-        <p className="text-blue-300 mt-2">Apprends la géographie en t'amusant</p>
-      </div>
-      <div className="w-full max-w-sm grid gap-4">
-        <button onClick={()=>onSelectMode("leitner")}
-          className="rounded-3xl p-5 text-left hover:scale-105 active:scale-95 transition-all shadow-xl"
-          style={{background:"linear-gradient(135deg,#1a3a5c,#2471a3)"}}>
-          <div className="flex items-center gap-4">
-            <span style={{fontSize:32}}>📦</span>
-            <div><h2 className="text-white text-lg font-black">Boîte de Leitner</h2><p className="text-blue-200 text-sm">Révision espacée intelligente</p></div>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 60%,#0f1f45 100%)",position:'relative'}}>
+      {/* Orbs */}
+      <div style={{position:'absolute',top:'5%',left:'5%',width:300,height:300,borderRadius:'50%',background:'radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%)',filter:'blur(50px)',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',bottom:'10%',right:'5%',width:250,height:250,borderRadius:'50%',background:'radial-gradient(circle,rgba(16,185,129,0.10) 0%,transparent 70%)',filter:'blur(50px)',pointerEvents:'none'}}/>
+
+      <div className="relative z-10 flex flex-col flex-1 items-center px-5 pt-12 pb-8" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        {/* Header */}
+        <div className="w-full flex items-center justify-between mb-10 anim-fadeIn">
+          <div>
+            <h1 className="text-white font-black text-3xl tracking-tight">GéoFlash</h1>
+            <p className="text-white/40 text-xs font-medium mt-0.5">Apprends en t'amusant</p>
           </div>
-        </button>
-        {MAIN_MODES.map(m=>(
-          <button key={m.id} onClick={()=>onSelectMode(m.id)}
-            className="rounded-3xl p-5 text-left hover:scale-105 active:scale-95 transition-all shadow-xl"
-            style={{background:`linear-gradient(135deg,${m.color}dd,${m.color})`}}>
-            <div className="flex items-center gap-4">
-              <span style={{fontSize:32}}>{m.icon}</span>
-              <div>
-                <h2 className="text-white text-lg font-black">{m.label}</h2>
-                <p className="text-white/60 text-sm">{m.id==="departements"?"Numéros, noms et chefs-lieux":m.id==="capitales"?"Pays et capitales du monde":"Définitions & auteurs clés"}</p>
-              </div>
-            </div>
-          </button>
-        ))}
+          <div className="flex items-center gap-2">
+            {isGuest
+              ? <button onClick={onSignIn} className="btn-press glass rounded-xl px-3 py-1.5 flex items-center gap-1.5 transition-all hover:bg-white/10" style={{cursor:'pointer'}}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                  <span className="text-white/65 text-xs font-medium">Se connecter</span>
+                </button>
+              : <>
+                  {user?.photoURL && <img src={user.photoURL} style={{width:34,height:34,borderRadius:'50%',border:'1.5px solid rgba(255,255,255,0.2)'}} alt="" aria-hidden="true"/>}
+                  <button onClick={()=>auth.signOut()} className="glass rounded-xl px-3 py-1.5 text-white/45 hover:text-white/80 text-xs font-medium transition-all" style={{cursor:'pointer'}}>
+                    Déco
+                  </button>
+                </>
+            }
+          </div>
+        </div>
+
+        {/* Cards */}
+        <div className="w-full flex flex-col gap-3">
+          {allItems.map((m, i) => {
+            const s = HOME_CARD_STYLES[m.id] || HOME_CARD_STYLES.capitales;
+            return (
+              <button key={m.id} onClick={()=>onSelectMode(m.id)}
+                className={`btn-press w-full rounded-2xl p-4 text-left anim-cardPop delay-${Math.min(i+1,5)}`}
+                style={{background:`linear-gradient(135deg,${s.from},${s.to})`,boxShadow:`0 8px 32px ${s.accent}`}}>
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl" style={{background:'rgba(255,255,255,0.12)'}}>
+                    <span className="text-white">{HOME_ICONS[m.id]}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-white font-bold text-base leading-tight">{m.label}</h2>
+                    <p className="text-white/55 text-xs mt-0.5 font-medium">{s.sub}</p>
+                  </div>
+                  <svg className="ml-auto flex-shrink-0 opacity-40" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -428,33 +745,44 @@ function HomeScreen({onSelectMode, user}) {
 // ─── GAME MODE SELECT ───
 function GameModeScreen({category, onSelect, onBack}) {
   const isPhilo = category==="philo";
-  const bg = isPhilo ? "linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)" : "linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)";
+  const catInfo = MAIN_MODES.find(m=>m.id===category);
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:bg}}>
-      <div className="w-full max-w-sm">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">← Accueil</button>
-        <h1 className="text-white text-3xl font-black mb-1">{MAIN_MODES.find(m=>m.id===category)?.icon} {MAIN_MODES.find(m=>m.id===category)?.label}</h1>
-        <p className="text-white/50 mb-8">Choisis ton mode de jeu</p>
-        <div className="grid gap-4">
-          <button onClick={()=>onSelect("lesson")}
-            className="rounded-3xl p-6 text-left hover:scale-105 transition-all shadow-xl"
-            style={{background:"linear-gradient(135deg,#1a6b3c,#27AE60)"}}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 60%,#0f1f45 100%)"}}>
+      <div style={{position:'absolute',top:'20%',left:'50%',transform:'translateX(-50%)',width:320,height:200,borderRadius:'50%',background:'radial-gradient(circle,rgba(99,102,241,0.13) 0%,transparent 70%)',filter:'blur(40px)',pointerEvents:'none'}}/>
+      <div className="relative z-10 w-full" style={{maxWidth:400}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/45 hover:text-white text-sm font-medium mb-8 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Accueil
+        </button>
+
+        <div className="anim-fadeUp mb-8">
+          <h1 className="text-white text-2xl font-black tracking-tight">{catInfo?.label}</h1>
+          <p className="text-white/40 text-sm mt-1 font-medium">Choisis ton mode de jeu</p>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <button onClick={()=>onSelect("lesson")} className="btn-press rounded-2xl p-5 text-left anim-cardPop delay-1"
+            style={{background:'linear-gradient(135deg,#064e3b,#059669)',boxShadow:'0 8px 32px rgba(5,150,105,0.25)'}}>
             <div className="flex items-center gap-4">
-              <div className="bg-white/20 rounded-2xl p-3"><BookOpen size={28} className="text-white"/></div>
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl" style={{background:'rgba(255,255,255,0.15)'}}>
+                <BookOpen size={24} color="white"/>
+              </div>
               <div>
-                <h2 className="text-white text-xl font-black">Mode Leçon</h2>
-                <p className="text-green-200 text-sm">{isPhilo?"Fiches de révision complètes":"Apprends à ton rythme"}</p>
+                <h2 className="text-white font-bold text-lg leading-tight">Mode Leçon</h2>
+                <p className="text-emerald-200/80 text-sm mt-0.5">{isPhilo?"Fiches de révision complètes":"Flashcards à retourner"}</p>
               </div>
             </div>
           </button>
-          <button onClick={()=>onSelect("challenge")}
-            className="rounded-3xl p-6 text-left hover:scale-105 transition-all shadow-xl"
-            style={{background:isPhilo?"linear-gradient(135deg,#2d1a4a,#7c3aed)":"linear-gradient(135deg,#7b1a1a,#E74C3C)"}}>
+
+          <button onClick={()=>onSelect("challenge")} className="btn-press rounded-2xl p-5 text-left anim-cardPop delay-2"
+            style={{background:isPhilo?'linear-gradient(135deg,#3b0764,#7c3aed)':'linear-gradient(135deg,#7f1d1d,#dc2626)',boxShadow:isPhilo?'0 8px 32px rgba(124,58,237,0.25)':'0 8px 32px rgba(220,38,38,0.25)'}}>
             <div className="flex items-center gap-4">
-              <div className="bg-white/20 rounded-2xl p-3"><Zap size={28} className="text-white"/></div>
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl" style={{background:'rgba(255,255,255,0.15)'}}>
+                <Zap size={24} color="white"/>
+              </div>
               <div>
-                <h2 className="text-white text-xl font-black">Mode Défi</h2>
-                <p className="text-white/70 text-sm">{isPhilo?"Flashcards nom ↔ définition + auteurs":"Contre la montre"}</p>
+                <h2 className="text-white font-bold text-lg leading-tight">Mode Défi</h2>
+                <p className="text-white/60 text-sm mt-0.5">{isPhilo?"Flashcards nom ↔ définition":"Saisie chronométrée"}</p>
               </div>
             </div>
           </button>
@@ -464,71 +792,96 @@ function GameModeScreen({category, onSelect, onBack}) {
   );
 }
 
+// ─── HELPERS SETUP UI ───
+function SetupSection({title, badge, children}) {
+  return (
+    <div className="glass rounded-2xl p-4 mb-3">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">{title}</p>
+        {badge && <span className="text-white/40 text-xs font-medium bg-white/8 px-2 py-0.5 rounded-full">{badge}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+function CheckItem({label, count, color, checked, onClick, last}) {
+  return (
+    <button onClick={onClick} className="cb-item w-full flex items-center gap-3 px-3 py-2.5 text-left"
+      style={{background:checked?(color||'#4f46e5'):'transparent',borderBottom:last?'none':'1px solid rgba(255,255,255,0.06)'}}>
+      <div className="flex-shrink-0 flex items-center justify-center" style={{width:18,height:18,borderRadius:4,background:checked?'rgba(255,255,255,0.9)':'transparent',border:checked?'none':'1.5px solid rgba(255,255,255,0.28)'}}>
+        {checked && <svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4.5l3 3 6-7" stroke={color||'#4f46e5'} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+      </div>
+      <span className="text-white text-sm font-medium flex-1">{label}</span>
+      {count !== undefined && <span className="text-white/35 text-xs tabular-nums">{count}</span>}
+    </button>
+  );
+}
+function ToggleBtn({label, active, accent, onClick}) {
+  return (
+    <button onClick={onClick} className="btn-press py-3 px-2 rounded-xl text-white text-xs font-semibold transition-all text-center leading-tight"
+      style={{background:active?accent:'rgba(255,255,255,0.07)',border:active?`1.5px solid rgba(255,255,255,0.35)`:'1.5px solid transparent'}}>
+      {label}
+    </button>
+  );
+}
+
 // ─── SETUP DÉPARTEMENTS ───
 function SetupDept({gameMode, onStart, onBack}) {
   const [selRegions,setSelRegions]=useState([]);
   const [subject,setSubject]=useState("num-nom");
   const [dir,setDir]=useState("num-to-nom");
-  const accent = gameMode==="lesson"?"#27AE60":"#E74C3C";
+  const accent = gameMode==="lesson"?"#059669":"#dc2626";
   const totalDeps = selRegions.reduce((s,r)=>s+DEPARTEMENTS.filter(d=>d.region===r).length,0);
   const dirs = subject==="chef" ? DEPT_DIRS_CHEF : DEPT_DIRS_NUM_NOM;
   const handleSubject = s => { setSubject(s); setDir(s==="chef"?"nom-to-chef":"num-to-nom"); };
   const toggle = r => setSelRegions(p=>p.includes(r)?p.filter(x=>x!==r):[...p,r]);
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 pt-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
-      <div className="w-full max-w-md">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-4">← Retour</button>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="rounded-2xl p-2" style={{background:accent}}>{gameMode==="lesson"?<BookOpen size={20} className="text-white"/>:<Zap size={20} className="text-white"/>}</div>
-          <h1 className="text-white text-2xl font-black">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:accent}}>
+            {gameMode==="lesson"?<BookOpen size={18} color="white"/>:<Zap size={18} color="white"/>}
+          </div>
+          <div>
+            <h1 className="text-white font-black text-xl">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+            <p className="text-white/40 text-xs font-medium">Départements français</p>
+          </div>
         </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-white/70 text-xs uppercase tracking-widest">Régions</p>
-            {selRegions.length>0&&<p className="text-white/50 text-xs">{selRegions.length} rég. · {totalDeps} dép.</p>}
+
+        <SetupSection title="Régions" badge={selRegions.length>0?`${selRegions.length} rég · ${totalDeps} dép.`:null}>
+          <div className="rounded-xl overflow-hidden border border-white/10 max-h-52 overflow-y-auto">
+            {REGIONS_LIST.map((r,i)=>(
+              <CheckItem key={r} label={r} count={DEPARTEMENTS.filter(d=>d.region===r).length} color={REGION_COLORS[r]} checked={selRegions.includes(r)} onClick={()=>toggle(r)} last={i===REGIONS_LIST.length-1}/>
+            ))}
           </div>
-          <div className="rounded-xl overflow-hidden border border-white/20 max-h-48 overflow-y-auto">
-            {REGIONS_LIST.map((r,i)=>{
-              const sel=selRegions.includes(r); const count=DEPARTEMENTS.filter(d=>d.region===r).length;
-              return(<button key={r} onClick={()=>toggle(r)} className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all"
-                style={{background:sel?(REGION_COLORS[r]||"#555"):i%2===0?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)",borderBottom:i<REGIONS_LIST.length-1?"1px solid rgba(255,255,255,0.08)":"none"}}>
-                <div style={{width:16,height:16,borderRadius:4,flexShrink:0,background:sel?"rgba(255,255,255,0.9)":"transparent",border:sel?"none":"1.5px solid rgba(255,255,255,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  {sel&&<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke={REGION_COLORS[r]||"#555"} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </div>
-                <span className="text-white text-sm font-medium flex-1">{r}</span>
-                <span className="text-white/40 text-xs">{count}</span>
-              </button>);
-            })}
-          </div>
-          <button onClick={()=>setSelRegions([...REGIONS_LIST])} className="w-full mt-2 py-2 rounded-xl text-white/70 hover:text-white text-xs font-semibold" style={{background:"rgba(255,255,255,0.06)"}}>
-            {selRegions.length===REGIONS_LIST.length?"✓ Toute la France":"🗺️ Toute la France"} ({DEPARTEMENTS.length})
+          <button onClick={()=>setSelRegions([...REGIONS_LIST])} className="btn-press w-full mt-2 py-2.5 rounded-xl text-white/60 hover:text-white text-xs font-semibold" style={{background:'rgba(255,255,255,0.06)',cursor:'pointer'}}>
+            {selRegions.length===REGIONS_LIST.length?"✓ France entière sélectionnée":"Sélectionner toute la France"} ({DEPARTEMENTS.length})
           </button>
-        </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-3">
-          <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Catégorie</p>
+        </SetupSection>
+
+        <SetupSection title="Catégorie">
           <div className="grid grid-cols-2 gap-2">
-            {DEPT_SUBJECTS.map(({id,label,icon})=>(
-              <button key={id} onClick={()=>handleSubject(id)} className="py-3 rounded-xl text-white text-sm font-semibold transition-all"
-                style={{background:subject===id?accent:"rgba(255,255,255,0.06)",border:subject===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
-                {icon} {label}
-              </button>
+            {DEPT_SUBJECTS.map(({id,label})=>(
+              <ToggleBtn key={id} label={label} active={subject===id} accent={accent} onClick={()=>handleSubject(id)}/>
             ))}
           </div>
-        </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-4">
-          <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Sens</p>
-          <div className={`grid gap-2 grid-cols-${Math.min(dirs.length,3)}`}>
-            {dirs.map(({id,label,icon})=>(
-              <button key={id} onClick={()=>setDir(id)} className="py-3 rounded-xl text-white text-sm font-semibold transition-all"
-                style={{background:dir===id?accent:"rgba(255,255,255,0.06)",border:dir===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
-                {icon} {label}
-              </button>
+        </SetupSection>
+
+        <SetupSection title="Sens">
+          <div className={`grid gap-2`} style={{gridTemplateColumns:`repeat(${Math.min(dirs.length,3)},1fr)`}}>
+            {dirs.map(({id,label})=>(
+              <ToggleBtn key={id} label={label} active={dir===id} accent={accent} onClick={()=>setDir(id)}/>
             ))}
           </div>
-        </div>
+        </SetupSection>
+
         <button onClick={()=>selRegions.length&&onStart({type:"dept",regions:selRegions,subject,dir})} disabled={!selRegions.length}
-          className="w-full py-4 rounded-2xl text-white font-black text-lg transition-all"
-          style={{background:selRegions.length?accent:"rgba(255,255,255,0.1)",opacity:selRegions.length?1:0.4}}>
+          className="btn-press w-full py-4 rounded-2xl text-white font-bold text-base mb-4"
+          style={{background:selRegions.length?accent:'rgba(255,255,255,0.07)',opacity:selRegions.length?1:0.4,cursor:selRegions.length?'pointer':'not-allowed',boxShadow:selRegions.length?`0 8px 24px ${accent}55`:'none'}}>
           {gameMode==="lesson"?"Commencer →":"Lancer le défi →"}
         </button>
       </div>
@@ -540,53 +893,101 @@ function SetupDept({gameMode, onStart, onBack}) {
 function SetupCapitales({gameMode, onStart, onBack}) {
   const [selConts,setSelConts]=useState([]);
   const [dir,setDir]=useState("pays-to-cap");
-  const accent = gameMode==="lesson"?"#27AE60":"#E74C3C";
+  const accent = gameMode==="lesson"?"#059669":"#dc2626";
   const totalPays = selConts.reduce((s,c)=>s+CAPITALES_RAW.filter(x=>x.continent===c).length,0);
   const toggle = c => setSelConts(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 pt-6" style={{background:"linear-gradient(160deg,#0f2010 0%,#0f2f1a 100%)"}}>
-      <div className="w-full max-w-md">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-4">← Retour</button>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="rounded-2xl p-2" style={{background:accent}}>{gameMode==="lesson"?<BookOpen size={20} className="text-white"/>:<Zap size={20} className="text-white"/>}</div>
-          <h1 className="text-white text-2xl font-black">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"} · Capitales</h1>
-        </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-white/70 text-xs uppercase tracking-widest">Continents</p>
-            {selConts.length>0&&<p className="text-white/50 text-xs">{selConts.length} cont. · {totalPays} pays</p>}
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:accent}}>
+            {gameMode==="lesson"?<BookOpen size={18} color="white"/>:<Zap size={18} color="white"/>}
           </div>
-          <div className="rounded-xl overflow-hidden border border-white/20">
-            {CONTINENTS.map((c,i)=>{
-              const sel=selConts.includes(c); const count=CAPITALES_RAW.filter(x=>x.continent===c).length; const col=CONTINENT_COLORS[c]||"#555";
-              return(<button key={c} onClick={()=>toggle(c)} className="w-full flex items-center gap-3 px-3 py-3 text-left transition-all"
-                style={{background:sel?col:i%2===0?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)",borderBottom:i<CONTINENTS.length-1?"1px solid rgba(255,255,255,0.08)":"none"}}>
-                <div style={{width:16,height:16,borderRadius:4,flexShrink:0,background:sel?"rgba(255,255,255,0.9)":"transparent",border:sel?"none":"1.5px solid rgba(255,255,255,0.35)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  {sel&&<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke={col} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </div>
-                <span className="text-white text-sm font-medium flex-1">{c}</span>
-                <span className="text-white/40 text-xs">{count} pays</span>
-              </button>);
-            })}
+          <div>
+            <h1 className="text-white font-black text-xl">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+            <p className="text-white/40 text-xs font-medium">Capitales du monde</p>
           </div>
-          <button onClick={()=>setSelConts([...CONTINENTS])} className="w-full mt-2 py-2 rounded-xl text-white/70 hover:text-white text-xs font-semibold" style={{background:"rgba(255,255,255,0.06)"}}>
-            {selConts.length===CONTINENTS.length?"✓ Monde entier":"🌍 Monde entier"} ({CAPITALES_RAW.length})
-          </button>
         </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-4">
-          <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Sens</p>
-          <div className="grid grid-cols-3 gap-2">
-            {CAP_DIRS.map(({id,label,icon})=>(
-              <button key={id} onClick={()=>setDir(id)} className="py-3 rounded-xl text-white text-sm font-semibold transition-all"
-                style={{background:dir===id?accent:"rgba(255,255,255,0.06)",border:dir===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
-                {icon} {label}
-              </button>
+
+        <SetupSection title="Continents" badge={selConts.length>0?`${selConts.length} cont · ${totalPays} pays`:null}>
+          <div className="rounded-xl overflow-hidden border border-white/10">
+            {CONTINENTS.map((c,i)=>(
+              <CheckItem key={c} label={c} count={CAPITALES_RAW.filter(x=>x.continent===c).length+" pays"} color={CONTINENT_COLORS[c]} checked={selConts.includes(c)} onClick={()=>toggle(c)} last={i===CONTINENTS.length-1}/>
             ))}
           </div>
-        </div>
+          <button onClick={()=>setSelConts([...CONTINENTS])} className="btn-press w-full mt-2 py-2.5 rounded-xl text-white/60 hover:text-white text-xs font-semibold" style={{background:'rgba(255,255,255,0.06)',cursor:'pointer'}}>
+            {selConts.length===CONTINENTS.length?"✓ Monde entier sélectionné":"Sélectionner le monde entier"} ({CAPITALES_RAW.length})
+          </button>
+        </SetupSection>
+
+        <SetupSection title="Sens">
+          <div className="grid grid-cols-3 gap-2">
+            {CAP_DIRS.map(({id,label})=>(
+              <ToggleBtn key={id} label={label} active={dir===id} accent={accent} onClick={()=>setDir(id)}/>
+            ))}
+          </div>
+        </SetupSection>
+
         <button onClick={()=>selConts.length&&onStart({type:"cap",continents:selConts,dir})} disabled={!selConts.length}
-          className="w-full py-4 rounded-2xl text-white font-black text-lg transition-all"
-          style={{background:selConts.length?accent:"rgba(255,255,255,0.1)",opacity:selConts.length?1:0.4}}>
+          className="btn-press w-full py-4 rounded-2xl text-white font-bold text-base mb-4"
+          style={{background:selConts.length?accent:'rgba(255,255,255,0.07)',opacity:selConts.length?1:0.4,cursor:selConts.length?'pointer':'not-allowed',boxShadow:selConts.length?`0 8px 24px ${accent}55`:'none'}}>
+          {gameMode==="lesson"?"Commencer →":"Lancer le défi →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SETUP DATES HISTORIQUES ───
+function SetupDates({gameMode, onStart, onBack}) {
+  const [selPeriodes,setSelPeriodes]=useState([]);
+  const [dir,setDir]=useState("date-to-evt");
+  const accent = gameMode==="lesson"?"#059669":"#dc2626";
+  const totalDates = selPeriodes.reduce((s,p)=>s+DATES_HISTORIQUES.filter(d=>d.periode===p).length,0);
+  const toggle = p => setSelPeriodes(prev=>prev.includes(p)?prev.filter(x=>x!==p):[...prev,p]);
+  return (
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:accent}}>
+            {gameMode==="lesson"?<BookOpen size={18} color="white"/>:<Zap size={18} color="white"/>}
+          </div>
+          <div>
+            <h1 className="text-white font-black text-xl">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+            <p className="text-white/40 text-xs font-medium">Dates historiques</p>
+          </div>
+        </div>
+
+        <SetupSection title="Périodes" badge={selPeriodes.length>0?`${selPeriodes.length} pér · ${totalDates} dates`:null}>
+          <div className="rounded-xl overflow-hidden border border-white/10 max-h-64 overflow-y-auto">
+            {PERIODES_HIST.map((p,i)=>(
+              <CheckItem key={p} label={p} count={DATES_HISTORIQUES.filter(d=>d.periode===p).length+" dates"} color={PERIODE_COLORS[p]} checked={selPeriodes.includes(p)} onClick={()=>toggle(p)} last={i===PERIODES_HIST.length-1}/>
+            ))}
+          </div>
+          <button onClick={()=>setSelPeriodes([...PERIODES_HIST])} className="btn-press w-full mt-2 py-2.5 rounded-xl text-white/60 hover:text-white text-xs font-semibold" style={{background:'rgba(255,255,255,0.06)',cursor:'pointer'}}>
+            {selPeriodes.length===PERIODES_HIST.length?"✓ Toutes les périodes":"Sélectionner toutes les périodes"} ({DATES_HISTORIQUES.length})
+          </button>
+        </SetupSection>
+
+        <SetupSection title="Sens">
+          <div className="grid grid-cols-3 gap-2">
+            {HIST_DIRS.map(({id,label})=>(
+              <ToggleBtn key={id} label={label} active={dir===id} accent={accent} onClick={()=>setDir(id)}/>
+            ))}
+          </div>
+        </SetupSection>
+
+        <button onClick={()=>selPeriodes.length&&onStart({type:"hist",periodes:selPeriodes,dir})} disabled={!selPeriodes.length}
+          className="btn-press w-full py-4 rounded-2xl text-white font-bold text-base mb-4"
+          style={{background:selPeriodes.length?accent:'rgba(255,255,255,0.07)',opacity:selPeriodes.length?1:0.4,cursor:selPeriodes.length?'pointer':'not-allowed',boxShadow:selPeriodes.length?`0 8px 24px ${accent}55`:'none'}}>
           {gameMode==="lesson"?"Commencer →":"Lancer le défi →"}
         </button>
       </div>
@@ -596,46 +997,65 @@ function SetupCapitales({gameMode, onStart, onBack}) {
 
 // ─── SETUP PHILO ───
 function SetupPhilo({gameMode, onStart, onBack}) {
+  const [selGroupes,setSelGroupes]=useState([]);
   const [dir,setDir]=useState("nom-to-back");
-  const accent = gameMode==="lesson"?"#27AE60":"#7c3aed";
+  const accent = gameMode==="lesson"?"#059669":"#7c3aed";
+  const totalCourants = selGroupes.reduce((s,g)=>s+(PHILO_GROUPES[g]?.length||0),0);
+  const toggle = g => setSelGroupes(prev=>prev.includes(g)?prev.filter(x=>x!==g):[...prev,g]);
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 pt-6" style={{background:"linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)"}}>
-      <div className="w-full max-w-md">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-4">← Retour</button>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="rounded-2xl p-2" style={{background:accent}}>{gameMode==="lesson"?<BookOpen size={20} className="text-white"/>:<Zap size={20} className="text-white"/>}</div>
-          <h1 className="text-white text-2xl font-black">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"} · Philosophie</h1>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:accent}}>
+            {gameMode==="lesson"?<BookOpen size={18} color="white"/>:<Zap size={18} color="white"/>}
+          </div>
+          <div>
+            <h1 className="text-white font-black text-xl">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+            <p className="text-white/40 text-xs font-medium">Courants philosophiques</p>
+          </div>
         </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-4">
-          <p className="text-white font-semibold">{COURANTS.length} courants philosophiques</p>
-          <p className="text-white/50 text-xs mt-1">De l'Antiquité au XXe siècle</p>
-        </div>
+
+        <SetupSection title="Périodes philosophiques" badge={selGroupes.length>0?`${selGroupes.length} pér · ${totalCourants} courants`:null}>
+          <div className="rounded-xl overflow-hidden border border-white/10">
+            {PERIODES_PHILO.map((g,i)=>{
+              const count=PHILO_GROUPES[g].length;
+              return(<CheckItem key={g} label={g} count={count+" courants"} color={PHILO_ERA_COLORS[g]} checked={selGroupes.includes(g)} onClick={()=>toggle(g)} last={i===PERIODES_PHILO.length-1}/>);
+            })}
+          </div>
+          <button onClick={()=>setSelGroupes([...PERIODES_PHILO])} className="btn-press w-full mt-2 py-2.5 rounded-xl text-white/60 hover:text-white text-xs font-semibold" style={{background:'rgba(255,255,255,0.06)',cursor:'pointer'}}>
+            {selGroupes.length===PERIODES_PHILO.length?"✓ Toutes les périodes":"Sélectionner toutes les périodes"} ({COURANTS.length})
+          </button>
+        </SetupSection>
+
         {gameMode==="challenge" && (
-          <div className="bg-white/10 rounded-2xl p-4 mb-4">
-            <p className="text-white/70 text-xs uppercase tracking-widest mb-3">Mode de révision</p>
-            <div className="grid gap-2">
-              {PHILO_DIRS.map(({id,label,icon})=>(
-                <button key={id} onClick={()=>setDir(id)} className="py-3 px-4 rounded-xl text-white text-sm font-semibold text-left transition-all"
-                  style={{background:dir===id?accent:"rgba(255,255,255,0.06)",border:dir===id?"2px solid rgba(255,255,255,0.4)":"2px solid transparent"}}>
-                  {icon} {label}
-                </button>
+          <SetupSection title="Sens">
+            <div className="flex flex-col gap-2">
+              {PHILO_DIRS.map(({id,label})=>(
+                <ToggleBtn key={id} label={label} active={dir===id} accent={accent} onClick={()=>setDir(id)}/>
               ))}
             </div>
-          </div>
+          </SetupSection>
         )}
-        <button onClick={()=>onStart({type:"philo",dir,gameMode})}
-          className="w-full py-4 rounded-2xl text-white font-black text-lg transition-all hover:scale-105"
-          style={{background:accent}}>
+
+        <button onClick={()=>selGroupes.length&&onStart({type:"philo",dir,groupes:selGroupes})} disabled={!selGroupes.length}
+          className="btn-press w-full py-4 rounded-2xl text-white font-bold text-base mb-4"
+          style={{background:selGroupes.length?accent:'rgba(255,255,255,0.07)',opacity:selGroupes.length?1:0.4,cursor:selGroupes.length?'pointer':'not-allowed',boxShadow:selGroupes.length?`0 8px 24px ${accent}55`:'none'}}>
           {gameMode==="lesson"?"Commencer les fiches →":"Lancer le défi →"}
         </button>
       </div>
     </div>
   );
 }
-
 // ─── PHILO FICHE (mode leçon) ───
-function PhiloFicheScreen({onBack, onEnd}) {
-  const [deck]=useState(()=>shuffle(COURANTS));
+function PhiloFicheScreen({config, onBack, onEnd}) {
+  const [deck]=useState(()=>{
+    const noms=new Set((config?.groupes||PERIODES_PHILO).flatMap(g=>PHILO_GROUPES[g]||[]));
+    return shuffle(COURANTS.filter(c=>noms.has(c.nom)));
+  });
   const [idx,setIdx]=useState(0);
   const [animating,setAnimating]=useState(false);
   const card=deck[idx];
@@ -643,7 +1063,7 @@ function PhiloFicheScreen({onBack, onEnd}) {
   const go = (delta) => {
     const next = idx+delta;
     if (next<0) return;
-    if (next>=deck.length) { onEnd({deck, config:{type:'philo'}, mode:'lesson'}); return; }
+    if (next>=deck.length) { onEnd({deck, config:{type:'philo',...(config||{})}, mode:'lesson'}); return; }
     setAnimating(true);
     setTimeout(()=>{setIdx(next);setTimeout(()=>setAnimating(false),50);},180);
   };
@@ -654,49 +1074,59 @@ function PhiloFicheScreen({onBack, onEnd}) {
   },[idx]);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)"}}>
-      <div className="flex items-center justify-between px-5 pt-6 pb-3">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Retour</button>
-        <span className="text-white/70 font-mono text-sm">{idx+1} / {deck.length}</span>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#12073a 100%)"}}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-6 pb-2" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1} / {deck.length}</span>
       </div>
-      <div className="px-5 mb-4">
-        <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
-          <div className="h-full bg-purple-400 rounded-full transition-all duration-500" style={{width:`${((idx+1)/deck.length)*100}%`}}/>
+      {/* Progress */}
+      <div className="px-5 mb-3" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="h-1 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+          <div className="progress-fill h-full" style={{width:`${((idx+1)/deck.length)*100}%`,background:'linear-gradient(90deg,#7c3aed,#a78bfa)'}}/>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{opacity:animating?0:1,transition:"opacity 0.15s"}}>
-        <div className="max-w-md mx-auto flex flex-col gap-3">
-          <div className="rounded-2xl p-5" style={{background:"#5b21b6"}}>
-            <p className="text-purple-300 text-xs uppercase tracking-widest mb-1">Courant philosophique</p>
-            <h2 className="text-white font-black text-3xl">{card.nom}</h2>
-            <p className="text-purple-300 text-sm mt-1">🕰️ {card.periode}</p>
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {card.tags.map(t=><span key={t} className="text-xs px-2.5 py-1 rounded-full bg-white/20 text-white/80">{t}</span>)}
+      {/* Cards */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{opacity:animating?0:1,transition:"opacity 0.18s ease",maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="flex flex-col gap-3">
+          {/* Courant card */}
+          <div className="rounded-2xl p-5" style={{background:'linear-gradient(135deg,#4c1d95,#6d28d9)',boxShadow:'0 8px 32px rgba(109,40,217,0.35)'}}>
+            <p className="text-purple-300 text-xs font-semibold uppercase tracking-widest mb-2">Courant</p>
+            <h2 className="text-white font-black text-3xl tracking-tight leading-tight">{card.nom}</h2>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className="text-purple-300/80 text-xs font-medium">{card.periode}</span>
+              {card.tags.map(t=><span key={t} className="text-xs px-2 py-0.5 rounded-full font-medium" style={{background:'rgba(255,255,255,0.15)',color:'rgba(255,255,255,0.8)'}}>{t}</span>)}
             </div>
           </div>
-          <div className="rounded-2xl p-5 bg-white">
-            <p className="text-xs uppercase tracking-widest font-bold mb-2 text-purple-600">📖 Définition</p>
-            <p className="text-gray-800 text-sm leading-relaxed">{card.definition}</p>
+          {/* Definition card */}
+          <div className="glass-strong rounded-2xl p-5">
+            <p className="text-purple-400 text-xs font-semibold uppercase tracking-widest mb-2">Définition</p>
+            <p className="text-white/90 text-sm leading-relaxed">{card.definition}</p>
           </div>
-          <div className="rounded-2xl p-5" style={{background:"rgba(255,255,255,0.1)"}}>
-            <p className="text-xs uppercase tracking-widest font-bold mb-3 text-purple-300">✍️ Auteurs clés</p>
+          {/* Authors card */}
+          <div className="glass rounded-2xl p-5">
+            <p className="text-purple-300 text-xs font-semibold uppercase tracking-widest mb-3">Auteurs clés</p>
             <div className="flex flex-wrap gap-2">
-              {card.auteurs.split(", ").map(a=><span key={a} className="bg-white/15 text-white text-sm px-3 py-1.5 rounded-full font-medium">{a}</span>)}
+              {card.auteurs.split(", ").map(a=>(
+                <span key={a} className="text-white text-xs px-3 py-1.5 rounded-full font-medium" style={{background:'rgba(139,92,246,0.25)',border:'1px solid rgba(139,92,246,0.3)'}}>{a}</span>
+              ))}
             </div>
           </div>
         </div>
       </div>
-      <div className="px-4 pb-6 pt-2">
-        <div className="max-w-md mx-auto grid grid-cols-2 gap-3">
-          <button onClick={()=>go(-1)} disabled={idx===0}
-            className="py-4 rounded-2xl text-white font-bold transition-all"
-            style={{background:idx===0?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.18)",opacity:idx===0?0.4:1}}>
+      {/* Navigation */}
+      <div className="px-4 pb-6 pt-3 safe-bottom" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="grid grid-cols-2 gap-3">
+          <button onClick={()=>go(-1)} disabled={idx===0} className="btn-press py-4 rounded-2xl text-white font-semibold text-sm transition-all"
+            style={{background:'rgba(255,255,255,0.08)',opacity:idx===0?0.35:1,cursor:idx===0?'not-allowed':'pointer'}}>
             ← Précédent
           </button>
-          <button onClick={()=>go(1)}
-            className="py-4 rounded-2xl text-white font-bold hover:scale-105 transition-all"
-            style={{background:"#5b21b6"}}>
-            {idx+1>=deck.length?"Terminé ✓":"Suivant →"}
+          <button onClick={()=>go(1)} className="btn-press py-4 rounded-2xl text-white font-bold text-sm"
+            style={{background:'linear-gradient(135deg,#4c1d95,#6d28d9)',boxShadow:'0 4px 20px rgba(109,40,217,0.4)',cursor:'pointer'}}>
+            {idx+1>=deck.length?"Terminer ✓":"Suivant →"}
           </button>
         </div>
       </div>
@@ -705,8 +1135,12 @@ function PhiloFicheScreen({onBack, onEnd}) {
 }
 
 // ─── PHILO DÉFI (flashcard 2 blocs) ───
-function PhiloDefiScreen({config, onBack, onEnd}) {
-  const [deck]=useState(()=>shuffle(COURANTS).map(c=>({...c,dir:config.dir==="mixed"?["nom-to-back","back-to-nom"][Math.floor(Math.random()*2)]:config.dir})));
+function PhiloDefiScreen({config, onBack, onEnd, retryDeck}) {
+  const [deck]=useState(()=>{
+    if(retryDeck) return shuffle([...retryDeck]);
+    const noms=new Set((config?.groupes||PERIODES_PHILO).flatMap(g=>PHILO_GROUPES[g]||[]));
+    return shuffle(COURANTS.filter(c=>noms.has(c.nom))).map(c=>({...c,dir:config.dir==="mixed"?["nom-to-back","back-to-nom"][Math.floor(Math.random()*2)]:config.dir}));
+  });
   const [idx,setIdx]=useState(0);
   const [flipped,setFlipped]=useState(false);
   const [scores,setScores]=useState([]);
@@ -731,67 +1165,74 @@ function PhiloDefiScreen({config, onBack, onEnd}) {
   },[flipped,idx,scores]);
 
   return(
-    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#1a0d2e 0%,#2d1a4a 100%)"}}>
-      <div className="flex items-center justify-between px-5 pt-6 pb-3">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Config</button>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#12073a 100%)"}}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-2" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Config
+        </button>
         <div className="flex items-center gap-3">
-          <span className="text-green-400 font-bold text-sm flex items-center gap-1"><CheckCircle size={14}/>{scores.filter(Boolean).length}</span>
-          <span className="text-red-400 font-bold text-sm flex items-center gap-1"><XCircle size={14}/>{scores.filter(x=>!x).length}</span>
+          <span className="flex items-center gap-1 text-xs font-semibold" style={{color:'#4ade80'}}><CheckCircle size={13}/>{scores.filter(Boolean).length}</span>
+          <span className="flex items-center gap-1 text-xs font-semibold" style={{color:'#f87171'}}><XCircle size={13}/>{scores.filter(x=>!x).length}</span>
         </div>
-        <span className="text-white/70 font-mono text-sm">{idx+1}/{deck.length}</span>
+        <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{deck.length}</span>
       </div>
-      <div className="px-5 mb-4">
-        <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
-          <div className="h-full bg-purple-400 rounded-full transition-all duration-500" style={{width:`${(idx/deck.length)*100}%`}}/>
+      {/* Progress */}
+      <div className="px-5 mb-3" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="h-1 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+          <div className="h-full" style={{width:`${(idx/deck.length)*100}%`,background:'linear-gradient(90deg,#7c3aed,#a78bfa)',borderRadius:999,transition:'width 0.4s ease'}}/>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col px-4 pb-6 gap-3 overflow-y-auto" style={{opacity:animating?0:1,transition:"opacity 0.15s"}}>
-        {/* Bloc question */}
-        <div className="rounded-2xl p-5 shadow-lg" style={{background:flipped?"rgba(255,255,255,0.06)":"white"}}>
-          <p className="text-xs uppercase tracking-widest font-bold mb-2" style={{color:flipped?"rgba(255,255,255,0.35)":"#7c3aed"}}>
+      <div className="flex-1 flex flex-col px-4 pb-4 gap-3 overflow-y-auto" style={{opacity:animating?0:1,transition:"opacity 0.15s",maxWidth:480,margin:'0 auto',width:'100%'}}>
+        {/* Question block */}
+        <div className="rounded-2xl p-5" style={{background:flipped?'rgba(255,255,255,0.06)':'white',border:flipped?'1px solid rgba(255,255,255,0.10)':'none',transition:'background 0.2s'}}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{color:flipped?'rgba(255,255,255,0.3)':'#7c3aed'}}>
             {isNomFront?"Courant":"Définition & Auteurs"}
           </p>
           {isNomFront
-            ? <p className="font-black text-3xl" style={{color:flipped?"rgba(255,255,255,0.4)":"#1a0d2e"}}>{card.nom}</p>
+            ? <p className="font-black text-3xl tracking-tight" style={{color:flipped?'rgba(255,255,255,0.4)':'#1a0d2e'}}>{card.nom}</p>
             : <div>
-                <p className="text-sm leading-relaxed mb-2" style={{color:flipped?"rgba(255,255,255,0.4)":"#1a2a4a"}}>{card.definition}</p>
-                <p className="text-xs italic" style={{color:flipped?"rgba(255,255,255,0.3)":"#6b7280"}}>✍️ {card.auteurs}</p>
+                <p className="text-sm leading-relaxed mb-2" style={{color:flipped?'rgba(255,255,255,0.45)':'#1a2a4a'}}>{card.definition}</p>
+                <p className="text-xs" style={{color:flipped?'rgba(255,255,255,0.3)':'#6b7280',fontStyle:'italic'}}>{card.auteurs}</p>
               </div>
           }
         </div>
 
-        {/* Bouton révéler ou réponse */}
+        {/* Reveal / Answer */}
         {!flipped
-          ? <button onClick={()=>setFlipped(true)}
-              className="rounded-2xl p-4 text-center border-2 border-dashed border-white/25 transition-all hover:bg-white/5"
-              style={{background:"rgba(255,255,255,0.03)"}}>
-              <p className="text-white/60 text-sm">👆 Appuyer pour révéler</p>
-              <p className="text-white/30 text-xs mt-1">{isNomFront?"Définition & auteurs":"Nom du courant"}</p>
+          ? <button onClick={()=>setFlipped(true)} className="btn-press rounded-2xl p-5 text-center" style={{background:'rgba(255,255,255,0.04)',border:'1.5px dashed rgba(255,255,255,0.18)',cursor:'pointer'}}>
+              <p className="text-white/55 text-sm font-medium">Toucher pour révéler</p>
+              <p className="text-white/25 text-xs mt-1">{isNomFront?"Définition & auteurs":"Nom du courant"}</p>
             </button>
-          : <div className="rounded-2xl p-5 shadow-lg" style={{background:"#5b21b6"}}>
-              <p className="text-xs uppercase tracking-widest font-bold mb-3 text-purple-300">
+          : <div className="rounded-2xl p-5" style={{background:'linear-gradient(135deg,#4c1d95,#6d28d9)',boxShadow:'0 8px 24px rgba(109,40,217,0.3)'}}>
+              <p className="text-purple-300 text-xs font-semibold uppercase tracking-widest mb-3">
                 {isNomFront?"Définition & Auteurs":"Courant"}
               </p>
               {isNomFront
                 ? <div>
                     <p className="text-white text-sm leading-relaxed mb-3">{card.definition}</p>
-                    <div className="border-t border-white/20 pt-3">
-                      <p className="text-purple-300 text-xs uppercase tracking-widest mb-1">Auteurs clés</p>
-                      <p className="text-white text-sm font-semibold">{card.auteurs}</p>
+                    <div style={{borderTop:'1px solid rgba(255,255,255,0.18)',paddingTop:12}}>
+                      <p className="text-purple-300 text-xs font-semibold uppercase tracking-widest mb-1.5">Auteurs</p>
+                      <p className="text-white text-sm font-medium">{card.auteurs}</p>
                     </div>
-                    {card.periode&&<p className="text-purple-300 text-xs mt-2">🕰️ {card.periode}</p>}
+                    {card.periode&&<p className="text-purple-300/70 text-xs mt-2 font-medium">{card.periode}</p>}
                   </div>
-                : <p className="text-white font-black text-3xl">{card.nom}</p>
+                : <p className="text-white font-black text-3xl tracking-tight">{card.nom}</p>
               }
             </div>
         }
 
-        {/* Boutons réponse */}
+        {/* Answer buttons */}
         {flipped&&(
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={()=>next(false)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#dc2626"}}><XCircle size={18}/> À revoir</button>
-            <button onClick={()=>next(true)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#16a34a"}}><CheckCircle size={18}/> Je savais !</button>
+          <div className="grid grid-cols-2 gap-3 mt-1">
+            <button onClick={()=>next(false)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm" style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',cursor:'pointer'}}>
+              <XCircle size={16}/> À revoir
+            </button>
+            <button onClick={()=>next(true)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm" style={{background:'linear-gradient(135deg,#064e3b,#059669)',cursor:'pointer'}}>
+              <CheckCircle size={16}/> Je savais !
+            </button>
           </div>
         )}
       </div>
@@ -800,14 +1241,19 @@ function PhiloDefiScreen({config, onBack, onEnd}) {
 }
 
 // ─── LESSON (dept + cap) ───
-function LessonScreen({config, onBack, onEnd}) {
+function LessonScreen({config, onBack, onEnd, retryDeck}) {
   const [deck]=useState(()=>{
+    if(retryDeck) return shuffle([...retryDeck]);
     const base = config.type==="dept"
       ? shuffle(DEPARTEMENTS.filter(d=>config.regions.includes(d.region)))
-      : shuffle(CAPITALES_RAW.filter(c=>config.continents.includes(c.continent)));
+      : config.type==="hist"
+        ? shuffle(DATES_HISTORIQUES.filter(d=>config.periodes.includes(d.periode)))
+        : shuffle(CAPITALES_RAW.filter(c=>config.continents.includes(c.continent)));
     const dirs = config.type==="dept"
       ? resolveDeptDirs(config.subject,config.dir)
-      : config.dir==="mixed"?["pays-to-cap","cap-to-pays"]:[config.dir];
+      : config.type==="hist"
+        ? (config.dir==="mixed"?["date-to-evt","evt-to-date"]:[config.dir])
+        : config.dir==="mixed"?["pays-to-cap","cap-to-pays"]:[config.dir];
     return base.map(d=>({...d,dir:dirs[Math.floor(Math.random()*dirs.length)]}));
   });
   const [idx,setIdx]=useState(0);
@@ -815,8 +1261,8 @@ function LessonScreen({config, onBack, onEnd}) {
   const [scores,setScores]=useState([]);
   const [animating,setAnimating]=useState(false);
   const card=deck[idx];
-  const color=config.type==="dept"?(REGION_COLORS[card.region]||"#4A90D9"):(CONTINENT_COLORS[card.continent]||"#4A90D9");
-  const {front,back,frontLabel,backLabel}=config.type==="dept"?getDeptCardFrontBack(card):getCapCardFrontBack(card);
+  const color=config.type==="dept"?(REGION_COLORS[card.region]||"#4A90D9"):config.type==="hist"?(PERIODE_COLORS[card.periode]||"#4A90D9"):(CONTINENT_COLORS[card.continent]||"#4A90D9");
+  const {front,back,frontLabel,backLabel}=config.type==="dept"?getDeptCardFrontBack(card):config.type==="hist"?getHistCardFrontBack(card):getCapCardFrontBack(card);
 
   const next=knew=>{
     const ns=[...scores,knew];
@@ -834,39 +1280,57 @@ function LessonScreen({config, onBack, onEnd}) {
   },[flipped,idx,scores]);
 
   return(
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:`linear-gradient(135deg,${color}99 0%,#0f1f3d 100%)`}}>
-      <div className="w-full max-w-md">
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Config</button>
+    <div className="min-h-screen flex flex-col" style={{background:`linear-gradient(160deg,#060b18 0%,${color}33 100%)`}}>
+      <div className="flex flex-col flex-1" style={{maxWidth:480,margin:'0 auto',width:'100%',padding:'20px 16px 24px'}}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Config
+          </button>
           <div className="text-center">
-            <p className="text-white font-bold text-sm">{config.type==="dept"?card.region:card.continent}</p>
-            <p className="text-white/50 text-xs">{frontLabel} → {backLabel}</p>
+            <p className="text-white/70 font-semibold text-xs">{config.type==="dept"?card.region:config.type==="hist"?card.periode:card.continent}</p>
+            <p className="text-white/30 text-xs">{frontLabel} → {backLabel}</p>
           </div>
-          <span className="text-white/70 font-mono text-sm">{idx+1}/{deck.length}</span>
+          <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{deck.length}</span>
         </div>
-        <div className="h-2 bg-white/20 rounded-full mb-6 overflow-hidden">
-          <div className="h-full bg-white rounded-full transition-all duration-500" style={{width:`${(idx/deck.length)*100}%`}}/>
+        {/* Progress */}
+        <div className="h-1 rounded-full overflow-hidden mb-6" style={{background:'rgba(255,255,255,0.10)'}}>
+          <div className="h-full rounded-full" style={{width:`${(idx/deck.length)*100}%`,background:'linear-gradient(90deg,rgba(255,255,255,0.5),rgba(255,255,255,0.9))',transition:'width 0.4s ease'}}/>
         </div>
-        <div style={{perspective:"1000px"}} onClick={()=>!flipped&&setFlipped(true)}>
-          <div className="relative w-full cursor-pointer select-none transition-all duration-500"
-            style={{transformStyle:"preserve-3d",transform:flipped?"rotateY(180deg)":"rotateY(0)",height:240,opacity:animating?0:1}}>
-            <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 bg-white" style={{backfaceVisibility:"hidden"}}>
-              <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{color}}>{frontLabel}</p>
-              <p className="font-black text-center text-gray-800" style={{fontSize:front.length>18?"1.6rem":front.length>10?"2.2rem":"3.2rem",lineHeight:1.1}}>{front}</p>
-              {!flipped&&<p className="text-gray-400 text-sm mt-6">Cliquer ou ↑↓ pour révéler</p>}
-            </div>
-            <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8" style={{backfaceVisibility:"hidden",transform:"rotateY(180deg)",background:color}}>
-              <p className="text-xs uppercase tracking-widest font-semibold mb-3 text-white/70">{backLabel}</p>
-              <p className="font-black text-white text-center" style={{fontSize:back.length>20?"1.6rem":back.length>10?"2.2rem":"3rem",lineHeight:1.1}}>{back}</p>
+        {/* Card flip */}
+        <div className="flex-1 flex items-center">
+          <div style={{perspective:"1200px",width:'100%'}} onClick={()=>!flipped&&setFlipped(true)}>
+            <div className="relative w-full select-none flip-card-inner" style={{height:220,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+              {/* Front */}
+              <div className="absolute inset-0 rounded-3xl flip-card-face flex flex-col items-center justify-center p-7"
+                style={{background:'#ffffff',boxShadow:'0 20px 60px rgba(0,0,0,0.5)',backfaceVisibility:'hidden'}}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{color}}>{frontLabel}</p>
+                <p className="font-black text-center text-gray-900" style={{fontSize:front.length>20?"1.4rem":front.length>12?"2rem":"2.8rem",lineHeight:1.1}}>{front}</p>
+                {!flipped&&<p className="text-gray-400 text-xs mt-5 font-medium">Toucher pour révéler</p>}
+              </div>
+              {/* Back */}
+              <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col items-center justify-center p-7"
+                style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/65">{backLabel}</p>
+                <p className="font-black text-white text-center" style={{fontSize:back.length>20?"1.4rem":back.length>12?"2rem":"2.8rem",lineHeight:1.1}}>{back}</p>
+              </div>
             </div>
           </div>
         </div>
+        {/* Buttons */}
         {flipped
-          ?<div className="grid grid-cols-2 gap-4 mt-6">
-            <button onClick={()=>next(false)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#E74C3C"}}><XCircle size={20}/> À revoir</button>
-            <button onClick={()=>next(true)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#27AE60"}}><CheckCircle size={20}/> Je savais !</button>
-          </div>
-          :<div className="h-16 flex items-center justify-center"><p className="text-white/30 text-xs">← À revoir | Je savais → (après révélation)</p></div>
+          ? <div className="grid grid-cols-2 gap-3 mt-6">
+              <button onClick={()=>next(false)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm" style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',cursor:'pointer'}}>
+                <XCircle size={17}/> À revoir
+              </button>
+              <button onClick={()=>next(true)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm" style={{background:'linear-gradient(135deg,#064e3b,#059669)',cursor:'pointer'}}>
+                <CheckCircle size={17}/> Je savais !
+              </button>
+            </div>
+          : <div className="h-14 flex items-center justify-center">
+              <p className="text-white/25 text-xs font-medium">← À revoir · Je savais → (après révélation)</p>
+            </div>
         }
       </div>
     </div>
@@ -874,14 +1338,19 @@ function LessonScreen({config, onBack, onEnd}) {
 }
 
 // ─── CHALLENGE (dept + cap) ───
-function ChallengeScreen({config, onBack, onEnd}) {
+function ChallengeScreen({config, onBack, onEnd, retryDeck}) {
   const [deck]=useState(()=>{
+    if(retryDeck) return shuffle([...retryDeck]);
     const base = config.type==="dept"
       ? shuffle(DEPARTEMENTS.filter(d=>config.regions.includes(d.region)))
-      : shuffle(CAPITALES_RAW.filter(c=>config.continents.includes(c.continent)));
+      : config.type==="hist"
+        ? shuffle(DATES_HISTORIQUES.filter(d=>config.periodes.includes(d.periode)))
+        : shuffle(CAPITALES_RAW.filter(c=>config.continents.includes(c.continent)));
     const dirs = config.type==="dept"
       ? resolveDeptDirs(config.subject,config.dir)
-      : config.dir==="mixed"?["pays-to-cap","cap-to-pays"]:[config.dir];
+      : config.type==="hist"
+        ? (config.dir==="mixed"?["date-to-evt","evt-to-date"]:[config.dir])
+        : config.dir==="mixed"?["pays-to-cap","cap-to-pays"]:[config.dir];
     return base.map(d=>({...d,dir:dirs[Math.floor(Math.random()*dirs.length)]}));
   });
   const [idx,setIdx]=useState(0);
@@ -893,8 +1362,8 @@ function ChallengeScreen({config, onBack, onEnd}) {
   const inputRef=useRef(null);
   const timerRef=useRef(null);
   const card=deck[idx];
-  const color=config.type==="dept"?(REGION_COLORS[card.region]||"#E74C3C"):(CONTINENT_COLORS[card.continent]||"#E74C3C");
-  const {front,back,frontLabel,backLabel}=config.type==="dept"?getDeptCardFrontBack(card):getCapCardFrontBack(card);
+  const color=config.type==="dept"?(REGION_COLORS[card.region]||"#E74C3C"):config.type==="hist"?(PERIODE_COLORS[card.periode]||"#E74C3C"):(CONTINENT_COLORS[card.continent]||"#E74C3C");
+  const {front,back,frontLabel,backLabel}=config.type==="dept"?getDeptCardFrontBack(card):config.type==="hist"?getHistCardFrontBack(card):getCapCardFrontBack(card);
 
   useEffect(()=>{timerRef.current=setInterval(()=>setElapsed(e=>e+1),1000);return()=>clearInterval(timerRef.current);},[]);
   useEffect(()=>{if(inputRef.current&&!feedback)inputRef.current.focus();},[idx,feedback]);
@@ -913,102 +1382,143 @@ function ChallengeScreen({config, onBack, onEnd}) {
   };
 
   return(
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(135deg,#3d0f0f 0%,#1a0a2b 100%)"}}>
-      <div className="w-full max-w-md">
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={onBack} className="text-white/50 hover:text-white text-sm">← Config</button>
-          <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-            <Clock size={16} className="text-red-400"/>
-            <span className="text-white font-mono font-bold text-lg">{fmt(elapsed)}</span>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#1a0a2b 100%)"}}>
+      <div className="flex flex-col flex-1 px-4 pt-5 pb-6" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Config
+          </button>
+          {/* Timer */}
+          <div className="flex items-center gap-2 rounded-xl px-3 py-1.5" style={{background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.25)'}}>
+            <Clock size={14} color="#f87171"/>
+            <span className="text-white font-mono font-bold text-sm tabular-nums">{fmt(elapsed)}</span>
           </div>
-          <span className="text-white/70 font-mono text-sm">{idx+1}/{deck.length}</span>
+          <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{deck.length}</span>
         </div>
-        <div className="h-2 bg-white/20 rounded-full mb-4 overflow-hidden">
-          <div className="h-full bg-red-500 rounded-full transition-all duration-500" style={{width:`${(idx/deck.length)*100}%`}}/>
+        {/* Progress */}
+        <div className="h-1 rounded-full overflow-hidden mb-4" style={{background:'rgba(255,255,255,0.08)'}}>
+          <div className="h-full rounded-full" style={{width:`${(idx/deck.length)*100}%`,background:'linear-gradient(90deg,#ef4444,#f97316)',transition:'width 0.4s ease'}}/>
         </div>
-        <div className="flex justify-center gap-6 mb-4">
-          <div className="flex items-center gap-1.5 text-green-400 font-bold text-sm"><CheckCircle size={15}/> {scores.filter(Boolean).length}</div>
-          <div className="flex items-center gap-1.5 text-red-400 font-bold text-sm"><XCircle size={15}/> {scores.filter(x=>!x).length}</div>
+        {/* Score row */}
+        <div className="flex justify-center gap-5 mb-4">
+          <span className="flex items-center gap-1.5 text-xs font-semibold tabular-nums" style={{color:'#4ade80'}}><CheckCircle size={13}/>{scores.filter(Boolean).length} correct</span>
+          <span className="flex items-center gap-1.5 text-xs font-semibold tabular-nums" style={{color:'#f87171'}}><XCircle size={13}/>{scores.filter(x=>!x).length} raté</span>
         </div>
-        <div className="w-full rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 mb-4 transition-all"
-          style={{background:feedback==="correct"?"#1a6b3c":feedback==="wrong"?"#6b1a1a":"white",minHeight:160,opacity:animating?0:1}}>
-          <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{color:feedback?"rgba(255,255,255,0.6)":"#E74C3C"}}>{frontLabel}</p>
-          <p className="font-black text-center" style={{color:feedback?"white":"#1a2a4a",fontSize:front.length>18?"1.6rem":front.length>10?"2.2rem":"3rem",lineHeight:1.15}}>{front}</p>
-          {feedback==="wrong"&&<p className="text-white/80 text-sm mt-3">✅ {backLabel} : <strong>{back}</strong></p>}
-          {feedback==="correct"&&<p className="text-green-200 text-sm mt-3 font-semibold">✓ Correct !</p>}
+        {/* Question card */}
+        <div className="w-full rounded-3xl flex flex-col items-center justify-center p-7 mb-4"
+          style={{
+            background:feedback==="correct"?'linear-gradient(135deg,#064e3b,#059669)':feedback==="wrong"?'linear-gradient(135deg,#7f1d1d,#dc2626)':'#ffffff',
+            minHeight:160,
+            opacity:animating?0:1,
+            transition:'background 0.2s, opacity 0.15s',
+            boxShadow:feedback?"0 16px 48px rgba(0,0,0,0.4)":'0 16px 48px rgba(0,0,0,0.3)'
+          }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{color:feedback?"rgba(255,255,255,0.55)":"#dc2626"}}>{frontLabel}</p>
+          <p className="font-black text-center" style={{color:feedback?"white":"#0f172a",fontSize:front.length>20?"1.4rem":front.length>12?"2rem":"2.8rem",lineHeight:1.1}}>{front}</p>
+          {feedback==="wrong" && <p className="text-white/80 text-sm mt-3 text-center font-medium">{backLabel} : <strong>{back}</strong></p>}
+          {feedback==="correct" && <p className="text-emerald-200 text-sm mt-2 font-semibold">Correct !</p>}
         </div>
-        <p className="text-white/50 text-xs text-center mb-2">→ {backLabel}</p>
+        <p className="text-white/35 text-xs text-center mb-2 font-medium">Répondre : {backLabel}</p>
+        {/* Input row */}
         <div className="flex gap-2">
           <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&submit()} disabled={!!feedback}
-            placeholder={`Tapez ${backLabel.toLowerCase()}…`}
-            className="flex-1 rounded-2xl px-4 py-4 text-base font-semibold outline-none transition-all"
-            style={{background:"rgba(255,255,255,0.1)",color:"white",border:feedback==="correct"?"2px solid #27AE60":feedback==="wrong"?"2px solid #E74C3C":"2px solid rgba(255,255,255,0.2)"}}/>
-          <button onClick={submit} disabled={!!feedback||!input.trim()}
-            className="px-5 py-4 rounded-2xl text-white font-black transition-all hover:scale-105"
-            style={{background:input.trim()&&!feedback?"#E74C3C":"rgba(255,255,255,0.1)"}}>OK</button>
+            placeholder={`${backLabel}…`}
+            className="flex-1 rounded-2xl px-4 text-sm font-semibold outline-none"
+            style={{
+              background:'rgba(255,255,255,0.08)',
+              color:'white',
+              border:feedback==="correct"?'1.5px solid #4ade80':feedback==="wrong"?'1.5px solid #f87171':'1.5px solid rgba(255,255,255,0.18)',
+              height:52,
+              transition:'border-color 0.15s'
+            }}/>
+          <button onClick={submit} disabled={!!feedback||!input.trim()} className="btn-press px-5 rounded-2xl text-white font-bold text-sm"
+            style={{height:52,background:input.trim()&&!feedback?'linear-gradient(135deg,#c2410c,#dc2626)':'rgba(255,255,255,0.08)',cursor:input.trim()&&!feedback?'pointer':'not-allowed',opacity:input.trim()&&!feedback?1:0.5}}>
+            OK
+          </button>
         </div>
-        <p className="text-white/30 text-xs text-center mt-3">Entrée pour valider · Accents facultatifs</p>
+        <p className="text-white/25 text-xs text-center mt-2.5 font-medium">Entrée pour valider · Accents facultatifs</p>
       </div>
     </div>
   );
 }
 
 // ─── RESULT ───
-function ResultScreen({data, onRetry, onHome}) {
+function ResultScreen({data, onRetry, onHome, isGuest}) {
   const {deck,scores,config,mode,elapsed}=data;
+  const leitnerConfigType = config.type==='dept' && config.subject==='chef' ? 'chef' : config.type;
   const [leitnerAdded, setLeitnerAdded] = useState(null);
-  const newLeitnerCount = useState(()=> mode==='lesson' ? countNewLeitnerCards(deck, config.type) : 0)[0];
+  const newLeitnerCount = useState(()=> mode==='lesson' ? countNewLeitnerCards(deck, leitnerConfigType) : 0)[0];
   const known=scores.filter(Boolean).length;
   const pct=Math.round((known/deck.length)*100);
   const toReview=deck.filter((_,i)=>!scores[i]);
   const fmt=s=>s?`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`:null;
   const emoji=pct>=90?"🏆":pct>=70?"🎉":pct>=50?"👍":"📚";
   return(
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0f1f3d 0%,#1a3a6b 100%)"}}>
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex flex-col flex-1 px-4 pt-8 pb-8 anim-fadeUp" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        {/* Score hero */}
         <div className="text-center mb-8">
-          <div className="text-6xl mb-3">{emoji}</div>
-          <h2 className="text-white text-5xl font-black">{pct}%</h2>
-          <p className="text-blue-200 text-lg mt-1">{known} / {deck.length} correctes</p>
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-            <span className="text-white/40 text-xs px-2 py-1 rounded-full bg-white/10">{config.type==="dept"?"🗺️ Départements":config.type==="philo"?"🧠 Philosophie":"🌍 Capitales"}</span>
-            <span className="text-white/40 text-xs px-2 py-1 rounded-full bg-white/10">{mode==="lesson"?"Leçon":"Défi"}</span>
-            {elapsed&&<span className="text-white/40 text-xs px-2 py-1 rounded-full bg-white/10 flex items-center gap-1"><Clock size={10}/>{fmt(elapsed)}</span>}
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl mb-4"
+            style={{background:pct>=70?'linear-gradient(135deg,#064e3b,#059669)':'linear-gradient(135deg,#7f1d1d,#dc2626)',boxShadow:pct>=70?'0 16px 48px rgba(5,150,105,0.4)':'0 16px 48px rgba(220,38,38,0.4)'}}>
+            <span style={{fontSize:44}}>{emoji}</span>
+          </div>
+          <h2 className="text-white text-6xl font-black tracking-tight">{pct}<span className="text-3xl">%</span></h2>
+          <p className="text-white/50 text-base mt-1 font-medium">{known} / {deck.length} correctes</p>
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+            <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{config.type==="dept"?"Départements":config.type==="philo"?"Philosophie":config.type==="hist"?"Dates historiques":"Capitales"}</span>
+            <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{mode==="lesson"?"Leçon":"Défi"}</span>
+            {elapsed&&<span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1"><Clock size={10}/>{fmt(elapsed)}</span>}
           </div>
         </div>
+
+        {/* To review */}
         {toReview.length>0&&(
-          <div className="bg-white/10 rounded-2xl p-4 mb-5">
-            <p className="text-white font-semibold mb-3 text-sm">À revoir ({toReview.length}) :</p>
-            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+          <div className="glass rounded-2xl p-4 mb-4">
+            <p className="text-white/60 font-semibold mb-3 text-xs uppercase tracking-widest">À revoir ({toReview.length})</p>
+            <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto">
               {toReview.map((d,i)=>(
-                <span key={i} className="bg-red-500/25 text-white text-xs px-3 py-1 rounded-full">
-                  {config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:`${d.pays} → ${d.capitale}`}
+                <span key={i} className="text-white/80 text-xs px-3 py-1.5 rounded-full font-medium" style={{background:'rgba(239,68,68,0.2)',border:'1px solid rgba(239,68,68,0.25)'}}>
+                  {config.type==="dept"&&config.subject==="chef"?`${d.num} – ${d.nom} → ${d.chef}`:config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:config.type==="hist"?`${d.date} – ${d.evenement.substring(0,35)}…`:`${d.pays} → ${d.capitale}`}
                 </span>
               ))}
             </div>
           </div>
         )}
-        <div className="grid gap-3">
+
+        {/* Actions */}
+        <div className="flex flex-col gap-3">
           {mode==='lesson' && (
-            leitnerAdded !== null
-              ? <div className="py-3 rounded-2xl text-center text-white/60 text-sm bg-white/10">✓ {leitnerAdded} carte{leitnerAdded>1?"s":""} ajoutée{leitnerAdded>1?"s":""} à la Boîte de Leitner</div>
-              : newLeitnerCount > 0
-                ? <button onClick={()=>setLeitnerAdded(addCardsToLeitnerStorage(deck,config.type))}
-                    className="py-4 rounded-2xl text-white font-black transition-all hover:scale-105" style={{background:"#2471a3"}}>
-                    📦 Envoyer dans la Boîte de Leitner ({newLeitnerCount} nouvelle{newLeitnerCount>1?"s":""} carte{newLeitnerCount>1?"s":""})
-                  </button>
-                : <div className="py-3 rounded-2xl text-center text-white/30 text-xs bg-white/5">Toutes ces cartes sont déjà dans la Boîte de Leitner</div>
+            isGuest
+              ? <div className="py-3 rounded-2xl text-center text-white/40 text-xs glass font-medium flex items-center justify-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Connecte-toi pour sauvegarder dans la Boîte de Leitner
+                </div>
+              : leitnerAdded !== null
+                ? <div className="py-3 rounded-2xl text-center text-white/55 text-sm glass font-medium">
+                    ✓ {leitnerAdded} carte{leitnerAdded>1?"s":""} ajoutée{leitnerAdded>1?"s":""} à la Boîte de Leitner
+                  </div>
+                : newLeitnerCount > 0
+                  ? <button onClick={()=>setLeitnerAdded(addCardsToLeitnerStorage(deck,leitnerConfigType))}
+                      className="btn-press py-4 rounded-2xl text-white font-bold text-sm" style={{background:'linear-gradient(135deg,#1e3a5f,#2563eb)',boxShadow:'0 8px 24px rgba(37,99,235,0.3)',cursor:'pointer'}}>
+                      Envoyer dans la Boîte de Leitner ({newLeitnerCount} nouvelle{newLeitnerCount>1?"s":""})
+                    </button>
+                  : <div className="py-3 rounded-2xl text-center text-white/30 text-xs glass font-medium">Toutes les cartes sont déjà dans la Boîte de Leitner</div>
           )}
           {toReview.length>0&&(
-            <button onClick={()=>onRetry(toReview)} className="py-4 rounded-2xl text-white font-black transition-all hover:scale-105" style={{background:"#E74C3C"}}>
-              🔄 Retravailler les erreurs ({toReview.length})
+            <button onClick={()=>onRetry(toReview)} className="btn-press py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2" style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',boxShadow:'0 8px 24px rgba(220,38,38,0.25)',cursor:'pointer'}}>
+              <RotateCcw size={15}/> Retravailler les erreurs ({toReview.length})
             </button>
           )}
-          <button onClick={()=>onRetry(null)} className="py-4 rounded-2xl text-white font-black transition-all hover:scale-105" style={{background:mode==="lesson"?"#27AE60":"#C0392B"}}>
-            <RotateCcw size={16} className="inline mr-2"/>Recommencer
+          <button onClick={()=>onRetry(null)} className="btn-press py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2"
+            style={{background:mode==="lesson"?'linear-gradient(135deg,#064e3b,#059669)':'linear-gradient(135deg,#7f1d1d,#b91c1c)',cursor:'pointer'}}>
+            <RotateCcw size={15}/> Recommencer
           </button>
-          <button onClick={onHome} className="py-4 rounded-2xl text-white/80 font-bold bg-white/10 hover:bg-white/20 transition-all">← Accueil</button>
+          <button onClick={onHome} className="btn-press py-4 rounded-2xl text-white/60 hover:text-white font-semibold text-sm glass" style={{cursor:'pointer'}}>
+            ← Accueil
+          </button>
         </div>
       </div>
     </div>
@@ -1017,7 +1527,7 @@ function ResultScreen({data, onRetry, onHome}) {
 
 // ─── LEITNER COMPONENT ───
 
-function LeitnerScreen({onBack}) {
+function LeitnerScreen({onBack,isGuest}) {
   const [state,setState]=useState(()=>{try{const s=localStorage.getItem("leitner_state");return s?JSON.parse(s):initLeitnerState();}catch{return initLeitnerState();}});
   const [view,setView]=useState("home");
   const [sessionDeck,setSessionDeck]=useState([]);
@@ -1027,9 +1537,11 @@ function LeitnerScreen({onBack}) {
 
   const save=s=>{
     setState(s);
-    try{localStorage.setItem("leitner_state",JSON.stringify(s));}catch{}
-    const u=auth.currentUser;
-    if(u) db.ref(`users/${u.uid}/leitner_state`).set(s).catch(()=>{});
+    if(!isGuest){
+      try{localStorage.setItem("leitner_state",JSON.stringify(s));}catch{}
+      const u=auth.currentUser;
+      if(u) db.ref(`users/${u.uid}/leitner_state`).set(s).catch(()=>{});
+    }
   };
   const startSession=()=>{
     const due=shuffle(getLeitnerDueCards(state)).map(c=>{
@@ -1037,12 +1549,29 @@ function LeitnerScreen({onBack}) {
       let _side;
       if(t==='cap') _side=Math.random()<0.5?"pays-to-cap":"cap-to-pays";
       else if(t==='philo') _side=Math.random()<0.5?"nom-to-back":"back-to-nom";
+      else if(t==='hist') _side=Math.random()<0.5?"date-to-evt":"evt-to-date";
+      else if(t==='chef') _side="dept-to-chef";
       else _side=Math.random()<0.5?"num-to-nom":"nom-to-num";
       return{...c,_side};
     });
     if(due.length===0){setView("nodues");return;}
     setSessionDeck(due);setIdx(0);setFlipped(false);setView("session");
   };
+
+  useEffect(()=>{
+    const today=new Date().toISOString().slice(0,10);
+    const allCards=[...LEITNER_CARDS,...(state.customCards||[])];
+    let changed=false;
+    const newCards={...state.cards};
+    allCards.forEach(c=>{
+      const s=newCards[c.id];
+      if(s&&s.box===0&&s.lastReviewedDate&&s.lastReviewedDate<today){
+        newCards[c.id]={box:1,lastReviewedDate:null};
+        changed=true;
+      }
+    });
+    if(changed){const ns={...state,cards:newCards};save(ns);}
+  },[]);
 
   const handleAnswer=knew=>{
     const card=sessionDeck[idx];
@@ -1066,89 +1595,160 @@ function LeitnerScreen({onBack}) {
   },[view,flipped,idx]);
 
   const allLeitnerCards=[...LEITNER_CARDS,...(state.customCards||[])];
-  const boxCounts=LEITNER_BOXES.map(b=>({...b,count:allLeitnerCards.filter(c=>(state.cards[c.id]?.box||1)===b.n).length}));
+  const boxCounts=LEITNER_BOXES.map(b=>({...b,count:allLeitnerCards.filter(c=>{const s=state.cards[c.id];return(s!==undefined?s.box:1)===b.n;}).length}));
   const dueCount=getLeitnerDueCards(state).length;
   const totalCards=allLeitnerCards.length;
   const today=new Date().toISOString().slice(0,10);
   const todayFR=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const nextReviewIn=(()=>{
-    let soonest=null;
+
+  // ── Tags dynamiques (régions/continents des cartes actives dans les boîtes) ──
+  const activeContentTags=(()=>{
+    const activeIds=new Set(Object.entries(state.cards).filter(([,s])=>s.box>0).map(([id])=>id));
+    const types=new Set();
     allLeitnerCards.forEach(c=>{
-      const s=state.cards[c.id];
-      if(!s||!s.lastReviewedDate)return;
-      const box=LEITNER_BOXES.find(b=>b.n===s.box);
-      const diffDays=Math.floor((new Date(today)-new Date(s.lastReviewedDate))/86400000);
-      if(diffDays<box.intervalDays){
-        const left=box.intervalDays-diffDays;
-        if(soonest===null||left<soonest)soonest=left;
-      }
+      if(activeIds.has(c.id)) types.add(c.type||'dept');
     });
-    return soonest;
+    const TYPE_META={
+      dept:  {label:'Départements',    color:'#1a3a6b'},
+      chef:  {label:'Chefs-lieux',     color:'#0f4c35'},
+      cap:   {label:'Capitales',       color:'#1a3b1a'},
+      philo: {label:'Philosophie',     color:'#5b21b6'},
+      hist:  {label:'Dates historiques',color:'#7d3a00'},
+    };
+    return [...types].sort().map(t=>TYPE_META[t]||{label:t,color:'#555'});
   })();
-  const nextReviewDate=nextReviewIn!=null?(()=>{const d=new Date();d.setDate(d.getDate()+nextReviewIn);return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});})():null;
+
+  // ── Prochaine révision par boîte (boîtes 1-5 seulement, si des cartes dedans) ──
+  const boxNextReviews=LEITNER_BOXES.filter(b=>b.n>=1).map(b=>{
+    const cardsInBox=allLeitnerCards.filter(c=>(state.cards[c.id]?.box??1)===b.n);
+    if(cardsInBox.length===0)return null;
+    let soonestDays=null;
+    cardsInBox.forEach(c=>{
+      const s=state.cards[c.id];
+      if(!s||!s.lastReviewedDate){soonestDays=0;return;}
+      const diffDays=Math.floor((new Date(today)-new Date(s.lastReviewedDate))/86400000);
+      if(diffDays>=b.intervalDays){soonestDays=0;}
+      else{const left=b.intervalDays-diffDays;if(soonestDays===null||left<soonestDays)soonestDays=left;}
+    });
+    const date=soonestDays===0?null:(()=>{const d=new Date();d.setDate(d.getDate()+soonestDays);return d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});})();
+    return{box:b,count:cardsInBox.length,daysLeft:soonestDays,date};
+  }).filter(Boolean);
 
   if(view==="home") return(
-    <div className="min-h-screen flex flex-col items-center p-5 pt-8" style={{background:"linear-gradient(160deg,#0d1f35 0%,#1a2a4a 100%)"}}>
-      <div className="w-full max-w-md">
-        <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-5">← Accueil</button>
-        <div className="flex items-center gap-3 mb-1"><span style={{fontSize:32}}>📦</span><h1 className="text-white text-2xl font-black">Boîte de Leitner</h1></div>
-        <p className="text-blue-300 text-sm">Session #{state.session} · {totalCards} cartes</p>
-        <div className="flex items-center gap-2 mt-1 mb-4">
-          <span style={{fontSize:13}}>📅</span>
-          <p className="text-white/50 text-xs" style={{textTransform:'capitalize'}}>{todayFR}</p>
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-6" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Accueil
+        </button>
+
+        {/* Header */}
+        <div className="mb-5 anim-fadeUp">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:'linear-gradient(135deg,#1e3a5f,#2563eb)'}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+            </div>
+            <div>
+              <h1 className="text-white font-black text-xl">Boîte de Leitner</h1>
+              <p className="text-white/35 text-xs font-medium">Session #{state.session} · {totalCards} cartes · <span style={{textTransform:'capitalize'}}>{todayFR}</span></p>
+            </div>
+          </div>
         </div>
-        <div className="bg-white/10 rounded-2xl p-3 mb-4">
-          <div className="grid grid-cols-5 gap-1">
+
+        {/* Box legend */}
+        <div className="glass rounded-2xl p-4 mb-3">
+          <p className="text-white/45 text-xs font-semibold uppercase tracking-widest mb-3">Les 6 boîtes</p>
+          <div className="grid grid-cols-3 gap-2">
             {LEITNER_BOXES.map(b=>(
-              <div key={b.n} className="text-center">
-                <div className="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center text-white font-black" style={{background:b.color,fontSize:10}}>{b.n}</div>
+              <div key={b.n} className="flex items-center gap-2 rounded-xl p-2" style={{background:'rgba(255,255,255,0.05)'}}>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-white font-black text-xs" style={{background:b.color}}>{b.n}</div>
                 <p className="text-white/50 text-xs leading-tight">{b.desc}</p>
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-4">
-          <p className="text-white/70 text-xs uppercase tracking-widest mb-4">Répartition</p>
-          <div className="flex items-end justify-between gap-2 h-24 mb-2">
-            {boxCounts.map(b=>{const h=Math.max(totalCards>0?(b.count/totalCards)*80:0,b.count>0?6:2);return(
+
+        {/* Bar chart */}
+        <div className="glass rounded-2xl p-4 mb-3">
+          <p className="text-white/45 text-xs font-semibold uppercase tracking-widest mb-4">Répartition</p>
+          <div className="flex items-end justify-between gap-1.5 h-20 mb-2">
+            {boxCounts.map(b=>{const h=Math.max(totalCards>0?(b.count/totalCards)*72:0,b.count>0?5:2);return(
               <div key={b.n} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-white font-black text-sm">{b.count}</span>
-                <div className="w-full rounded-t-lg" style={{height:h,background:b.color,opacity:b.count===0?0.2:1}}/>
+                <span className="text-white font-bold text-xs tabular-nums" style={{opacity:b.count===0?0.3:1}}>{b.count}</span>
+                <div className="w-full rounded-t-md" style={{height:h,background:b.color,opacity:b.count===0?0.2:1,transition:'height 0.4s ease'}}/>
               </div>
             );})}
           </div>
-          <div className="flex justify-between">{LEITNER_BOXES.map(b=><div key={b.n} className="flex-1 text-center"><p className="text-white/40 text-xs">B{b.n}</p></div>)}</div>
+          <div className="flex justify-between">
+            {LEITNER_BOXES.map(b=><div key={b.n} className="flex-1 text-center"><p className="text-white/30 text-xs">B{b.n}</p></div>)}
+          </div>
         </div>
-        <div className="bg-white/10 rounded-2xl p-4 mb-4">
-          <p className="text-white/70 text-xs uppercase tracking-widest mb-2">Régions</p>
-          <div className="flex flex-wrap gap-1.5">{LEITNER_REGIONS.map(r=><span key={r} className="text-white text-xs px-2 py-1 rounded-full" style={{background:REGION_COLORS[r]||"#555"}}>{r}</span>)}</div>
-        </div>
-        {dueCount===0&&nextReviewDate&&(
-          <div className="rounded-2xl p-3 mb-3 flex items-center gap-3" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)"}}>
-            <span style={{fontSize:20}}>⏰</span>
-            <div>
-              <p className="text-white/80 text-sm font-bold">Prochaine révision</p>
-              <p className="text-blue-300 text-xs" style={{textTransform:'capitalize'}}>{nextReviewDate} · dans {nextReviewIn} jour{nextReviewIn>1?"s":""}</p>
+
+        {/* Contenu dynamique */}
+        {activeContentTags.length>0&&(
+          <div className="glass rounded-2xl p-4 mb-3">
+            <p className="text-white/45 text-xs font-semibold uppercase tracking-widest mb-2.5">Contenu dans les boîtes</p>
+            <div className="flex flex-wrap gap-1.5">
+              {activeContentTags.map(({label,color})=>(
+                <span key={label} className="text-white text-xs px-2.5 py-1 rounded-full font-medium" style={{background:color}}>{label}</span>
+              ))}
             </div>
           </div>
         )}
-        <button onClick={startSession} className="w-full py-4 rounded-2xl text-white font-black text-lg mb-3 transition-all hover:scale-105" style={{background:dueCount>0?"#2471a3":"rgba(255,255,255,0.1)"}}>
-          {dueCount>0?`▶ Démarrer (${dueCount} cartes dues)`:"✓ Rien à réviser aujourd'hui"}
+
+        {/* Prochaines révisions par boîte */}
+        {boxNextReviews.length>0&&(
+          <div className="glass rounded-2xl p-4 mb-3">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock size={13} color="#60a5fa"/>
+              <p className="text-white/45 text-xs font-semibold uppercase tracking-widest">Prochaines révisions</p>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {boxNextReviews.map(({box,count,daysLeft,date})=>(
+                <div key={box.n} className="flex items-center gap-3 rounded-xl px-3 py-2" style={{background:'rgba(255,255,255,0.04)'}}>
+                  {/* Pastille boîte */}
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white font-black text-xs" style={{background:box.color}}>{box.n}</div>
+                  {/* Infos */}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-white/65 text-xs font-medium">{box.desc}</span>
+                    <span className="text-white/30 text-xs ml-1.5">({count} carte{count>1?'s':''})</span>
+                  </div>
+                  {/* Date */}
+                  {daysLeft===0
+                    ? <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'rgba(239,68,68,0.2)',color:'#f87171'}}>Due !</span>
+                    : <span className="text-xs font-medium text-right" style={{color:'#93c5fd',textTransform:'capitalize',whiteSpace:'nowrap'}}>
+                        {daysLeft===1?'Demain':date}
+                      </span>
+                  }
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
+        <button onClick={startSession} className="btn-press w-full py-4 rounded-2xl text-white font-bold mb-3 text-sm"
+          style={{background:dueCount>0?'linear-gradient(135deg,#1e3a5f,#2563eb)':'rgba(255,255,255,0.07)',boxShadow:dueCount>0?'0 8px 24px rgba(37,99,235,0.3)':'none',cursor:'pointer'}}>
+          {dueCount>0?`Démarrer la session (${dueCount} cartes dues)`:"Rien à réviser aujourd'hui ✓"}
         </button>
-        <button onClick={()=>{if(window.confirm("Remettre toutes les cartes à zéro ?"))save(initLeitnerState());}} className="w-full py-3 rounded-2xl text-white/40 hover:text-white/70 text-sm" style={{background:"rgba(255,255,255,0.04)"}}>
-          🔄 Réinitialiser
+        <button onClick={()=>{if(window.confirm("Remettre toutes les cartes à zéro ?"))save(initLeitnerState());}} className="w-full py-3 rounded-2xl text-white/30 hover:text-white/55 text-xs font-medium" style={{background:"rgba(255,255,255,0.03)",cursor:'pointer'}}>
+          Réinitialiser toutes les boîtes
         </button>
       </div>
     </div>
   );
 
   if(view==="nodues") return(
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0d1f35 0%,#1a2a4a 100%)"}}>
-      <div className="text-center">
-        <div className="text-6xl mb-4">✅</div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="text-center anim-fadeUp" style={{maxWidth:320}}>
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-5" style={{background:'linear-gradient(135deg,#064e3b,#059669)',boxShadow:'0 16px 48px rgba(5,150,105,0.35)'}}>
+          <CheckCircle size={36} color="white"/>
+        </div>
         <h2 className="text-white text-2xl font-black mb-2">Tout est à jour !</h2>
-        <p className="text-blue-300 mb-8">Aucune carte due pour cette session.</p>
-        <button onClick={()=>setView("home")} className="py-4 px-8 rounded-2xl text-white font-black bg-white/10 hover:bg-white/20 transition-all">← Retour</button>
+        <p className="text-white/45 text-sm font-medium mb-8">Aucune carte due pour cette session.</p>
+        <button onClick={()=>setView("home")} className="btn-press py-4 px-8 rounded-2xl text-white font-bold text-sm glass" style={{cursor:'pointer'}}>
+          ← Retour aux boîtes
+        </button>
       </div>
     </div>
   );
@@ -1166,6 +1766,16 @@ function LeitnerScreen({onBack}) {
       if(card._side==='nom-to-back'){front=card.nom;back=card.definition;frontLabel="Courant";backLabel="Définition";}
       else{front=card.definition;back=card.nom;frontLabel="Définition";backLabel="Courant";}
       color="#5b21b6";
+    }else if(t==='hist'){
+      if(card._side==='date-to-evt'){front=card.date;back=card.evenement;frontLabel="Date";backLabel="Événement";}
+      else{front=card.evenement;back=card.date;frontLabel="Événement";backLabel="Date";}
+      color=PERIODE_COLORS[card.periode]||"#7d5a00";
+    }else if(t==='chef'){
+      front=`${card.nom} — N°${card.num}`;
+      back=card.chef;
+      frontLabel="Département";
+      backLabel="Chef-lieu";
+      color=REGION_COLORS[card.region]||"#2471a3";
     }else{
       front=card._side==="num-to-nom"?card.num:card.nom;
       back=card._side==="num-to-nom"?card.nom:card.num;
@@ -1174,43 +1784,64 @@ function LeitnerScreen({onBack}) {
       color=REGION_COLORS[card.region]||"#2471a3";
     }
     return(
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:`linear-gradient(135deg,${color}99 0%,#0d1f35 100%)`}}>
-        <div className="w-full max-w-md">
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={()=>setView("home")} className="text-white/50 hover:text-white text-sm">← Pause</button>
+      <div className="min-h-screen flex flex-col" style={{background:`linear-gradient(160deg,#060b18 0%,${color}28 100%)`}}>
+        <div className="flex flex-col flex-1 px-4 pt-5 pb-6" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={()=>setView("home")} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+              Pause
+            </button>
             <div className="text-center">
-              <p className="text-white font-bold text-sm">{card.region}</p>
-              <div className="flex items-center justify-center gap-1 mt-0.5">
-                {LEITNER_BOXES.map(b=><div key={b.n} className="w-4 h-4 rounded-full flex items-center justify-center font-black" style={{background:curBox===b.n?b.color:"rgba(255,255,255,0.15)",color:"white",fontSize:8}}>{b.n}</div>)}
+              <p className="text-white/60 text-xs font-semibold">{t==='hist'?card.periode:t==='cap'?card.continent:t==='philo'?card.periode||"":card.region}</p>
+              <div className="flex items-center justify-center gap-1 mt-1">
+                {LEITNER_BOXES.map(b=>(
+                  <div key={b.n} className="flex items-center justify-center rounded-full font-black" style={{width:18,height:18,background:curBox===b.n?b.color:"rgba(255,255,255,0.12)",color:"white",fontSize:8,border:curBox===b.n?`2px solid rgba(255,255,255,0.4)`:'none'}}>
+                    {b.n}
+                  </div>
+                ))}
               </div>
             </div>
-            <span className="text-white/70 font-mono text-sm">{idx+1}/{sessionDeck.length}</span>
+            <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{sessionDeck.length}</span>
           </div>
-          <div className="h-2 bg-white/20 rounded-full mb-6 overflow-hidden">
-            <div className="h-full bg-white rounded-full transition-all duration-500" style={{width:`${(idx/sessionDeck.length)*100}%`}}/>
+          {/* Progress */}
+          <div className="h-1 rounded-full overflow-hidden mb-6" style={{background:'rgba(255,255,255,0.10)'}}>
+            <div className="h-full rounded-full" style={{width:`${(idx/sessionDeck.length)*100}%`,background:'linear-gradient(90deg,rgba(255,255,255,0.5),rgba(255,255,255,0.9))',transition:'width 0.4s ease'}}/>
           </div>
-          <div style={{perspective:"1000px"}} onClick={()=>!flipped&&setFlipped(true)}>
-            <div className="relative w-full cursor-pointer select-none transition-all duration-500"
-              style={{transformStyle:"preserve-3d",transform:flipped?"rotateY(180deg)":"rotateY(0)",height:240,opacity:animating?0:1}}>
-              <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 bg-white" style={{backfaceVisibility:"hidden"}}>
-                <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{color}}>{frontLabel}</p>
-                <p className="font-black text-center text-gray-800" style={{fontSize:front.length>25?"1.2rem":front.length>15?"1.8rem":"3.2rem",lineHeight:1.1}}>{front}</p>
-                {!flipped&&<p className="text-gray-400 text-sm mt-6">Cliquer ou ↑↓ pour révéler</p>}
-              </div>
-              <div className="absolute inset-0 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8" style={{backfaceVisibility:"hidden",transform:"rotateY(180deg)",background:color}}>
-                <p className="text-xs uppercase tracking-widest font-semibold mb-3 text-white/70">{backLabel}</p>
-                <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.2rem":back.length>15?"1.8rem":"3rem",lineHeight:1.1}}>{back}</p>
-                <p className="text-white/50 text-xs mt-2">{card.region}</p>
+          {/* Card flip */}
+          <div className="flex-1 flex items-center">
+            <div style={{perspective:"1200px",width:'100%'}} onClick={()=>!flipped&&setFlipped(true)}>
+              <div className="relative w-full select-none flip-card-inner" style={{height:220,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+                <div className="absolute inset-0 rounded-3xl flip-card-face flex flex-col items-center justify-center p-7"
+                  style={{background:'#ffffff',boxShadow:'0 20px 60px rgba(0,0,0,0.5)',backfaceVisibility:'hidden'}}>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{color}}>{frontLabel}</p>
+                  <p className="font-black text-center text-gray-900" style={{fontSize:front.length>25?"1.1rem":front.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{front}</p>
+                  {!flipped&&<p className="text-gray-400 text-xs mt-5 font-medium">Toucher pour révéler</p>}
+                </div>
+                <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col items-center justify-center p-7"
+                  style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/65">{backLabel}</p>
+                  <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.1rem":back.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{back}</p>
+                </div>
               </div>
             </div>
           </div>
+          {/* Answer buttons */}
           {flipped?(
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <button onClick={()=>handleAnswer(false)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#E74C3C"}}><XCircle size={20}/> Boîte {Math.max(curBox-1,1)}</button>
-              <button onClick={()=>handleAnswer(true)} className="py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all" style={{background:"#27AE60"}}><CheckCircle size={20}/> Boîte {Math.min(curBox+1,5)}</button>
+            <div className="grid grid-cols-2 gap-3 mt-6">
+              <button onClick={()=>handleAnswer(false)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm"
+                style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',cursor:'pointer'}}>
+                <XCircle size={16}/> Boîte {Math.max(curBox-1,1)}
+              </button>
+              <button onClick={()=>handleAnswer(true)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm"
+                style={{background:'linear-gradient(135deg,#064e3b,#059669)',cursor:'pointer'}}>
+                <CheckCircle size={16}/> Boîte {Math.min(curBox+1,5)}
+              </button>
             </div>
           ):(
-            <div className="h-16 flex items-center justify-center"><p className="text-white/30 text-xs">← Descendre | Monter →</p></div>
+            <div className="h-14 flex items-center justify-center">
+              <p className="text-white/25 text-xs font-medium">← Descendre | Monter →</p>
+            </div>
           )}
         </div>
       </div>
@@ -1218,24 +1849,31 @@ function LeitnerScreen({onBack}) {
   }
 
   if(view==="done") return(
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#0d1f35 0%,#1a2a4a 100%)"}}>
-      <div className="w-full max-w-md text-center">
-        <div className="text-6xl mb-4">🎯</div>
-        <h2 className="text-white text-3xl font-black mb-2">Session terminée !</h2>
-        <p className="text-blue-300 mb-2">{sessionDeck.length} cartes révisées</p>
-        <p className="text-white/40 text-sm mb-8">Session #{state.session-1} complétée</p>
-        <div className="bg-white/10 rounded-2xl p-4 mb-6">
-          <div className="flex items-end justify-between gap-2 h-20 mb-2">
-            {LEITNER_BOXES.map(b=>{const cnt=LEITNER_CARDS.filter(c=>(state.cards[c.id]?.box||1)===b.n).length;const h=Math.max(totalCards>0?(cnt/totalCards)*72:0,cnt>0?6:2);return(
+    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="w-full text-center anim-fadeUp" style={{maxWidth:400}}>
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-5" style={{background:'linear-gradient(135deg,#1e3a5f,#2563eb)',boxShadow:'0 16px 48px rgba(37,99,235,0.4)'}}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        </div>
+        <h2 className="text-white text-3xl font-black mb-2 tracking-tight">Session terminée !</h2>
+        <p className="text-blue-400 font-semibold mb-1">{sessionDeck.length} cartes révisées</p>
+        <p className="text-white/35 text-sm mb-7 font-medium">Session #{state.session-1} complétée</p>
+        <div className="glass rounded-2xl p-4 mb-5">
+          <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">Nouvelle répartition</p>
+          <div className="flex items-end justify-between gap-1.5 h-16 mb-2">
+            {LEITNER_BOXES.map(b=>{const cnt=LEITNER_CARDS.filter(c=>(state.cards[c.id]?.box||1)===b.n).length;const h=Math.max(totalCards>0?(cnt/totalCards)*58:0,cnt>0?4:2);return(
               <div key={b.n} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-white font-black text-sm">{cnt}</span>
-                <div className="w-full rounded-t-lg" style={{height:h,background:b.color,opacity:cnt===0?0.2:1}}/>
+                <span className="text-white font-bold text-xs tabular-nums" style={{opacity:cnt===0?0.3:1}}>{cnt}</span>
+                <div className="w-full rounded-t-md" style={{height:h,background:b.color,opacity:cnt===0?0.2:1}}/>
               </div>
             );})}
           </div>
-          <div className="flex justify-between">{LEITNER_BOXES.map(b=><p key={b.n} className="flex-1 text-center text-white/40 text-xs">B{b.n}</p>)}</div>
+          <div className="flex justify-between">
+            {LEITNER_BOXES.map(b=><p key={b.n} className="flex-1 text-center text-white/30 text-xs">B{b.n}</p>)}
+          </div>
         </div>
-        <button onClick={()=>setView("home")} className="w-full py-4 rounded-2xl text-white font-black bg-white/10 hover:bg-white/20 transition-all">← Retour aux boîtes</button>
+        <button onClick={()=>setView("home")} className="btn-press w-full py-4 rounded-2xl text-white font-bold text-sm glass" style={{cursor:'pointer'}}>
+          ← Retour aux boîtes
+        </button>
       </div>
     </div>
   );
@@ -1251,6 +1889,7 @@ function App() {
   const [retryDeck,setRetryDeck]=useState(null);
   const [user,setUser]=useState(null);
   const [authLoading,setAuthLoading]=useState(true);
+  const [isGuest,setIsGuest]=useState(false);
 
   useEffect(()=>{
     const unsub=auth.onAuthStateChanged(async u=>{
@@ -1270,16 +1909,16 @@ function App() {
   useEffect(()=>{ if(user) requestAndScheduleNotifications(); },[user]);
 
   if(authLoading) return <LoadingScreen/>;
-  if(!user) return <LoginScreen/>;
+  if(!user && !isGuest) return <LoginScreen onGuestLogin={()=>setIsGuest(true)}/>;
 
   const goHome=()=>{setScreen("home");setCategory(null);setGameMode(null);setPlayConfig(null);setResultData(null);setRetryDeck(null);};
 
-  if(screen==="home") return <HomeScreen user={user} onSelectMode={c=>{
+  if(screen==="home") return <HomeScreen user={user} isGuest={isGuest} onSignIn={()=>setIsGuest(false)} onSelectMode={c=>{
     if(c==="leitner"){setScreen("leitner");return;}
     setCategory(c);setScreen("gamemode");
   }}/>;
 
-  if(screen==="leitner") return <LeitnerScreen onBack={goHome}/>;
+  if(screen==="leitner") return <LeitnerScreen isGuest={isGuest} onBack={goHome}/>;
 
   if(screen==="gamemode") return <GameModeScreen category={category} onSelect={m=>{setGameMode(m);setScreen("setup");}} onBack={goHome}/>;
 
@@ -1288,25 +1927,26 @@ function App() {
     const startPlay=cfg=>{setPlayConfig(cfg);setRetryDeck(null);setScreen("play");};
     if(category==="departements") return <SetupDept gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
     if(category==="capitales")    return <SetupCapitales gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
+    if(category==="dates")        return <SetupDates gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
     if(category==="philo")        return <SetupPhilo gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
   }
 
-  if(screen==="result") return <ResultScreen data={resultData} onRetry={d=>{setRetryDeck(d);setScreen("play");}} onHome={goHome}/>;
+  if(screen==="result") return <ResultScreen data={resultData} isGuest={isGuest} onRetry={d=>{setRetryDeck(d);setScreen("play");}} onHome={goHome}/>;
 
   if(screen==="play"){
     const k=retryDeck?"retry":"fresh";
     const cfg=playConfig;
     // Philo leçon → fiches
     if(cfg?.type==="philo"&&gameMode==="lesson")
-      return <PhiloFicheScreen key={k} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+      return <PhiloFicheScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
     // Philo défi → flashcards 2 blocs
     if(cfg?.type==="philo"&&gameMode==="challenge")
-      return <PhiloDefiScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+      return <PhiloDefiScreen key={k} config={cfg} retryDeck={retryDeck} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
     // Dept / Cap leçon
     if(gameMode==="lesson")
-      return <LessonScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+      return <LessonScreen key={k} config={cfg} retryDeck={retryDeck} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
     // Dept / Cap défi
-    return <ChallengeScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    return <ChallengeScreen key={k} config={cfg} retryDeck={retryDeck} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
   }
 
   return null;
