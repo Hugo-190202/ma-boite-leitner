@@ -504,11 +504,74 @@ const DEPT_DIRS_CHEF = [{id:"nom-to-chef",label:"Nom → Chef-lieu",icon:"🗺�
 const PHILO_DIRS = [{id:"nom-to-back",label:"Nom → Déf. + Auteurs",icon:"🧠"},{id:"back-to-nom",label:"Déf. + Auteurs → Nom",icon:"📖"}];
 const CAP_DIRS = [{id:"pays-to-cap",label:"Pays → Capitale",icon:"🌍"},{id:"cap-to-pays",label:"Capitale → Pays",icon:"🏙️"},{id:"mixed",label:"Mixte",icon:"🔀"}];
 const HIST_DIRS = [{id:"date-to-evt",label:"Date → Événement",icon:"📅"},{id:"evt-to-date",label:"Événement → Date",icon:"🔢"},{id:"mixed",label:"Mixte",icon:"🔀"}];
+
+// ─── FIGURES DE STYLE ───
+const FIGURES_STYLE = [
+  // Analogie
+  {id:"metaphore",    nom:"Métaphore",        categorie:"Analogie",       definition:"Comparaison implicite sans outil comparatif. Assimile directement deux réalités.", exemple:"\"La vie est un long fleuve tranquille.\" / \"Il a le cœur de pierre.\"", effet:"Crée une image forte, exprime une ressemblance profonde de façon condensée."},
+  {id:"comparaison",  nom:"Comparaison",       categorie:"Analogie",       definition:"Rapprochement explicite de deux réalités à l'aide d'un outil comparatif (comme, tel, pareil à…).", exemple:"\"Il est fort comme un lion.\" / \"Elle pleurait comme une Madeleine.\"", effet:"Éclaire une idée en la rapprochant d'une autre plus concrète ou connue."},
+  {id:"allegorie",    nom:"Allégorie",         categorie:"Analogie",       definition:"Représentation concrète et prolongée d'une idée abstraite par un récit ou une image filée.", exemple:"Les Fables de La Fontaine : la société représentée par des animaux.", effet:"Rend accessible une abstraction complexe, permet la critique voilée."},
+  {id:"personnification",nom:"Personnification",categorie:"Analogie",      definition:"Attribution de caractéristiques humaines à des êtres non humains ou à des abstractions.", exemple:"\"La nature se réveille au printemps.\" / \"La mort nous guette.\"", effet:"Crée une proximité affective, anime le récit."},
+  {id:"prosopopee",   nom:"Prosopopée",        categorie:"Analogie",       definition:"Variante de la personnification : on fait parler un absent, un mort ou une abstraction à la première personne.", exemple:"\"Ô liberté, que de crimes on commet en ton nom !\"", effet:"Donne voix aux absents, effet oratoire puissant."},
+  {id:"synecdoque",   nom:"Synecdoque",        categorie:"Analogie",       definition:"Substitution d'un terme par un autre entretenant un rapport partie/tout ou matière/objet.", exemple:"\"Avoir un toit\" (= un logement). \"Les voiles\" (= les bateaux).", effet:"Condensation expressive, effet de style littéraire."},
+  // Amplification
+  {id:"hyperbole",    nom:"Hyperbole",         categorie:"Amplification",  definition:"Exagération volontaire pour amplifier un sentiment, une idée ou une description.", exemple:"\"Je t'ai dit mille fois de ranger ta chambre !\" / \"Je meurs de faim.\"", effet:"Insiste sur l'intensité, effet comique ou dramatique selon le contexte."},
+  {id:"gradation",    nom:"Gradation",         categorie:"Amplification",  definition:"Succession de termes ordonnés par degré croissant (montante) ou décroissant (descendante).", exemple:"\"Va, cours, vole et nous venge !\" (Corneille, Le Cid)", effet:"Crée un effet de crescendo, renforce l'impact émotionnel."},
+  {id:"accumulation", nom:"Accumulation",      categorie:"Amplification",  definition:"Juxtaposition de nombreux termes de même nature grammaticale pour donner l'impression d'abondance.", exemple:"\"Des hommes, des femmes, des enfants, des vieillards… tous fuyaient.\"", effet:"Renforce l'intensité, crée un effet d'envahissement."},
+  {id:"anaphore",     nom:"Anaphore",          categorie:"Amplification",  definition:"Répétition d'un même mot ou groupe de mots en début de phrases ou de vers successifs.", exemple:"\"Je t'aime pour ta douceur. Je t'aime pour ton courage. Je t'aime pour ton rire.\"", effet:"Crée un effet incantatoire, insiste sur le mot répété."},
+  {id:"epiphore",     nom:"Épiphore",          categorie:"Amplification",  definition:"Répétition d'un même terme ou expression en fin de propositions successives.", exemple:"\"Et tout tremble, Ithurbide ! Et tout tremble, Espelette !\" (Hugo)", effet:"Martèlement d'une idée, effet de conviction ou de hantise."},
+  // Atténuation
+  {id:"litote",       nom:"Litote",            categorie:"Atténuation",    definition:"Dire moins pour exprimer davantage : on minimise volontairement ce qu'on veut exprimer avec force.", exemple:"\"Va, je ne te hais point.\" (Corneille) — signifie : je t'aime.", effet:"Suggestion puissante, effet de pudeur ou d'ironie retenue."},
+  {id:"euphemisme",   nom:"Euphémisme",        categorie:"Atténuation",    definition:"Remplacement d'un mot choquant ou tabou par une expression plus douce ou voilée.", exemple:"\"Il a disparu\" (pour : il est mort). \"Personne à mobilité réduite.\"", effet:"Atténue un propos blessant, marque le tact ou la censure sociale."},
+  {id:"preterition",  nom:"Prétérition",       categorie:"Atténuation",    definition:"Semblant de passer sous silence quelque chose tout en le disant quand même.", exemple:"\"Je ne parlerai pas de ses nombreuses trahisons, ni de ses mensonges…\"", effet:"Met paradoxalement en valeur ce qu'on prétend taire, effet rhétorique."},
+  // Opposition
+  {id:"antithese",    nom:"Antithèse",         categorie:"Opposition",     definition:"Rapprochement dans le même énoncé de deux termes ou idées de sens opposé.", exemple:"\"Partir, c'est mourir un peu.\" / \"L'amour est enfant de Bohème.\"", effet:"Souligne un contraste, enrichit la pensée par la dialectique."},
+  {id:"oxymore",      nom:"Oxymore",           categorie:"Opposition",     definition:"Alliance de deux termes de sens contraires directement associés, créant une tension paradoxale.", exemple:"\"Cette obscure clarté\" (Corneille). \"Un silence éloquent.\"", effet:"Exprime l'ambivalence, la complexité d'un sentiment."},
+  {id:"paradoxe",     nom:"Paradoxe",          categorie:"Opposition",     definition:"Affirmation qui semble aller à l'encontre du sens commun mais qui contient une vérité profonde.", exemple:"\"Plus on est de fous, plus on rit.\" / \"Je me presse de rire de tout…\"", effet:"Provoque la réflexion, remet en question les certitudes."},
+  {id:"chiasme",      nom:"Chiasme",           categorie:"Opposition",     definition:"Construction croisée de deux membres de phrase en miroir : A B / B' A'.", exemple:"\"Il faut manger pour vivre et non pas vivre pour manger.\" (Molière)", effet:"Crée un effet d'équilibre, met en valeur le retournement."},
+  {id:"antiphrase",   nom:"Antiphrase",        categorie:"Opposition",     definition:"Dire le contraire de ce qu'on pense, souvent avec ironie ou sarcasme.", exemple:"\"C'est du beau travail !\" (dit d'un travail raté). \"Bravo, le génie !\"", effet:"Vecteur de l'ironie et du sarcasme, effet comique ou critique."},
+  // Sonorité
+  {id:"alliteration", nom:"Allitération",      categorie:"Sonorité",       definition:"Répétition d'un même son consonantique dans des mots rapprochés.", exemple:"\"Pour qui sont ces serpents qui sifflent sur vos têtes ?\" (Racine)", effet:"Crée une musicalité, peut imiter un son (effet onomatopéique)."},
+  {id:"assonance",    nom:"Assonance",         categorie:"Sonorité",       definition:"Répétition d'un même son vocalique dans des mots rapprochés.", exemple:"\"Les sanglots longs des violons de l'automne\" (Verlaine) — son [ɔ̃].", effet:"Harmonie musicale du texte, accompagne une atmosphère."},
+  {id:"onomatopee",   nom:"Onomatopée",        categorie:"Sonorité",       definition:"Mot dont le son imite la chose ou l'action désignée.", exemple:"\"Plouf\", \"coucou\", \"tic-tac\", \"vrombir\", \"cocorico\".", effet:"Mimétisme sonore, vitalité expressive, effet pittoresque."},
+  {id:"paronomase",   nom:"Paronomase",        categorie:"Sonorité",       definition:"Rapprochement de mots de sons proches mais de sens différents.", exemple:"\"Qui se sent morveux, qu'il se mouche.\" / \"Les dés sont faits, les faits sont dits.\"", effet:"Jeu sonore, effet de surprise, comique ou poétique."},
+  // Construction
+  {id:"ellipse",      nom:"Ellipse",           categorie:"Construction",   definition:"Omission d'un ou plusieurs éléments grammaticalement attendus mais compréhensibles par le contexte.", exemple:"\"Faute de grives, on mange des merles.\"", effet:"Concentre l'expression, accélère le rythme du discours."},
+  {id:"zeugme",       nom:"Zeugme",            categorie:"Construction",   definition:"Un même verbe gouverne plusieurs compléments de nature ou de registre très différents.", exemple:"\"Il prit son chapeau et congé.\" / \"Elle était vêtue de blanc et de prudence.\"", effet:"Effet comique ou poétique par l'alliance inattendue."},
+  {id:"asyndete",     nom:"Asyndète",          categorie:"Construction",   definition:"Suppression des mots de liaison (conjonctions) entre des propositions ou des groupes.", exemple:"\"Veni, vidi, vici.\" — Je suis venu, j'ai vu, j'ai vaincu. (César)", effet:"Rythme rapide, effet de dynamisme ou de laconisme."},
+  {id:"polysyndete",  nom:"Polysyndète",       categorie:"Construction",   definition:"Répétition abondante des mots de liaison, à l'inverse de l'asyndète.", exemple:"\"Et le vent et la pluie et la grêle frappaient à la fenêtre.\"", effet:"Ralentit le rythme, crée un effet d'accumulation ou d'insistance."},
+  // Ironie & Détour
+  {id:"ironie",       nom:"Ironie",            categorie:"Ironie & Détour",definition:"Procédé par lequel on dit le contraire de ce qu'on pense, avec l'intention d'être compris. Implique une complicité.", exemple:"\"Quelle belle journée !\" (lors d'une tempête).", effet:"Critique voilée, connivence avec le lecteur, effet comique ou mordant."},
+  {id:"periphrase",   nom:"Périphrase",        categorie:"Ironie & Détour",definition:"Remplacement d'un mot par une expression plus longue qui le décrit ou l'évoque.", exemple:"\"Le roi des animaux\" (= le lion). \"L'astre du jour\" (= le soleil).", effet:"Embellissement poétique, mise en valeur descriptive."},
+  {id:"apostrophe",   nom:"Apostrophe",        categorie:"Ironie & Détour",definition:"Interpellation directe d'un être (présent ou absent, réel ou fictif) au cours du discours.", exemple:"\"Ô temps ! Ô mœurs !\" / \"France, mère des arts, des armes et des lois\"", effet:"Interpelle, implique affectivement, effet oratoire."},
+];
+const FIGURES_GROUPES = {
+  "Analogie":       ["Métaphore","Comparaison","Allégorie","Personnification","Prosopopée","Synecdoque"],
+  "Amplification":  ["Hyperbole","Gradation","Accumulation","Anaphore","Épiphore"],
+  "Atténuation":    ["Litote","Euphémisme","Prétérition"],
+  "Opposition":     ["Antithèse","Oxymore","Paradoxe","Chiasme","Antiphrase"],
+  "Sonorité":       ["Allitération","Assonance","Onomatopée","Paronomase"],
+  "Construction":   ["Ellipse","Zeugme","Asyndète","Polysyndète"],
+  "Ironie & Détour":["Ironie","Périphrase","Apostrophe"],
+};
+const FIGURES_GROUPES_LIST = Object.keys(FIGURES_GROUPES);
+const FIGURES_CAT_COLORS = {
+  "Analogie":"#6366f1","Amplification":"#f59e0b","Atténuation":"#10b981",
+  "Opposition":"#ef4444","Sonorité":"#8b5cf6","Construction":"#0ea5e9","Ironie & Détour":"#ec4899",
+};
+const FIGURES_DIRS = [{id:"nom-to-def",label:"Nom → Définition",icon:"📖"},{id:"def-to-nom",label:"Définition → Nom",icon:"🔤"}];
+function getFigureCardFrontBack(card) {
+  if(card.dir==="nom-to-def") return {front:card.nom, back:card.definition, frontLabel:"Figure", backLabel:"Définition"};
+  return {front:card.definition, back:card.nom, frontLabel:"Définition", backLabel:"Figure"};
+}
+
 const MAIN_MODES = [
   {id:"departements",label:"Départements français",  icon:"🗺️",color:"#1a3a6b"},
   {id:"capitales",   label:"Capitales du monde",     icon:"🌍",color:"#1a3b1a"},
   {id:"dates",       label:"Dates historiques",      icon:"📅",color:"#3d1a00"},
   {id:"philo",       label:"Courants philosophiques",icon:"🧠",color:"#2d1a4a"},
+  {id:"echecs",      label:"Académie des Échecs",    icon:"♟️",color:"#1a1a2e"},
+  {id:"figures",     label:"Figures de style",       icon:"✍️", color:"#831843"},
 ];
 
 // ─── LEITNER ───
@@ -574,6 +637,10 @@ function addCardsToLeitnerStorage(deck, configType) {
       id = card.id;
       if (!existingCustomIds.has(id))
         customCard = {id, type:'hist', date:card.date, evenement:card.evenement, periode:card.periode};
+    } else if (configType==='figures') {
+      id = 'figstyle_'+card.id;
+      if (!existingCustomIds.has(id))
+        customCard = {id, type:'figures', nom:card.nom, definition:card.definition, exemple:card.exemple, effet:card.effet, categorie:card.categorie};
     }
     if (id && !seen.has(id) && !newState.cards[id]) {
       const today = new Date().toISOString().slice(0,10);
@@ -599,6 +666,7 @@ function countNewLeitnerCards(deck, configType) {
     else if (configType==='cap') id = 'cap_'+card.pays;
     else if (configType==='philo') id = 'philo_'+card.nom;
     else if (configType==='hist') id = card.id;
+    else if (configType==='figures') id = 'figstyle_'+card.id;
     if (id && !seen.has(id) && !state.cards[id]) { seen.add(id); count++; }
   });
   return count;
@@ -678,6 +746,8 @@ const HOME_ICONS = {
   capitales: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
   dates: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
   philo: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+  echecs: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="17" width="18" height="4" rx="1"/><rect x="6" y="13" width="12" height="4" rx="1"/><path d="M9 13V9M15 13V9"/><path d="M7 9h10"/><path d="M10 9V6M14 9V6"/><path d="M8 6h8"/></svg>,
+  figures: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
 };
 const HOME_CARD_STYLES = {
   leitner:     {from:'#1e3a5f', to:'#2563eb', accent:'rgba(59,130,246,0.3)',  sub:'Révision espacée intelligente'},
@@ -685,6 +755,8 @@ const HOME_CARD_STYLES = {
   capitales:   {from:'#14432a', to:'#047857', accent:'rgba(4,120,87,0.3)',    sub:'Pays et capitales du monde'},
   dates:       {from:'#3d1f00', to:'#c2410c', accent:'rgba(194,65,12,0.3)',   sub:'Évènements & dates clés'},
   philo:       {from:'#2d1a50', to:'#6d28d9', accent:'rgba(109,40,217,0.3)',  sub:'Courants & auteurs majeurs'},
+  echecs:      {from:'#1a1a2e', to:'#3d3d5c', accent:'rgba(212,175,55,0.3)', sub:'Ouvertures étape par étape'},
+  figures:     {from:'#4a0020', to:'#9d174d', accent:'rgba(157,23,77,0.3)',  sub:'Rhétorique & procédés littéraires'},
 };
 
 function HomeScreen({onSelectMode, user, isGuest, onSignIn}) {
@@ -1053,6 +1125,244 @@ function SetupPhilo({gameMode, onStart, onBack}) {
     </div>
   );
 }
+// ─── SETUP FIGURES DE STYLE ───
+function SetupFigures({gameMode, onStart, onBack}) {
+  const [selGroupes,setSelGroupes]=useState([]);
+  const [dir,setDir]=useState("nom-to-def");
+  const accent = gameMode==="lesson"?"#059669":"#9d174d";
+  const totalFigures = selGroupes.reduce((s,g)=>s+(FIGURES_GROUPES[g]?.length||0),0);
+  const toggle = g => setSelGroupes(prev=>prev.includes(g)?prev.filter(x=>x!==g):[...prev,g]);
+  return (
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:accent}}>
+            {gameMode==="lesson"?<BookOpen size={18} color="white"/>:<Zap size={18} color="white"/>}
+          </div>
+          <div>
+            <h1 className="text-white font-black text-xl">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+            <p className="text-white/40 text-xs font-medium">Figures de style</p>
+          </div>
+        </div>
+
+        <SetupSection title="Catégories" badge={selGroupes.length>0?`${selGroupes.length} cat · ${totalFigures} figures`:null}>
+          <div className="rounded-xl overflow-hidden border border-white/10">
+            {FIGURES_GROUPES_LIST.map((g,i)=>{
+              const count=FIGURES_GROUPES[g].length;
+              return(<CheckItem key={g} label={g} count={count+" figures"} color={FIGURES_CAT_COLORS[g]} checked={selGroupes.includes(g)} onClick={()=>toggle(g)} last={i===FIGURES_GROUPES_LIST.length-1}/>);
+            })}
+          </div>
+          <button onClick={()=>setSelGroupes([...FIGURES_GROUPES_LIST])} className="btn-press w-full mt-2 py-2.5 rounded-xl text-white/60 hover:text-white text-xs font-semibold" style={{background:'rgba(255,255,255,0.06)',cursor:'pointer'}}>
+            {selGroupes.length===FIGURES_GROUPES_LIST.length?"✓ Toutes les catégories":"Sélectionner toutes les catégories"} ({FIGURES_STYLE.length})
+          </button>
+        </SetupSection>
+
+        <SetupSection title="Sens">
+          <div className="grid grid-cols-2 gap-2">
+            {FIGURES_DIRS.map(({id,label})=>(
+              <ToggleBtn key={id} label={label} active={dir===id} accent={accent} onClick={()=>setDir(id)}/>
+            ))}
+          </div>
+        </SetupSection>
+
+        <button onClick={()=>selGroupes.length&&onStart({type:"figures",dir,groupes:selGroupes})} disabled={!selGroupes.length}
+          className="btn-press w-full py-4 rounded-2xl text-white font-bold text-base mb-4"
+          style={{background:selGroupes.length?accent:'rgba(255,255,255,0.07)',opacity:selGroupes.length?1:0.4,cursor:selGroupes.length?'pointer':'not-allowed',boxShadow:selGroupes.length?`0 8px 24px ${accent}55`:'none'}}>
+          {gameMode==="lesson"?"Commencer les fiches →":"Lancer le défi →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── FIGURES FICHE (mode leçon) ───
+function FigureFicheScreen({config, onBack, onEnd}) {
+  const [deck]=useState(()=>{
+    const noms=new Set((config?.groupes||FIGURES_GROUPES_LIST).flatMap(g=>FIGURES_GROUPES[g]||[]));
+    return shuffle(FIGURES_STYLE.filter(f=>noms.has(f.nom)));
+  });
+  const [idx,setIdx]=useState(0);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+  const color=FIGURES_CAT_COLORS[card.categorie]||"#9d174d";
+
+  const go = (delta) => {
+    const next = idx+delta;
+    if (next<0) return;
+    if (next>=deck.length) { onEnd({deck, config:{type:'figures',...(config||{})}, mode:'lesson'}); return; }
+    setAnimating(true);
+    setTimeout(()=>{setIdx(next);setTimeout(()=>setAnimating(false),50);},180);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{if(e.key==="ArrowRight")go(1);if(e.key==="ArrowLeft")go(-1);};
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[idx]);
+
+  return (
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#2d0a1a 100%)"}}>
+      <div className="flex items-center justify-between px-5 pt-6 pb-2" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1} / {deck.length}</span>
+      </div>
+      <div className="px-5 mb-3" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="h-1 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+          <div className="h-full" style={{width:`${((idx+1)/deck.length)*100}%`,background:`linear-gradient(90deg,${color},${color}cc)`,borderRadius:999,transition:'width 0.4s'}}/>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{opacity:animating?0:1,transition:"opacity 0.18s ease",maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="flex flex-col gap-3">
+          {/* Nom card */}
+          <div className="rounded-2xl p-5" style={{background:`linear-gradient(135deg,${color}cc,${color})`,boxShadow:`0 8px 32px ${color}55`}}>
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Figure de style · {card.categorie}</p>
+            <h2 className="text-white font-black text-3xl tracking-tight leading-tight">{card.nom}</h2>
+          </div>
+          {/* Définition */}
+          <div className="glass-strong rounded-2xl p-5">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{color}}>Définition</p>
+            <p className="text-white/90 text-sm leading-relaxed">{card.definition}</p>
+          </div>
+          {/* Exemple */}
+          <div className="glass rounded-2xl p-5">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{color}}>Exemple</p>
+            <p className="text-white/85 text-sm leading-relaxed italic">{card.exemple}</p>
+          </div>
+          {/* Effet */}
+          <div className="glass rounded-2xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-1.5" style={{color}}>Effet produit</p>
+            <p className="text-white/70 text-sm leading-relaxed">{card.effet}</p>
+          </div>
+        </div>
+      </div>
+      <div className="px-4 pb-6 pt-3 safe-bottom" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="grid grid-cols-2 gap-3">
+          <button onClick={()=>go(-1)} disabled={idx===0} className="btn-press py-4 rounded-2xl text-white font-semibold text-sm"
+            style={{background:'rgba(255,255,255,0.08)',opacity:idx===0?0.35:1,cursor:idx===0?'not-allowed':'pointer'}}>
+            ← Précédente
+          </button>
+          <button onClick={()=>go(1)} className="btn-press py-4 rounded-2xl text-white font-bold text-sm"
+            style={{background:`linear-gradient(135deg,${color}cc,${color})`,boxShadow:`0 4px 20px ${color}66`,cursor:'pointer'}}>
+            {idx+1>=deck.length?"Terminer ✓":"Suivante →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── FIGURES DÉFI (flashcard retournement) ───
+function FigureDefiScreen({config, onBack, onEnd, retryDeck}) {
+  const [deck]=useState(()=>{
+    if(retryDeck) return shuffle([...retryDeck]);
+    const noms=new Set((config?.groupes||FIGURES_GROUPES_LIST).flatMap(g=>FIGURES_GROUPES[g]||[]));
+    const dir=config?.dir||"nom-to-def";
+    return shuffle(FIGURES_STYLE.filter(f=>noms.has(f.nom))).map(f=>({...f,dir}));
+  });
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [scores,setScores]=useState([]);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+  const color=FIGURES_CAT_COLORS[card.categorie]||"#9d174d";
+  const isNomFront=card.dir==="nom-to-def";
+
+  const next=knew=>{
+    const ns=[...scores,knew];
+    if(idx+1>=deck.length){onEnd({deck,scores:ns,config,mode:"challenge"});return;}
+    setScores(ns);setAnimating(true);
+    setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{
+      if(["ArrowUp","ArrowDown"," "].includes(e.key)){e.preventDefault();if(!flipped)setFlipped(true);}
+      if(flipped&&e.key==="ArrowRight")next(true);
+      if(flipped&&e.key==="ArrowLeft")next(false);
+    };
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[flipped,idx,scores]);
+
+  return(
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#2d0a1a 100%)"}}>
+      <div className="flex items-center justify-between px-5 pt-5 pb-2" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Config
+        </button>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-xs font-semibold" style={{color:'#4ade80'}}><CheckCircle size={13}/>{scores.filter(Boolean).length}</span>
+          <span className="flex items-center gap-1 text-xs font-semibold" style={{color:'#f87171'}}><XCircle size={13}/>{scores.filter(x=>!x).length}</span>
+        </div>
+        <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{deck.length}</span>
+      </div>
+      <div className="px-5 mb-3" style={{maxWidth:480,margin:'0 auto',width:'100%'}}>
+        <div className="h-1 rounded-full overflow-hidden" style={{background:'rgba(255,255,255,0.08)'}}>
+          <div className="h-full" style={{width:`${(idx/deck.length)*100}%`,background:`linear-gradient(90deg,${color},${color}cc)`,borderRadius:999,transition:'width 0.4s'}}/>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col px-4 pb-4 gap-3 overflow-y-auto" style={{opacity:animating?0:1,transition:"opacity 0.15s",maxWidth:480,margin:'0 auto',width:'100%'}}>
+        {/* Question */}
+        <div className="rounded-2xl p-5" style={{background:flipped?'rgba(255,255,255,0.06)':'white',border:flipped?'1px solid rgba(255,255,255,0.10)':'none',transition:'background 0.2s'}}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{color:flipped?'rgba(255,255,255,0.3)':color}}>
+            {isNomFront?"Figure de style":"Définition"}
+          </p>
+          {isNomFront
+            ? <p className="font-black text-3xl tracking-tight" style={{color:flipped?'rgba(255,255,255,0.4)':'#1a0d2e'}}>{card.nom}</p>
+            : <p className="text-sm leading-relaxed" style={{color:flipped?'rgba(255,255,255,0.45)':'#1a2a4a'}}>{card.definition}</p>
+          }
+        </div>
+
+        {/* Réponse cachée / révélée */}
+        {!flipped
+          ? <button onClick={()=>setFlipped(true)} className="btn-press rounded-2xl p-5 text-center" style={{background:'rgba(255,255,255,0.04)',border:'1.5px dashed rgba(255,255,255,0.18)',cursor:'pointer'}}>
+              <p className="text-white/55 text-sm font-medium">Toucher pour révéler</p>
+              <p className="text-white/25 text-xs mt-1">{isNomFront?"Définition + exemple":"Nom de la figure"}</p>
+            </button>
+          : <div className="rounded-2xl p-5" style={{background:`linear-gradient(135deg,${color}cc,${color})`,boxShadow:`0 8px 24px ${color}44`}}>
+              <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-2">
+                {isNomFront?"Définition & exemple":"Figure de style"}
+              </p>
+              {isNomFront
+                ? <div>
+                    <p className="text-white text-sm leading-relaxed mb-3">{card.definition}</p>
+                    <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:10}}>
+                      <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1.5">Exemple</p>
+                      <p className="text-white text-sm italic leading-relaxed">{card.exemple}</p>
+                    </div>
+                    <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:10,marginTop:10}}>
+                      <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Effet</p>
+                      <p className="text-white/80 text-xs leading-relaxed">{card.effet}</p>
+                    </div>
+                  </div>
+                : <p className="text-white font-black text-3xl tracking-tight">{card.nom}</p>
+              }
+            </div>
+        }
+
+        {/* Boutons auto-évaluation */}
+        {flipped&&(
+          <div className="grid grid-cols-2 gap-3 mt-1">
+            <button onClick={()=>next(false)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm" style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',cursor:'pointer'}}>
+              <XCircle size={16}/> À revoir
+            </button>
+            <button onClick={()=>next(true)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm" style={{background:'linear-gradient(135deg,#064e3b,#059669)',cursor:'pointer'}}>
+              <CheckCircle size={16}/> Je savais !
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── PHILO FICHE (mode leçon) ───
 function PhiloFicheScreen({config, onBack, onEnd}) {
   const [deck]=useState(()=>{
@@ -1471,7 +1781,7 @@ function ResultScreen({data, onRetry, onHome, isGuest}) {
           <h2 className="text-white text-6xl font-black tracking-tight">{pct}<span className="text-3xl">%</span></h2>
           <p className="text-white/50 text-base mt-1 font-medium">{known} / {deck.length} correctes</p>
           <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-            <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{config.type==="dept"?"Départements":config.type==="philo"?"Philosophie":config.type==="hist"?"Dates historiques":"Capitales"}</span>
+            <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{config.type==="dept"?"Départements":config.type==="philo"?"Philosophie":config.type==="hist"?"Dates historiques":config.type==="figures"?"Figures de style":"Capitales"}</span>
             <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{mode==="lesson"?"Leçon":"Défi"}</span>
             {elapsed&&<span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1"><Clock size={10}/>{fmt(elapsed)}</span>}
           </div>
@@ -1484,7 +1794,7 @@ function ResultScreen({data, onRetry, onHome, isGuest}) {
             <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto">
               {toReview.map((d,i)=>(
                 <span key={i} className="text-white/80 text-xs px-3 py-1.5 rounded-full font-medium" style={{background:'rgba(239,68,68,0.2)',border:'1px solid rgba(239,68,68,0.25)'}}>
-                  {config.type==="dept"&&config.subject==="chef"?`${d.num} – ${d.nom} → ${d.chef}`:config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:config.type==="hist"?`${d.date} – ${d.evenement.substring(0,35)}…`:`${d.pays} → ${d.capitale}`}
+                  {config.type==="dept"&&config.subject==="chef"?`${d.num} – ${d.nom} → ${d.chef}`:config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:config.type==="hist"?`${d.date} – ${d.evenement.substring(0,35)}…`:config.type==="figures"?d.nom:`${d.pays} → ${d.capitale}`}
                 </span>
               ))}
             </div>
@@ -1553,6 +1863,7 @@ function LeitnerScreen({onBack,isGuest}) {
       if(t==='cap') _side=Math.random()<0.5?"pays-to-cap":"cap-to-pays";
       else if(t==='philo') _side=Math.random()<0.5?"nom-to-back":"back-to-nom";
       else if(t==='hist') _side=Math.random()<0.5?"date-to-evt":"evt-to-date";
+      else if(t==='figures') _side="nom-to-def";
       else if(t==='chef') _side="dept-to-chef";
       else _side=Math.random()<0.5?"num-to-nom":"nom-to-num";
       return{...c,_side};
@@ -1631,9 +1942,10 @@ function LeitnerScreen({onBack,isGuest}) {
     }
 
     // Capitales, Philosophie, Dates : toujours un seul tag
-    if(allLeitnerCards.some(c=>c.type==='cap'&&activeIds.has(c.id)))  tags.push({label:'Capitales',       color:'#1a3b1a'});
-    if(allLeitnerCards.some(c=>c.type==='philo'&&activeIds.has(c.id)))tags.push({label:'Philosophie',     color:'#5b21b6'});
-    if(allLeitnerCards.some(c=>c.type==='hist'&&activeIds.has(c.id))) tags.push({label:'Dates historiques',color:'#7d3a00'});
+    if(allLeitnerCards.some(c=>c.type==='cap'&&activeIds.has(c.id)))     tags.push({label:'Capitales',        color:'#1a3b1a'});
+    if(allLeitnerCards.some(c=>c.type==='philo'&&activeIds.has(c.id)))  tags.push({label:'Philosophie',      color:'#5b21b6'});
+    if(allLeitnerCards.some(c=>c.type==='hist'&&activeIds.has(c.id)))   tags.push({label:'Dates historiques', color:'#7d3a00'});
+    if(allLeitnerCards.some(c=>c.type==='figures'&&activeIds.has(c.id)))tags.push({label:'Figures de style', color:'#831843'});
 
     return tags.sort((a,b)=>a.label.localeCompare(b.label));
   })();
@@ -1777,11 +2089,15 @@ function LeitnerScreen({onBack,isGuest}) {
     const card=sessionDeck[idx];
     const curBox=state.cards[card.id]?.box||1;
     const t=card.type||'dept';
-    let front,back,frontLabel,backLabel,color;
+    let front,back,frontLabel,backLabel,color,backExtra=null;
     if(t==='cap'){
       if(card._side==='pays-to-cap'){front=card.pays;back=card.capitale;frontLabel="Pays";backLabel="Capitale";}
       else{front=card.capitale;back=card.pays;frontLabel="Capitale";backLabel="Pays";}
       color=CONTINENT_COLORS[card.continent]||"#2471a3";
+    }else if(t==='figures'){
+      front=card.nom; back=card.definition; backExtra=card.exemple;
+      frontLabel="Figure de style"; backLabel="Définition";
+      color=FIGURES_CAT_COLORS[card.categorie]||"#9d174d";
     }else if(t==='philo'){
       if(card._side==='nom-to-back'){front=card.nom;back=card.definition;frontLabel="Courant";backLabel="Définition";}
       else{front=card.definition;back=card.nom;frontLabel="Définition";backLabel="Courant";}
@@ -1813,7 +2129,7 @@ function LeitnerScreen({onBack,isGuest}) {
               Pause
             </button>
             <div className="text-center">
-              <p className="text-white/60 text-xs font-semibold">{t==='hist'?card.periode:t==='cap'?card.continent:t==='philo'?card.periode||"":card.region}</p>
+              <p className="text-white/60 text-xs font-semibold">{t==='hist'?card.periode:t==='cap'?card.continent:t==='philo'?card.periode||"":t==='figures'?card.categorie:card.region}</p>
               <div className="flex items-center justify-center gap-1 mt-1">
                 {LEITNER_BOXES.map(b=>(
                   <div key={b.n} className="flex items-center justify-center rounded-full font-black" style={{width:18,height:18,background:curBox===b.n?b.color:"rgba(255,255,255,0.12)",color:"white",fontSize:8,border:curBox===b.n?`2px solid rgba(255,255,255,0.4)`:'none'}}>
@@ -1831,18 +2147,32 @@ function LeitnerScreen({onBack,isGuest}) {
           {/* Card flip */}
           <div className="flex-1 flex items-center">
             <div style={{perspective:"1200px",width:'100%'}} onClick={()=>!flipped&&setFlipped(true)}>
-              <div className="relative w-full select-none flip-card-inner" style={{height:220,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+              <div className="relative w-full select-none flip-card-inner" style={{height:t==='figures'?320:220,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+                {/* Recto */}
                 <div className="absolute inset-0 rounded-3xl flip-card-face flex flex-col items-center justify-center p-7"
                   style={{background:'#ffffff',boxShadow:'0 20px 60px rgba(0,0,0,0.5)',backfaceVisibility:'hidden'}}>
                   <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{color}}>{frontLabel}</p>
                   <p className="font-black text-center text-gray-900" style={{fontSize:front.length>25?"1.1rem":front.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{front}</p>
+                  {t==='figures'&&<p className="text-xs mt-2 font-medium" style={{color}}>{card.categorie}</p>}
                   {!flipped&&<p className="text-gray-400 text-xs mt-5 font-medium">Toucher pour révéler</p>}
                 </div>
-                <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col items-center justify-center p-7"
-                  style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/65">{backLabel}</p>
-                  <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.1rem":back.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{back}</p>
-                </div>
+                {/* Verso */}
+                {t==='figures'
+                  ? <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col justify-center p-6"
+                      style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                      <p className="text-xs font-semibold uppercase tracking-widest mb-2 text-white/60">{backLabel}</p>
+                      <p className="text-white text-sm leading-relaxed font-medium mb-4">{back}</p>
+                      <div style={{borderTop:'1px solid rgba(255,255,255,0.25)',paddingTop:12}}>
+                        <p className="text-xs font-semibold uppercase tracking-widest mb-1.5 text-white/60">Exemple</p>
+                        <p className="text-white/90 text-sm italic leading-relaxed">{backExtra}</p>
+                      </div>
+                    </div>
+                  : <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col items-center justify-center p-7"
+                      style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                      <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/65">{backLabel}</p>
+                      <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.1rem":back.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{back}</p>
+                    </div>
+                }
               </div>
             </div>
           </div>
@@ -1899,6 +2229,594 @@ function LeitnerScreen({onBack,isGuest}) {
   );
 }
 
+// ─── ACADÉMIE DES ÉCHECS ───
+const CHESS_PIECES = {
+  wK:"♔",wQ:"♕",wR:"♖",wB:"♗",wN:"♘",wP:"♙",
+  bK:"♚",bQ:"♛",bR:"♜",bB:"♝",bN:"♞",bP:"♟",
+};
+const CHESS_FILES = {a:0,b:1,c:2,d:3,e:4,f:5,g:6,h:7};
+const CHESS_LIGHT = "#eeeed2";
+const CHESS_DARK  = "#769656";
+const CHESS_LIGHT_HL = "#f7f769";
+const CHESS_DARK_HL  = "#bbcb44";
+
+function chessInitBoard() {
+  const b = Array(8).fill(null).map(() => Array(8).fill(null));
+  const order = ["R","N","B","Q","K","B","N","R"];
+  order.forEach((p,i) => { b[0][i] = "b"+p; b[7][i] = "w"+p; });
+  for(let i=0;i<8;i++) { b[1][i]="bP"; b[6][i]="wP"; }
+  return b;
+}
+function chessApplyMove(board, move, color) {
+  const b = board.map(r=>[...r]);
+  const mv = move.replace(/[+#!?]/g,'');
+  if(mv==="O-O") {
+    const row=color==="w"?7:0;
+    b[row][6]=color+"K";b[row][4]=null;b[row][5]=color+"R";b[row][7]=null; return b;
+  }
+  if(mv==="O-O-O") {
+    const row=color==="w"?7:0;
+    b[row][2]=color+"K";b[row][4]=null;b[row][3]=color+"R";b[row][0]=null; return b;
+  }
+  if(mv.length===2&&mv[0]>='a'&&mv[0]<='h') {
+    const tc=CHESS_FILES[mv[0]],tr=8-parseInt(mv[1]),dir=color==="w"?1:-1;
+    for(let dr=1;dr<=2;dr++){const fr=tr+dir*dr;if(fr>=0&&fr<8&&b[fr][tc]===color+"P"){b[tr][tc]=color+"P";b[fr][tc]=null;break;}}
+    return b;
+  }
+  if(mv.includes("x")&&mv[0]>='a'&&mv[0]<='h') {
+    const fc=CHESS_FILES[mv[0]],tc=CHESS_FILES[mv[2]],tr=8-parseInt(mv[3]),dir=color==="w"?1:-1,fr=tr+dir;
+    if(b[fr][fc]===color+"P"){b[tr][tc]=color+"P";b[fr][fc]=null;}
+    return b;
+  }
+  if(mv[0]>='A'&&mv[0]<='Z') {
+    const type=mv[0],dest=mv.replace(/x/g,''),tc=CHESS_FILES[dest[dest.length-2]],tr=8-parseInt(dest[dest.length-1]);
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++) {
+      if(b[r][c]===color+type) {
+        const dr=Math.abs(tr-r),dc=Math.abs(tc-c);
+        let ok=false;
+        if(type==="N") ok=(dr===2&&dc===1)||(dr===1&&dc===2);
+        if(type==="B") ok=dr===dc;
+        if(type==="R") ok=dr===0||dc===0;
+        if(type==="Q") ok=dr===0||dc===0||dr===dc;
+        if(type==="K") ok=dr<=1&&dc<=1;
+        if(ok&&(!b[tr][tc]||b[tr][tc][0]!==color)){b[tr][tc]=color+type;b[r][c]=null;return b;}
+      }
+    }
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++) {
+      if(b[r][c]===color+type){b[tr][tc]=color+type;b[r][c]=null;return b;}
+    }
+  }
+  return b;
+}
+function chessBuildBoard(moves, upToIdx) {
+  let b = chessInitBoard();
+  for(let i=0;i<=upToIdx;i++) b = chessApplyMove(b, moves[i].move, moves[i].color);
+  return b;
+}
+
+const CHESS_OPENINGS = [
+  {id:1,name:"Partie Italienne",eco:"C50",category:"Ouverte",difficulty:"Débutant",color:"#6366f1",emoji:"🇮🇹",tagline:"La plus ancienne ouverture du monde",description:"La Partie Italienne est l'une des ouvertures les plus classiques. Elle vise à contrôler le centre rapidement, développer les pièces légères et préparer le roque. Idéale pour les débutants car elle enseigne les principes fondamentaux.",principles:["Contrôler le centre avec les pions","Développer les cavaliers avant les fous","Roquer rapidement pour la sécurité du roi"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Blanc occupe le centre avec son pion roi. C'est le coup le plus populaire — il ouvre les diagonales de la Dame et du Fou roi."},{move:"e5",color:"b",notation:"1... e5",explain:"Noir répond symétriquement en contestant le centre. Cette réponse est appelée 'ouverture ouverte'."},{move:"Nf3",color:"w",notation:"2. Nf3",explain:"Le Cavalier attaque le pion e5 tout en se développant vers une excellente case centrale. Principe clé : développer les cavaliers avant les fous."},{move:"Nc6",color:"b",notation:"2... Nc6",explain:"Noir défend son pion e5 avec le Cavalier. Coup naturel et solide qui développe une pièce tout en protégeant."},{move:"Bc4",color:"w",notation:"3. Bc4",explain:"Le Fou vise le point faible f7 ! C'est le coup caractéristique de la Partie Italienne. Le Fou est actif et prépare le roque."},{move:"Bc5",color:"b",notation:"3... Bc5",explain:"Noir répond avec son propre Fou actif visant f2. Nous avons la Giuoco Piano ('jeu tranquille' en italien)."}],tip:"💡 Après ces 3 coups, blancs doivent roquer côté roi et placer la Dame sur e2 ou d3 pour un jeu harmonieux.",famousGames:["Morphy vs Anderssen (1858)","Fischer vs Fine (1963)"]},
+  {id:2,name:"Défense Sicilienne",eco:"B20",category:"Semi-ouverte",difficulty:"Intermédiaire",color:"#f59e0b",emoji:"🔥",tagline:"L'ouverture la plus combative",description:"La Défense Sicilienne est la réponse la plus populaire à 1.e4. Noir crée un déséquilibre dès le départ. C'est l'ouverture préférée des joueurs qui aiment gagner avec les Noirs !",principles:["Créer un déséquilibre dès le début","Contre-attaquer au centre plutôt que le tenir","Préparer une attaque sur l'aile dame"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Blanc contrôle le centre. La question est : comment Noir va-t-il répondre ?"},{move:"c5",color:"b",notation:"1... c5",explain:"C'est le coup sicilien ! Noir prépare le contrôle de d4 sans avancer son pion roi. Déséquilibre immédiat !"},{move:"Nf3",color:"w",notation:"2. Nf3",explain:"Blanc développe son cavalier et prépare d4. Coup flexible qui ne révèle pas encore la variante choisie."},{move:"d6",color:"b",notation:"2... d6",explain:"Noir prépare e5 ou Nf6. Le coup d6 soutient le centre et prépare le développement du Fou roi."},{move:"d4",color:"w",notation:"3. d4",explain:"Blanc ouvre le centre ! Ce coup donne à Blanc une forte présence centrale et de l'espace."},{move:"cxd4",color:"b",notation:"3... cxd4",explain:"Noir échange son pion c contre le pion d. Blanc a plus d'espace au centre mais Noir aura du jeu sur la colonne c semi-ouverte."}],tip:"💡 La Sicilienne mène souvent à des parties où Blanc attaque côté roi et Noir contre-attaque côté dame — très tactique !",famousGames:["Kasparov vs Deep Blue (1997)","Fischer vs Spassky (1972)"]},
+  {id:3,name:"Gambit Dame",eco:"D06",category:"Fermée",difficulty:"Intermédiaire",color:"#10b981",emoji:"♟",tagline:"Le gambit le plus classique",description:"Le Gambit Dame est une ouverture de pions d. Blanc offre son pion c en échange d'un contrôle central massif. C'est une ouverture très solide, appréciée à tous niveaux.",principles:["Contrôler le centre avec les pions d et c","Développer les pièces harmonieusement","Le pion offert n'est souvent pas un vrai sacrifice"],moves:[{move:"d4",color:"w",notation:"1. d4",explain:"Blanc ouvre avec le pion dame. Ce coup contrôle e5 et c5 et mène à des parties plus fermées que 1.e4."},{move:"d5",color:"b",notation:"1... d5",explain:"Noir répond en miroir, contestant le centre. C'est la réponse la plus directe et solide."},{move:"c4",color:"w",notation:"2. c4",explain:"Voici le Gambit Dame ! Blanc offre son pion c4. Si Noir le prend, Blanc récupère facilement avec e3 puis Bxc4."},{move:"e6",color:"b",notation:"2... e6",explain:"Noir décline le gambit ! En jouant e6, Noir soutient d5 et développe son Fou. C'est le 'Gambit Dame Refusé'."},{move:"Nc3",color:"w",notation:"3. Nc3",explain:"Blanc développe son Cavalier dame, défendant c4 et attaquant d5. Coup naturel et puissant."},{move:"Nf6",color:"b",notation:"3... Nf6",explain:"Noir développe son Cavalier roi, attaquant e4 potentiel et contrôlant le centre."}],tip:"💡 Si Noir accepte le gambit (2...dxc4), Blanc ne doit pas s'acharner à regagner le pion mais continuer son développement — l'avantage de centre compense !",famousGames:["Carlsen vs Anand WC (2013)","Karpov vs Kasparov (1985)"]},
+  {id:4,name:"Ouverture Anglaise",eco:"A10",category:"Flanc",difficulty:"Avancé",color:"#ec4899",emoji:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",tagline:"La flexibilité au service du stratège",description:"L'Ouverture Anglaise est une ouverture hypermoderne où Blanc contrôle le centre à distance avec son pion c4. Elle offre une grande flexibilité et peut transposer vers de nombreuses autres ouvertures.",principles:["Contrôler le centre de loin (hypermodernisme)","Fianchetter le Fou roi sur g2","Préparer e4 pour saisir le centre au bon moment"],moves:[{move:"c4",color:"w",notation:"1. c4",explain:"L'Anglaise commence ! Blanc contrôle d5 depuis le flanc. Ouverture hypermoderne."},{move:"e5",color:"b",notation:"1... e5",explain:"Noir occupe le centre. Une des réponses les plus agressives."},{move:"Nc3",color:"w",notation:"2. Nc3",explain:"Développement naturel qui met la pression sur d5 et e4. Blanc reste flexible."},{move:"Nf6",color:"b",notation:"2... Nf6",explain:"Noir développe son Cavalier vers une case active, attaquant e4 potentiel."},{move:"g3",color:"w",notation:"3. g3",explain:"Blanc prépare le fianchetto de son Fou roi. Le Fou sur g2 exercera une pression longue distance sur le centre."},{move:"d5",color:"b",notation:"3... d5",explain:"Noir contre-attaque au centre ! En jouant d5, Noir défi le contrôle de Blanc et ouvre la position."}],tip:"💡 L'Anglaise est appréciée des joueurs positionnels. Elle évite la théorie classique et mène à des positions originales.",famousGames:["Karpov vs Kasparov (1985 match)","Carlsen vs Nakamura (2012)"]},
+  {id:5,name:"Défense Française",eco:"C00",category:"Semi-ouverte",difficulty:"Débutant",color:"#3b82f6",emoji:"🇫🇷",tagline:"Solide et contre-attaquante",description:"La Défense Française est une réponse solide à 1.e4. Noir construit une forteresse avec ses pions et attend le bon moment pour contre-attaquer. Réputée pour être difficile à percer pour les Blancs.",principles:["Construire une structure de pions solide","Libérer le Fou droit (problème classique de la Française)","Contre-attaquer avec c5 au bon moment"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Blanc occupe le centre avec son pion roi."},{move:"e6",color:"b",notation:"1... e6",explain:"Voici la Défense Française ! Noir prépare d5. Ce coup ferme temporairement la diagonale du Fou droit."},{move:"d4",color:"w",notation:"2. d4",explain:"Blanc renforce son centre avec deux pions côte à côte. Une structure de pions puissante."},{move:"d5",color:"b",notation:"2... d5",explain:"Noir attaque le centre de Blanc ! Ce coup est le but de la manœuvre française."},{move:"Nc3",color:"w",notation:"3. Nc3",explain:"Blanc défend e4 avec le Cavalier et prépare éventuellement e5 pour restreindre le jeu de Noir."},{move:"Nf6",color:"b",notation:"3... Nf6",explain:"Noir développe et attaque e4. Si Blanc joue e5, le Cavalier ira en d7 et e5 pourra être contesté plus tard."}],tip:"💡 Le talon d'Achille de la Française est le Fou c8 souvent emprisonné. Trouvez comment le libérer et vous maîtriserez cette ouverture !",famousGames:["Tal vs Petrosian (1958)","Korchnoi vs Karpov (1978)"]},
+  {id:6,name:"Partie Espagnole (Ruy Lopez)",eco:"C60",category:"Ouverte",difficulty:"Avancé",color:"#8b5cf6",emoji:"🇪🇸",tagline:"L'ouverture des champions",description:"Le Ruy Lopez (ou Partie Espagnole) est l'une des ouvertures les plus profondes et étudiées. Blanc met immédiatement la pression sur le défenseur du pion e5. L'ouverture favorite de nombreux champions du monde.",principles:["Pression indirecte sur le centre noir","Clouage du Cavalier c6","Maintenir la tension le plus longtemps possible"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Le classique coup d'ouverture roi."},{move:"e5",color:"b",notation:"1... e5",explain:"Noir occupe le centre symétriquement."},{move:"Nf3",color:"w",notation:"2. Nf3",explain:"Développement du Cavalier avec attaque sur e5."},{move:"Nc6",color:"b",notation:"2... Nc6",explain:"Défense du pion e5 par le Cavalier. Coup le plus naturel."},{move:"Bb5",color:"w",notation:"3. Bb5",explain:"C'EST le Ruy Lopez ! Le Fou épingle le Cavalier c6 — défenseur du pion e5. Pression psychologique et stratégique immédiate !"},{move:"a6",color:"b",notation:"3... a6",explain:"La Défense Morphy ! Noir chasse le Fou. Cette position a été analysée pendant des siècles !"}],tip:"💡 Le Ruy Lopez nécessite une bonne compréhension des structures de pions. La théorie va jusqu'au mouvement 30+ dans certaines variantes.",famousGames:["Fischer vs Spassky match (1972)","Kasparov vs Karpov match (1985)"]},
+  {id:7,name:"Défense Scandinave",eco:"B01",category:"Semi-ouverte",difficulty:"Débutant",color:"#06b6d4",emoji:"🇸🇪",tagline:"Directe et facile à apprendre",description:"La Défense Scandinave est l'une des plus anciennes ouvertures connues. Noir conteste immédiatement le centre dès le premier coup. Peu de variantes à mémoriser — idéale pour éviter la théorie complexe.",principles:["Contester le centre dès le 1er coup","Sortir rapidement la Dame en sécurité","Développement solide derrière une structure stable"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Blanc occupe le centre."},{move:"d5",color:"b",notation:"1... d5",explain:"Voilà la Scandinave ! Noir attaque immédiatement le pion e4. Blanc doit choisir : prendre, défendre ou avancer."},{move:"exd5",color:"w",notation:"2. exd5",explain:"Blanc capture le pion. C'est la réponse la plus naturelle. Noir va devoir reprendre avec sa Dame ou son Cavalier."},{move:"Qxd5",color:"b",notation:"2... Qxd5",explain:"La Dame récupère le pion. Attention : la Dame s'expose et pourra être attaquée par Nc3 — Blanc gagnera un tempo."},{move:"Nc3",color:"w",notation:"3. Nc3",explain:"Blanc développe AVEC gain de tempo en attaquant la Dame. C'est l'idée principale de cette ligne pour Blanc."},{move:"Qa5",color:"b",notation:"3... Qa5",explain:"La Dame se réfugie en a5, position classique. Elle reste active et clouera potentiellement le Cavalier c3 sur le Roi."}],tip:"💡 La variante moderne 2...Nf6 (au lieu de Qxd5) consiste à reprendre le pion plus tard sans exposer la Dame. Plus solide au haut niveau !",famousGames:["Carlsen vs Karjakin (2016)","Anand vs Lautier (1997)"]},
+  {id:8,name:"Caro-Kann",eco:"B10",category:"Semi-ouverte",difficulty:"Intermédiaire",color:"#14b8a6",emoji:"🏰",tagline:"La défense des champions du monde",description:"La Caro-Kann est très solide : Noir prépare d5 sans bloquer son Fou c8 (contrairement à la Française). Adoptée par Capablanca, Karpov et Anand pour sa structure de pions saine.",principles:["Préparer d5 sans bloquer le Fou c8","Structure de pions saine et durable","Préférer la solidité à l'agressivité"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Coup classique."},{move:"c6",color:"b",notation:"1... c6",explain:"C'est la Caro-Kann ! Noir prépare d5 SANS fermer la diagonale du Fou c8 — grande différence avec la Française !"},{move:"d4",color:"w",notation:"2. d4",explain:"Blanc construit un grand centre avec ses deux pions."},{move:"d5",color:"b",notation:"2... d5",explain:"Noir attaque le centre. Blanc doit décider : échanger, avancer (e5) ou défendre (Nc3/Nd2)."},{move:"Nc3",color:"w",notation:"3. Nc3",explain:"Variante classique. Blanc défend e4 et menace de prendre en d5 ou jouer e5."},{move:"dxe4",color:"b",notation:"3... dxe4",explain:"Noir simplifie la position en prenant le pion. Blanc reprendra avec son Cavalier."},{move:"Nxe4",color:"w",notation:"4. Nxe4",explain:"Le Cavalier recapture sur une excellente case centrale. Position calme et équilibrée — idéale pour les joueurs positionnels."}],tip:"💡 Le coup typique pour Noir après 4.Nxe4 est 4...Bf5 — qui sort le Fou AVANT de jouer e6. C'est exactement ce qui manque à la Française !",famousGames:["Capablanca vs Tartakower (1924)","Karpov vs Kasparov (1984-85)"]},
+  {id:9,name:"Défense Petrov",eco:"C42",category:"Ouverte",difficulty:"Avancé",color:"#a855f7",emoji:"⚔️",tagline:"La défense russe symétrique",description:"La Petrov (Défense Russe) est connue pour sa solidité légendaire. Au lieu de défendre le pion e5, Noir contre-attaque immédiatement e4 ! Préférée par Kramnik, Caruana et de nombreux autres champions pour neutraliser 1.e4.",principles:["Contre-attaquer plutôt que défendre","Symétrie pour neutraliser l'avantage du trait","Égaliser rapidement par un jeu solide"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Coup classique."},{move:"e5",color:"b",notation:"1... e5",explain:"Réponse symétrique."},{move:"Nf3",color:"w",notation:"2. Nf3",explain:"Blanc attaque le pion e5."},{move:"Nf6",color:"b",notation:"2... Nf6",explain:"C'EST la Petrov ! Au lieu de défendre e5 avec Nc6, Noir contre-attaque e4 en miroir. Si Blanc prend e5, Noir prend e4 !"},{move:"Nxe5",color:"w",notation:"3. Nxe5",explain:"Blanc prend le pion. Mais ATTENTION : si Noir reprend immédiatement par 3...Nxe4??, Blanc joue 4.Qe2! gagnant la pièce. Patience !"},{move:"d6",color:"b",notation:"3... d6",explain:"Le coup CORRECT ! Noir chasse le Cavalier blanc avant de récupérer le pion. Précision indispensable."},{move:"Nf3",color:"w",notation:"4. Nf3",explain:"Le Cavalier rentre. Maintenant Noir peut prendre tranquillement."},{move:"Nxe4",color:"b",notation:"4... Nxe4",explain:"Noir récupère le pion. Position symétrique et équilibrée — la Petrov a fait son office."}],tip:"💡 La Petrov a la réputation d'être 'pacifique' mais elle a fait nul d'innombrables matchs de championnat du monde. C'est une arme redoutable pour qui sait l'utiliser.",famousGames:["Kramnik vs Kasparov (2000)","Caruana vs Carlsen WC (2018)"]},
+  {id:10,name:"Défense Slave",eco:"D10",category:"Fermée",difficulty:"Intermédiaire",color:"#0ea5e9",emoji:"🛡️",tagline:"La réponse solide au Gambit Dame",description:"La Défense Slave est la réponse la plus solide au Gambit Dame. Noir défend d5 avec c6 plutôt que e6 — son Fou c8 reste libre ! Arme préférée d'Anand et Carlsen face à 1.d4.",principles:["Soutenir d5 sans bloquer le Fou","Structure flexible adaptable","Le Fou c8 sortira par f5 ou g4"],moves:[{move:"d4",color:"w",notation:"1. d4",explain:"Ouverture du pion dame."},{move:"d5",color:"b",notation:"1... d5",explain:"Réponse symétrique."},{move:"c4",color:"w",notation:"2. c4",explain:"Le Gambit Dame ! Blanc offre son pion c."},{move:"c6",color:"b",notation:"2... c6",explain:"C'EST la Défense Slave ! Au lieu de e6 (qui bloque le Fou c8), Noir défend d5 avec c6. Le Fou c8 reste libre — différence cruciale avec le Gambit Dame Refusé !"},{move:"Nf3",color:"w",notation:"3. Nf3",explain:"Développement naturel."},{move:"Nf6",color:"b",notation:"3... Nf6",explain:"Noir développe son Cavalier roi. Position classique de la Slave."},{move:"Nc3",color:"w",notation:"4. Nc3",explain:"Le second Cavalier blanc se développe et attaque d5."},{move:"dxc4",color:"b",notation:"4... dxc4",explain:"Slave Acceptée ! Noir prend le pion c4. Il pourra défendre ce pion avec b5 au prochain coup, créant une structure complexe."}],tip:"💡 L'avantage majeur de la Slave : votre Fou c8 sortira facilement par f5 ou g4. Anand a fait carrière avec cette défense — solide et puissante.",famousGames:["Anand vs Topalov WC (2010)","Carlsen vs Anand WC (2014)"]},
+  {id:11,name:"Défense Indienne du Roi",eco:"E60",category:"Indienne",difficulty:"Avancé",color:"#db2777",emoji:"👑",tagline:"Hypermoderne et combative",description:"Défense agressive contre 1.d4 : Noir laisse Blanc construire un grand centre puis l'attaque par les flancs. Fianchetto du Fou roi, attaque de l'aile roi avec f5-f4-g4. L'ouverture des combattants — adorée par Fischer et Kasparov.",principles:["Fianchetto du Fou roi (Bg7)","Laisser Blanc occuper le centre","Contre-attaquer par l'aile (souvent côté roi)"],moves:[{move:"d4",color:"w",notation:"1. d4",explain:"Ouverture du pion dame."},{move:"Nf6",color:"b",notation:"1... Nf6",explain:"Noir développe son Cavalier en surveillant e4 — coup hypermoderne."},{move:"c4",color:"w",notation:"2. c4",explain:"Blanc prend de l'espace au centre."},{move:"g6",color:"b",notation:"2... g6",explain:"Noir prépare le fianchetto du Fou roi. Le coup CARACTÉRISTIQUE de l'Indienne du Roi !"},{move:"Nc3",color:"w",notation:"3. Nc3",explain:"Blanc continue son développement."},{move:"Bg7",color:"b",notation:"3... Bg7",explain:"Le Fou prend la grande diagonale a1-h8 ! Il exerce une pression longue distance sur tout le centre adverse."},{move:"e4",color:"w",notation:"4. e4",explain:"Blanc construit un ÉNORME centre — exactement ce que Noir voulait ! Maintenant la contre-attaque va commencer..."},{move:"d6",color:"b",notation:"4... d6",explain:"Noir prépare e5 — coup typique. Va suivre Nbd7, e5, puis souvent f5 pour une attaque furieuse côté roi !"}],tip:"💡 L'Indienne du Roi mène à des parties très tranchantes : les deux camps attaquent sur des ailes opposées (Blanc côté dame, Noir côté roi). Course à qui mate en premier !",famousGames:["Kasparov vs Korchnoi (1983)","Fischer — multiple parties classiques"]},
+  {id:12,name:"Système de Londres",eco:"D02",category:"Système",difficulty:"Débutant",color:"#ef4444",emoji:"🏛️",tagline:"Joue les mêmes coups à chaque partie",description:"L'ouverture la plus populaire chez les amateurs grâce à sa simplicité ! Blanc joue presque toujours les mêmes coups : d4, Bf4, e3, Nf3, Bd3, c3, Nbd2, h3, O-O. Pas de théorie à mémoriser — un setup fiable contre presque tout.",principles:["Setup mémorisable et reproductible","Position solide quelle que soit la défense","Bf4 sort AVANT e3 — c'est l'idée clé !"],moves:[{move:"d4",color:"w",notation:"1. d4",explain:"Coup d'ouverture du pion dame."},{move:"d5",color:"b",notation:"1... d5",explain:"Noir répond classiquement."},{move:"Nf3",color:"w",notation:"2. Nf3",explain:"Blanc développe son Cavalier roi. Coup standard du Londres."},{move:"Nf6",color:"b",notation:"2... Nf6",explain:"Noir développe symétriquement."},{move:"Bf4",color:"w",notation:"3. Bf4",explain:"COUP CLÉ DU LONDRES ! Le Fou sort AVANT e3 — sinon il serait emprisonné derrière son propre pion. C'est la signature du système."},{move:"e6",color:"b",notation:"3... e6",explain:"Noir prépare le développement de son Fou roi."},{move:"e3",color:"w",notation:"4. e3",explain:"Maintenant que le Fou est sorti, Blanc joue e3 pour soutenir d4 et préparer Bd3."},{move:"Bd6",color:"b",notation:"4... Bd6",explain:"Noir propose l'échange des Fous noirs — souvent une bonne idée contre le Londres pour neutraliser le Fou f4."}],tip:"💡 PARFAIT pour les débutants : peu de théorie, position solide à chaque partie, plan clair. Inconvénient : ne donne souvent qu'un petit avantage et peut produire des parties 'sèches'.",famousGames:["Carlsen vs Wesley So (2019)","Kamsky — multiple parties"]},
+  {id:13,name:"Mat du Berger",eco:"—",category:"Piège",difficulty:"Débutant",color:"#facc15",emoji:"⚠️",tagline:"Le piège des débutants — à connaître pour le contrer !",description:"Le Mat du Berger n'est pas vraiment une ouverture, c'est un piège classique en 4 coups. Tout joueur DOIT le connaître pour ne PAS s'y faire prendre. Stratégie non viable au-dessus du niveau débutant — la Dame sort trop tôt et perd des tempos.",principles:["Reconnaître la menace de Qxf7#","Toujours protéger f7 (point le plus faible !)","Ne JAMAIS sortir la Dame trop tôt — elle se fait chasser"],moves:[{move:"e4",color:"w",notation:"1. e4",explain:"Coup classique."},{move:"e5",color:"b",notation:"1... e5",explain:"Noir occupe le centre."},{move:"Bc4",color:"w",notation:"2. Bc4",explain:"Le Fou vise f7 — point le plus faible des Noirs (défendu uniquement par le Roi). Coup naturel mais la menace se prépare déjà..."},{move:"Nc6",color:"b",notation:"2... Nc6",explain:"Noir développe naturellement. Mais ATTENTION au prochain coup de Blanc !"},{move:"Qh5",color:"w",notation:"3. Qh5",explain:"⚠️ ALERTE ! La Dame menace DEUX choses : 1) Qxf7# (mat !) et 2) Qxe5 (gain du pion). Noir DOIT défendre f7 immédiatement."},{move:"Nf6",color:"b",notation:"3... Nf6??",explain:"❌ ERREUR FATALE ! Noir attaque la Dame mais oublie la menace de mat. Les bons coups étaient g6, Qe7 ou Qf6 pour défendre f7 !"},{move:"Qxf7",color:"w",notation:"4. Qxf7#",explain:"💀 ÉCHEC ET MAT ! La Dame, soutenue par le Fou c4, mate sur f7. Le Roi ne peut pas s'enfuir, ne peut pas capturer (Dame protégée), ne peut pas bloquer."}],tip:"💡 Pour CONTRER le Mat du Berger : après 3.Qh5, jouez 3...g6 ! La Dame doit reculer. Ensuite Nf6 chasse la Dame — Blanc aura sorti sa Dame trop tôt et perdu plein de tempos. Le piégeur devient le piégé !",famousGames:["Joué tous les jours par les débutants","À connaître ABSOLUMENT pour le contrer"]},
+];
+
+const CHESS_DIFF_COLOR = d => d==="Débutant"?"#10b981":d==="Intermédiaire"?"#f59e0b":"#ef4444";
+const CHESS_FILTERS = ["Tous","Débutant","Intermédiaire","Avancé"];
+
+function ChessBoard({boardState, highlight}) {
+  return (
+    <div style={{display:"inline-block",border:"6px solid #3d3d2c",borderRadius:4,boxShadow:"0 8px 32px rgba(0,0,0,.6)"}}>
+      {Array(8).fill(0).map((_,r)=>(
+        <div key={r} style={{display:"flex"}}>
+          <div style={{width:18,display:"flex",alignItems:"center",justifyContent:"center",background:"#3d3d2c",color:"#eeeed2",fontSize:10,fontWeight:700}}>{8-r}</div>
+          {Array(8).fill(0).map((_,c)=>{
+            const isLight=(r+c)%2===0;
+            const isHl=highlight&&highlight[0]===r&&highlight[1]===c;
+            const bg=isLight?(isHl?CHESS_LIGHT_HL:CHESS_LIGHT):(isHl?CHESS_DARK_HL:CHESS_DARK);
+            const piece=boardState[r][c];
+            return (
+              <div key={c} style={{width:44,height:44,background:bg,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {piece&&<span style={{fontSize:34,lineHeight:1,userSelect:"none",color:piece[0]==="w"?"#ffffff":"#1a1a1a",textShadow:piece[0]==="w"?"0 0 1px #000,0 0 2px #000,1px 1px 2px rgba(0,0,0,.5)":"0 0 1px #fff,1px 1px 2px rgba(0,0,0,.4)",fontFamily:"'Arial Unicode MS','Segoe UI Symbol',sans-serif"}}>{CHESS_PIECES[piece]}</span>}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+      <div style={{display:"flex",background:"#3d3d2c"}}>
+        <div style={{width:18}}/>
+        {"abcdefgh".split("").map(f=>(
+          <div key={f} style={{width:44,textAlign:"center",color:"#eeeed2",fontSize:10,fontWeight:700,padding:"2px 0"}}>{f}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChessLessonView({opening, onBack}) {
+  const [step, setStep] = React.useState(-1);
+  const [boardState, setBoardState] = React.useState(chessInitBoard());
+  const [highlight, setHighlight] = React.useState(null);
+
+  React.useEffect(()=>{
+    if(step===-1){setBoardState(chessInitBoard());setHighlight(null);return;}
+    const b=chessBuildBoard(opening.moves,step);
+    setBoardState(b);
+    const mv=opening.moves[step].move.replace(/[+#!?]/g,'');
+    if(mv.length===2&&mv[0]>='a') setHighlight([8-parseInt(mv[1]),CHESS_FILES[mv[0]]]);
+    else if(mv.length===3&&mv[0]>='A') setHighlight([8-parseInt(mv[2]),CHESS_FILES[mv[1]]]);
+    else if(mv.includes("x")) setHighlight([8-parseInt(mv[mv.length-1]),CHESS_FILES[mv[mv.length-2]]]);
+    else setHighlight(null);
+  },[step,opening]);
+
+  return (
+    <div style={{minHeight:"100vh",background:"#1a1a2e",fontFamily:"'Georgia',serif",color:"#f1f5f9"}}>
+      <div style={{maxWidth:900,margin:"0 auto",padding:"16px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
+          <button onClick={onBack} style={{background:"#2d2d44",border:"none",color:"#94a3b8",cursor:"pointer",borderRadius:10,padding:"8px 14px",fontSize:13,fontWeight:700,fontFamily:"Georgia,serif"}}>← Retour</button>
+          <div>
+            <h2 style={{margin:0,fontSize:"1.2rem",fontWeight:800,fontFamily:"Georgia,serif"}}>{opening.emoji} {opening.name}</h2>
+            <p style={{margin:0,fontSize:11,color:"#64748b"}}>{opening.eco} · {opening.category} · <span style={{color:CHESS_DIFF_COLOR(opening.difficulty)}}>{opening.difficulty}</span></p>
+          </div>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:18,alignItems:"start"}}>
+          <div>
+            <ChessBoard boardState={boardState} highlight={highlight}/>
+            <div style={{marginTop:10,maxWidth:380}}>
+              <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                <button onClick={()=>setStep(-1)} style={{padding:"4px 8px",borderRadius:6,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"Georgia,serif",background:step===-1?"#d4af37":"#2d2d44",color:step===-1?"#1a1a2e":"#94a3b8"}}>Départ</button>
+                {opening.moves.map((m,i)=>(
+                  <button key={i} onClick={()=>setStep(i)} style={{padding:"4px 8px",borderRadius:6,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,fontFamily:"Georgia,serif",background:step===i?(m.color==="w"?"#d4af37":"#8B6914"):"#2d2d44",color:step===i?"#1a1a2e":"#94a3b8"}}>{m.notation}</button>
+                ))}
+              </div>
+            </div>
+            <div style={{display:"flex",gap:8,marginTop:8,maxWidth:380}}>
+              <button onClick={()=>setStep(s=>Math.max(-1,s-1))} disabled={step===-1} style={{flex:1,padding:"8px",borderRadius:8,border:"none",cursor:step===-1?"not-allowed":"pointer",background:"#2d2d44",color:step===-1?"#3d3d5c":"#94a3b8",fontWeight:700,fontSize:18}}>◀</button>
+              <button onClick={()=>setStep(s=>Math.min(opening.moves.length-1,s+1))} disabled={step===opening.moves.length-1} style={{flex:1,padding:"8px",borderRadius:8,border:"none",cursor:step===opening.moves.length-1?"not-allowed":"pointer",background:"#d4af37",color:"#1a1a2e",fontWeight:700,fontSize:18}}>▶</button>
+            </div>
+          </div>
+
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {step===-1?(
+              <>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:16}}>
+                  <h3 style={{margin:"0 0 8px",fontSize:"0.95rem",fontWeight:700,color:"#d4af37",fontFamily:"Georgia,serif"}}>📖 Description</h3>
+                  <p style={{margin:0,color:"#94a3b8",fontSize:13,lineHeight:1.7}}>{opening.description}</p>
+                </div>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:16}}>
+                  <h3 style={{margin:"0 0 8px",fontSize:"0.95rem",fontWeight:700,fontFamily:"Georgia,serif"}}>🎯 Principes clés</h3>
+                  {opening.principles.map((p,i)=>(
+                    <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:6}}>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:opening.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,flexShrink:0,color:"white"}}>{i+1}</div>
+                      <p style={{margin:0,color:"#94a3b8",fontSize:12,lineHeight:1.5}}>{p}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:16}}>
+                  <h3 style={{margin:"0 0 8px",fontSize:"0.95rem",fontWeight:700,fontFamily:"Georgia,serif"}}>🏆 Parties célèbres</h3>
+                  {opening.famousGames.map((g,i)=><div key={i} style={{color:"#64748b",fontSize:12,marginBottom:3}}>♟ {g}</div>)}
+                </div>
+                <button onClick={()=>setStep(0)} style={{padding:"11px",borderRadius:12,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#d4af37,#f5c842)",color:"#1a1a2e",fontWeight:700,fontSize:14,fontFamily:"Georgia,serif"}}>▶ Commencer la leçon</button>
+              </>
+            ):(
+              <>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:18,borderLeft:`4px solid ${opening.moves[step].color==="w"?"#f5f0e8":"#2c1810"}`}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+                    <div style={{width:38,height:38,borderRadius:"50%",background:opening.moves[step].color==="w"?"#f5f0e8":"#2c1810",border:"2px solid #8B6914",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{opening.moves[step].color==="w"?"♔":"♚"}</div>
+                    <div>
+                      <div style={{fontSize:18,fontWeight:800,color:"#d4af37",fontFamily:"Georgia,serif"}}>{opening.moves[step].notation}</div>
+                      <div style={{fontSize:11,color:"#64748b"}}>{opening.moves[step].color==="w"?"Blancs jouent":"Noirs jouent"}</div>
+                    </div>
+                  </div>
+                  <p style={{margin:0,color:"#cbd5e1",fontSize:13,lineHeight:1.8}}>{opening.moves[step].explain}</p>
+                </div>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:14}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6,fontSize:12,color:"#64748b"}}>
+                    <span>Progression</span><span>{step+1} / {opening.moves.length}</span>
+                  </div>
+                  <div style={{background:"#3d3d5c",borderRadius:10,height:7}}>
+                    <div style={{background:"linear-gradient(90deg,#d4af37,#f5c842)",height:7,borderRadius:10,width:`${((step+1)/opening.moves.length)*100}%`,transition:"width .3s"}}/>
+                  </div>
+                </div>
+                {step===opening.moves.length-1&&(
+                  <div style={{background:"#2d2d44",borderRadius:12,padding:14,border:"1px solid #d4af37"}}>
+                    <div style={{fontSize:16,marginBottom:4}}>💡 Conseil de maître</div>
+                    <p style={{margin:0,color:"#94a3b8",fontSize:12,lineHeight:1.7}}>{opening.tip}</p>
+                  </div>
+                )}
+                {step===opening.moves.length-1&&(
+                  <button onClick={onBack} style={{padding:"11px",borderRadius:12,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#d4af37,#f5c842)",color:"#1a1a2e",fontWeight:700,fontSize:14,fontFamily:"Georgia,serif"}}>✓ Leçon terminée — Choisir une autre</button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── FINALES D'ÉCHECS ───
+const CHESS_ENDINGS = [
+  {
+    id:1, name:"Mat de l'escalier", emoji:"🪜", difficulty:"Débutant", color:"#6366f1",
+    tagline:"Le mat le plus facile à retenir",
+    description:"La Dame et le Roi montent en escadrons, repoussant le Roi adverse vers un bord. C'est souvent la première technique de mat apprise — simple et efficace.",
+    principles:["Repousser le Roi adverse vers un bord ou un coin","La Dame fait des 'escaliers' en se rapprochant","Le Roi blanc doit avancer pour soutenir la Dame"],
+    tip:"⚠️ Attention au pat ! Ne donnez jamais une position où le Roi noir n'a aucun coup légal sans être en échec.",
+    board: [
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","wQ","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["bK","","","","","","",""],
+      ["","","","wK","","","",""],
+    ],
+    moves:[
+      {move:"Qe6",color:"w",notation:"1. De6",explain:"La Dame avance d'une rangée, enfermant le Roi noir dans les deux premières rangées. Pattern escalier : la Dame reste toujours à distance du Roi noir pour éviter qu'il la capture.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wQ","","","",""],["bK","","","","","","",""],["","","","wK","","","",""]]},
+      {move:"Ka7",color:"b",notation:"1... Ra7",explain:"Le Roi noir recule vers le coin. Il n'a que peu de cases disponibles — c'est exactement ce que nous voulons.",board:[["","","","","","","",""],["bK","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wQ","","","",""],["","","","","","","",""],["","","","wK","","","",""]]},
+      {move:"Kd2",color:"w",notation:"2. Rd2",explain:"Le Roi blanc avance pour soutenir la Dame. Il doit approcher — la Dame seule ne peut pas mater sans l'aide du Roi.",board:[["","","","","","","",""],["bK","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wQ","","","",""],["","","","","","","",""],["","","wK","","","","",""]]},
+      {move:"Ka8",color:"b",notation:"2... Ra8",explain:"Le Roi recule dans le coin. Le piège se referme.",board:[["bK","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wQ","","","",""],["","","","","","","",""],["","","wK","","","","",""]]},
+      {move:"Qb6",color:"w",notation:"3. Db6",explain:"La Dame glisse sur b6 — le Roi est en échec et mat ! La Dame contrôle a7, b7, c7 et le Roi blanc surveille a1. Le Roi noir ne peut aller nulle part.",board:[["bK","","","","","","",""],["","wQ","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","wK","","","","",""]]}
+    ]
+  },
+  {
+    id:2, name:"Mat avec Roi + Dame", emoji:"👑", difficulty:"Débutant", color:"#10b981",
+    tagline:"La finale fondamentale",
+    description:"Roi et Dame contre Roi nu. La technique consiste à pousser le Roi adverse dans un coin puis à donner mat. Indispensable à maîtriser — c'est la finale la plus courante en pratique.",
+    principles:["Centraliser votre Roi en premier","Réduire la mobilité du Roi adverse avec la Dame","Pousser vers un coin — pas vers le centre du bord"],
+    tip:"💡 Évitez le pat ! Si le Roi noir est en a8, votre Dame ne doit pas aller en b6 si ce serait le seul coup légal. Vérifiez toujours.",
+    board:[
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","bK","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","wK","","wQ","",""],
+    ],
+    moves:[
+      {move:"Qf5",color:"w",notation:"1. Df5",explain:"La Dame avance pour restreindre le Roi noir. Elle contrôle de nombreuses cases, réduisant la mobilité adverse.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","bK","","","",""],["","","","","","","",""],["","","","","wQ","","",""],["","","","","","","",""],["","","","wK","","","",""]]},
+      {move:"Kd4",color:"w",notation:"2. Rd4",explain:"Le Roi blanc s'active ! Il avance vers le centre pour s'approcher du Roi noir et l'encercler.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","bK","","","",""],["","","","wK","","","",""],["","","","","wQ","","",""],["","","","","","","",""],["","","","","","","",""]]},
+      {move:"Kc3",color:"b",notation:"2... Rc3",explain:"Le Roi noir tente de fuir vers le centre, mais le Roi blanc et la Dame l'en empêchent.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","bK","","","","",""],["","","","wK","","","",""],["","","","","wQ","","",""],["","","","","","","",""],["","","","","","","",""]]},
+      {move:"Qc5",color:"w",notation:"3. Dc5+",explain:"Échec ! La Dame pousse le Roi vers le bord. À chaque coup, on rapproche le Roi noir d'un coin.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","bK","","","","",""],["","","","wK","","","",""],["","","wQ","","","","",""],["","","","","","","",""],["","","","","","","",""]]},
+      {move:"Kb2",color:"b",notation:"3... Rb2",explain:"Le Roi fuit sur le bord. Il est de plus en plus à court d'espace.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wK","","","",""],["","","wQ","","","","",""],["","","","","","","",""],["","bK","","","","","",""]]},
+      {move:"Kd3",color:"w",notation:"4. Rd3",explain:"Le Roi blanc continue d'avancer. La coordination Roi-Dame est la clé.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","wQ","wK","","","",""],["","","","","","","",""],["","bK","","","","","",""]]},
+      {move:"Ka1",color:"b",notation:"4... Ra1",explain:"Le Roi est poussé dans le coin ! C'est presque fini.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","wQ","wK","","","",""],["","","","","","","",""],["bK","","","","","","",""]]},
+      {move:"Qa3",color:"w",notation:"5. Da3#",explain:"ÉCHEC ET MAT ! La Dame donne mat sur a3. Le Roi est dans le coin et ne peut aller nulle part. Le Roi blanc contrôle b2.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wQ","","","wK","","","",""],["","","","","","","",""],["bK","","","","","","",""]]}
+    ]
+  },
+  {
+    id:3, name:"Mat de l'étouffement", emoji:"🕸️", difficulty:"Intermédiaire", color:"#f59e0b",
+    tagline:"Quand votre propre camp vous étouffe",
+    description:"Le mat de l'étouffement (ou mat à l'étouffé) est donné par un Cavalier quand le Roi adverse est emprisonné par ses propres pièces. Spectaculaire et souvent imprévisible !",
+    principles:["Le Cavalier donne mat quand le Roi est bloqué par ses propres pièces","Forcer le Roi à rester entouré de ses pièces","Un sacrifice de Dame permet souvent de déclencher ce mat"],
+    tip:"💡 Ce mat apparaît souvent dans des parties tactiques complexes. L'idée clé : le Roi se bloque lui-même !",
+    board:[
+      ["","","","","","bR","bK",""],
+      ["","","","","","bP","bP","bP"],
+      ["","","","","","","wN",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","wK","","",""],
+    ],
+    moves:[
+      {move:"Nf8",color:"w",notation:"1. Cf8+",explain:"Le Cavalier saute sur f8 — échec ! Le Roi doit aller en h8 car g8 est occupé par sa propre Tour. Ses propres pièces commencent à le piéger.",board:[["","","","","","bR","bK",""],["","","","","","bP","bP","bP"],["","","","","","","",""],["","","","","","","","wN"],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","wK","","",""]]},
+      {move:"Kh8",color:"b",notation:"1... Rh8",explain:"Forcé ! Le Roi va en h8 — g8 est bloqué par sa propre Tour. Il est maintenant dans le coin, entouré par sa Tour en f8 et ses pions.",board:[["","","","","","bR","","bK"],["","","","","","bP","bP","bP"],["","","","","","","",""],["","","","","","","","wN"],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","wK","","",""]]},
+      {move:"Ng6",color:"w",notation:"2. Cg6+",explain:"Le Cavalier revient sur g6 — échec en révélant une attaque ! Le Roi ne peut pas aller en g8 (Tour) ni rester en h8 (Cavalier). Il n'a aucun coup !",board:[["","","","","","bR","","bK"],["","","","","","bP","bP","bP"],["","","","","","","wN",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","wK","","",""]]},
+      {move:"mat",color:"b",notation:"— ÉCHEC ET MAT",explain:"💀 MAT DE L'ÉTOUFFEMENT ! Le Roi noir est coincé par g7, h7 (ses pions) et sa propre Tour sur f8. Le Cavalier sur g6 donne le coup de grâce. Le Roi est littéralement étouffé par ses propres pièces !",board:[["","","","","","bR","","bK"],["","","","","","bP","bP","bP"],["","","","","","","wN",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","wK","","",""]]}
+    ]
+  },
+  {
+    id:4, name:"Mat avec Roi + Tour", emoji:"🏰", difficulty:"Intermédiaire", color:"#0ea5e9",
+    tagline:"La finale de Tour la plus fondamentale",
+    description:"Roi et Tour contre Roi nu. La technique : la Tour coupe le Roi sur une colonne puis le repousse rang par rang. Plus lente que le mat avec la Dame mais tout aussi essentielle.",
+    principles:["La Tour coupe le Roi adverse sur une rangée ou colonne","Le Roi blanc s'approche pour aider la Tour","Repousser progressivement vers le bord"],
+    tip:"💡 Cette finale nécessite environ 16 coups avec un jeu parfait. La méthode : couper, approcher, couper plus loin.",
+    board:[
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","bK","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["wK","","","","wR","","",""],
+    ],
+    moves:[
+      {move:"Re1",color:"w",notation:"1. Te1",explain:"La Tour se place sur la colonne e, coupant le Roi noir des colonnes e-h. C'est la méthode de 'coupure' — on réduit l'espace du Roi.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","bK","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wK","","","","wR","","",""]]},
+      {move:"Kd4",color:"w",notation:"2. Rd4",explain:"Le Roi blanc avance ! Il se rapproche du centre pour encercler le Roi noir en coordination avec la Tour.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","bK","","","",""],["","","","wK","","","",""],["","","","","","","",""],["","","","","wR","","",""],["","","","","","","",""]]},
+      {move:"Kc3",color:"b",notation:"2... Rc3",explain:"Le Roi noir tente de fuir vers le bas, mais le Roi blanc et la Tour l'empêchent.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wK","","","",""],["","","bK","","","","",""],["","","","","wR","","",""],["","","","","","","",""]]},
+      {move:"Re3",color:"w",notation:"3. Te3+",explain:"Échec ! La Tour pousse le Roi vers le haut. À chaque coup, on reserre l'étau.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wK","","","",""],["","","bK","wR","","","",""],["","","","","","","",""],["","","","","","","",""]]},
+      {move:"Kd2",color:"b",notation:"3... Rd2",explain:"Le Roi cherche à fuir encore, mais l'espace se réduit.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","wK","","","",""],["","","","wR","","","",""],["","","","","","","",""],["","","bK","","","","",""]]},
+      {move:"Rd3",color:"w",notation:"4. Rd3",explain:"Le Roi blanc suit de près. Maintenant le Roi noir est repoussé vers le bord inférieur.",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","wK","wR","","","",""],["","","","","","","",""],["","","bK","","","","",""]]},
+      {move:"Ke1",color:"b",notation:"4... Re1",explain:"Le Roi est sur la dernière rangée — coincé !",board:[["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","wK","wR","","","",""],["","","","","","","",""],["","","","","bK","","",""]]},
+      {move:"Re3",color:"w",notation:"5. Te8#",explain:"ÉCHEC ET MAT ! La Tour donne mat sur la dernière rangée. Le Roi blanc contrôle d2 et e2, la Tour coupe toute la rangée 8. Le Roi ne peut aller nulle part.",board:[["","","","","wR","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","wK","","","","",""],["","","","","","","",""],["","","","","bK","","",""]]}
+    ]
+  },
+  {
+    id:5, name:"Mat de Légal", emoji:"⚡", difficulty:"Intermédiaire", color:"#ec4899",
+    tagline:"Le sacrifice de Dame le plus célèbre",
+    description:"Le mat de Légal est un piège d'ouverture spectaculaire : on sacrifie sa Dame pour mater avec les pièces mineures ! Connu depuis le XVIIIe siècle, il surprend encore les joueurs non avertis.",
+    principles:["Sacrifice de Dame en échange de mat en 2 coups","Deux Cavaliers et un Fou donnent mat","Ne fonctionne que si le Roi est mal placé"],
+    tip:"💡 Ce mat survient souvent quand Noir joue 3...Bg4 trop tôt dans la Partie Italienne. Gardez ce piège en mémoire !",
+    board:[
+      ["bR","","bB","bQ","bK","bB","bN","bR"],
+      ["bP","bP","bP","","bP","bP","bP","bP"],
+      ["","","bN","bP","","","",""],
+      ["","","","","","","",""],
+      ["","","wB","","wP","bB","",""],
+      ["","","","","","wN","",""],
+      ["wP","wP","wP","wP","","wP","wP","wP"],
+      ["wR","wN","wB","wQ","wK","","","wR"],
+    ],
+    moves:[
+      {move:"Nxe5",color:"w",notation:"1. Cxe5!",explain:"Blanc sacrifie son Cavalier en prenant le pion e5 ! Noir voit sa Dame menacer la Dame blanche (le Fou noir en g4 clouait le Cavalier f3 sur la Dame). Noir pense capturer la Dame...",board:[["bR","","bB","bQ","bK","bB","bN","bR"],["bP","bP","bP","","bP","bP","bP","bP"],["","","bN","bP","","","",""],["","","","","wN","","",""],["","","wB","","","bB","",""],["","","","","","","",""],["wP","wP","wP","wP","","wP","wP","wP"],["wR","wN","wB","wQ","wK","","","wR"]]},
+      {move:"Bxd1",color:"b",notation:"1... Fxd1??",explain:"Noir capture la Dame ! Erreur fatale — il ne voit pas le mat qui arrive en 2 coups. Le piège se referme.",board:[["bR","","bB","","bK","bB","bN","bR"],["bP","bP","bP","","bP","bP","bP","bP"],["","","bN","bP","","","",""],["","","","","wN","","",""],["","","wB","","","","",""],["","","","","","","",""],["wP","wP","wP","wP","","wP","wP","wP"],["wR","wN","wB","bB","wK","","","wR"]]},
+      {move:"Bxf7",color:"w",notation:"2. Fxf7+",explain:"Échec du Fou ! Le Roi noir est forcé d'aller en e7 — la seule case disponible. Le filet se referme.",board:[["bR","","bB","","bK","bB","bN","bR"],["bP","bP","bP","","bP","wB","bP","bP"],["","","bN","bP","","","",""],["","","","","wN","","",""],["","","","","","","",""],["","","","","","","",""],["wP","wP","wP","wP","","wP","wP","wP"],["wR","wN","wB","bB","wK","","","wR"]]},
+      {move:"Ke7",color:"b",notation:"2... Re7",explain:"Forcé ! Le Roi avance sur e7 — c'est la seule case disponible. Il tombe dans le piège.",board:[["bR","","bB","","","bB","bN","bR"],["bP","bP","bP","","bK","wB","bP","bP"],["","","bN","bP","","","",""],["","","","","wN","","",""],["","","","","","","",""],["","","","","","","",""],["wP","wP","wP","wP","","wP","wP","wP"],["wR","wN","wB","bB","wK","","","wR"]]},
+      {move:"Nd5",color:"w",notation:"3. Cd5#",explain:"ÉCHEC ET MAT DE LÉGAL ! Le Cavalier saute sur d5 — mat ! Le Roi ne peut aller ni en e6 (Cavalier e5), ni en d6 (Cavalier d5), ni en e8 (Fou f7). Le Roi est pris dans un filet de pièces mineures. La Dame sacrifiée il y a 2 coups n'était qu'un leurre !",board:[["bR","","bB","","","bB","bN","bR"],["bP","bP","bP","","bK","wB","bP","bP"],["","","bN","bP","","","",""],["","","","wN","wN","","",""],["","","","","","","",""],["","","","","","","",""],["wP","wP","wP","wP","","wP","wP","wP"],["wR","wN","wB","bB","wK","","","wR"]]}
+    ]
+  },
+  {
+    id:6, name:"Mat des Arabes (2 Cavaliers)", emoji:"🐴", difficulty:"Avancé", color:"#a855f7",
+    tagline:"Le mat le plus élégant aux échecs",
+    description:"Le mat des Arabes est donné par un Cavalier et une Tour quand le Roi est coincé dans un coin. La Tour empêche la fuite, le Cavalier donne l'estocade. Connu depuis l'ère des échecs arabes (IXe siècle).",
+    principles:["La Tour cloue le Roi dans le coin sur une rangée","Le Cavalier saute pour donner mat","Le Roi adverse ne doit avoir aucune case de fuite"],
+    tip:"💡 Ce mat est souvent le résultat d'une finale Tour + Cavalier bien conduite. La Tour fait le travail de 'cage', le Cavalier frappe.",
+    board:[
+      ["bK","","","","","","",""],
+      ["","","wR","","","","",""],
+      ["","wN","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["","","","","","","",""],
+      ["wK","","","","","","",""],
+    ],
+    moves:[
+      {move:"Ra8",color:"w",notation:"1. Ta8+",explain:"La Tour donne échec sur a8 ! Le Roi est forcé vers le bord. La Tour va maintenant le clouer sur la rangée.",board:[["bK","","","","","","","wR"],["","","","","","","",""],["","wN","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wK","","","","","","",""]]},
+      {move:"Kb7",color:"b",notation:"1... Rb7",explain:"Le Roi fuit sur b7. Mais la Tour va le ramener dans le coin.",board:[["","","","","","","","wR"],["bK","","","","","","",""],["","wN","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wK","","","","","","",""]]},
+      {move:"Rb8",color:"w",notation:"2. Tb8+",explain:"Échec ! La Tour repousse le Roi vers a7. Le Roi ne peut pas se rapprocher de la Tour — il resterait en échec.",board:[["","","","","","","",""],["bK","wR","","","","","",""],["","wN","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wK","","","","","","",""]]},
+      {move:"Ka7",color:"b",notation:"2... Ra7",explain:"Le Roi va en a7 — il est maintenant dans le coin. La Tour le tient prisonnier sur la rangée 8.",board:[["","","","","","","",""],["bK","wR","","","","","",""],["","wN","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wK","","","","","","",""]]},
+      {move:"Nc8",color:"w",notation:"3. Cc8#",explain:"ÉCHEC ET MAT DES ARABES ! Le Cavalier saute sur c8. Le Roi ne peut pas aller en a8 (Tour), ni en b7 (Cavalier c8 contrôle cette case), ni en b6 (Cavalier). La Tour tient la rangée 8, le Cavalier ferme les cases de fuite. Mat parfait !",board:[["","","wN","","","","",""],["bK","wR","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["","","","","","","",""],["wK","","","","","","",""]]}
+    ]
+  },
+];
+
+function chessSetupBoard(boardArr) {
+  return boardArr.map(row => row.map(cell => cell||null));
+}
+
+function ChessEndingLessonView({ending, onBack}) {
+  const [step, setStep] = React.useState(-1);
+  const currentBoard = step===-1 ? chessSetupBoard(ending.board) : ending.moves[step].board ? chessSetupBoard(ending.moves[step].board) : chessSetupBoard(ending.board);
+
+  return (
+    <div style={{minHeight:"100vh",background:"#1a1a2e",fontFamily:"'Georgia',serif",color:"#f1f5f9"}}>
+      <div style={{maxWidth:900,margin:"0 auto",padding:"16px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
+          <button onClick={onBack} style={{background:"#2d2d44",border:"none",color:"#94a3b8",cursor:"pointer",borderRadius:10,padding:"8px 14px",fontSize:13,fontWeight:700,fontFamily:"Georgia,serif"}}>← Retour</button>
+          <div>
+            <h2 style={{margin:0,fontSize:"1.2rem",fontWeight:800,fontFamily:"Georgia,serif"}}>{ending.emoji} {ending.name}</h2>
+            <p style={{margin:0,fontSize:11,color:"#64748b"}}><span style={{color:CHESS_DIFF_COLOR(ending.difficulty)}}>{ending.difficulty}</span></p>
+          </div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:18,alignItems:"start"}}>
+          <div>
+            <ChessBoard boardState={currentBoard} highlight={null}/>
+            <div style={{display:"flex",gap:8,marginTop:10,maxWidth:380}}>
+              <button onClick={()=>setStep(s=>Math.max(-1,s-1))} disabled={step===-1} style={{flex:1,padding:"8px",borderRadius:8,border:"none",cursor:step===-1?"not-allowed":"pointer",background:"#2d2d44",color:step===-1?"#3d3d5c":"#94a3b8",fontWeight:700,fontSize:18}}>◀</button>
+              <button onClick={()=>setStep(s=>Math.min(ending.moves.length-1,s+1))} disabled={step===ending.moves.length-1} style={{flex:1,padding:"8px",borderRadius:8,border:"none",cursor:step===ending.moves.length-1?"not-allowed":"pointer",background:"#d4af37",color:"#1a1a2e",fontWeight:700,fontSize:18}}>▶</button>
+            </div>
+            <div style={{marginTop:6,maxWidth:380}}>
+              <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                <button onClick={()=>setStep(-1)} style={{padding:"4px 8px",borderRadius:6,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,background:step===-1?"#d4af37":"#2d2d44",color:step===-1?"#1a1a2e":"#94a3b8"}}>Départ</button>
+                {ending.moves.map((m,i)=>(
+                  <button key={i} onClick={()=>setStep(i)} style={{padding:"4px 8px",borderRadius:6,border:"none",cursor:"pointer",fontSize:11,fontWeight:700,background:step===i?(m.color==="w"?"#d4af37":"#8B6914"):"#2d2d44",color:step===i?"#1a1a2e":"#94a3b8"}}>{m.notation}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {step===-1?(
+              <>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:16}}>
+                  <h3 style={{margin:"0 0 8px",fontSize:"0.95rem",fontWeight:700,color:"#d4af37",fontFamily:"Georgia,serif"}}>📖 Description</h3>
+                  <p style={{margin:0,color:"#94a3b8",fontSize:13,lineHeight:1.7}}>{ending.description}</p>
+                </div>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:16}}>
+                  <h3 style={{margin:"0 0 8px",fontSize:"0.95rem",fontWeight:700,fontFamily:"Georgia,serif"}}>🎯 Principes clés</h3>
+                  {ending.principles.map((p,i)=>(
+                    <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:6}}>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:ending.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,flexShrink:0,color:"white"}}>{i+1}</div>
+                      <p style={{margin:0,color:"#94a3b8",fontSize:12,lineHeight:1.5}}>{p}</p>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={()=>setStep(0)} style={{padding:"11px",borderRadius:12,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#d4af37,#f5c842)",color:"#1a1a2e",fontWeight:700,fontSize:14,fontFamily:"Georgia,serif"}}>▶ Voir la technique</button>
+              </>
+            ):(
+              <>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:18,borderLeft:`4px solid ${ending.moves[step].color==="w"?"#f5f0e8":"#2c1810"}`}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+                    <div style={{width:38,height:38,borderRadius:"50%",background:ending.moves[step].color==="w"?"#f5f0e8":"#2c1810",border:"2px solid #8B6914",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{ending.moves[step].color==="w"?"♔":"♚"}</div>
+                    <div>
+                      <div style={{fontSize:18,fontWeight:800,color:"#d4af37",fontFamily:"Georgia,serif"}}>{ending.moves[step].notation}</div>
+                      <div style={{fontSize:11,color:"#64748b"}}>{ending.moves[step].color==="w"?"Blancs jouent":"Noirs jouent"}</div>
+                    </div>
+                  </div>
+                  <p style={{margin:0,color:"#cbd5e1",fontSize:13,lineHeight:1.8}}>{ending.moves[step].explain}</p>
+                </div>
+                <div style={{background:"#2d2d44",borderRadius:12,padding:14}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6,fontSize:12,color:"#64748b"}}>
+                    <span>Progression</span><span>{step+1} / {ending.moves.length}</span>
+                  </div>
+                  <div style={{background:"#3d3d5c",borderRadius:10,height:7}}>
+                    <div style={{background:"linear-gradient(90deg,#d4af37,#f5c842)",height:7,borderRadius:10,width:`${((step+1)/ending.moves.length)*100}%`,transition:"width .3s"}}/>
+                  </div>
+                </div>
+                {step===ending.moves.length-1&&(
+                  <div style={{background:"#2d2d44",borderRadius:12,padding:14,border:"1px solid #d4af37"}}>
+                    <div style={{fontSize:16,marginBottom:4}}>💡 À retenir</div>
+                    <p style={{margin:0,color:"#94a3b8",fontSize:12,lineHeight:1.7}}>{ending.tip}</p>
+                  </div>
+                )}
+                {step===ending.moves.length-1&&(
+                  <button onClick={onBack} style={{padding:"11px",borderRadius:12,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#d4af37,#f5c842)",color:"#1a1a2e",fontWeight:700,fontSize:14,fontFamily:"Georgia,serif"}}>✓ Terminé — Choisir une autre</button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChessEndingsView({onBack}) {
+  const [selected, setSelected] = React.useState(null);
+  const ending = CHESS_ENDINGS.find(e=>e.id===selected);
+  if(ending) return <ChessEndingLessonView ending={ending} onBack={()=>setSelected(null)}/>;
+  return (
+    <div style={{minHeight:"100vh",background:"#1a1a2e",fontFamily:"'Georgia',serif",color:"#f1f5f9"}}>
+      <div style={{maxWidth:680,margin:"0 auto",padding:"20px 16px"}}>
+        <button onClick={onBack} style={{background:"#2d2d44",border:"none",color:"#94a3b8",cursor:"pointer",borderRadius:10,padding:"8px 14px",fontSize:13,fontWeight:700,fontFamily:"Georgia,serif",marginBottom:18}}>← Retour</button>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{fontSize:42,marginBottom:6}}>♔</div>
+          <h1 style={{fontSize:"1.8rem",fontWeight:800,margin:0,background:"linear-gradient(135deg,#d4af37,#f5e6a3)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontFamily:"Georgia,serif"}}>Mats & Finales</h1>
+          <p style={{color:"#94a3b8",marginTop:6,fontStyle:"italic",fontSize:13}}>Maîtrisez les techniques de mat essentielles</p>
+        </div>
+        <div style={{display:"grid",gap:12}}>
+          {CHESS_ENDINGS.map(e=>(
+            <div key={e.id} onClick={()=>setSelected(e.id)} style={{background:"#2d2d44",borderRadius:12,padding:16,cursor:"pointer",border:"1px solid #3d3d5c",borderLeft:`5px solid ${e.color}`,transition:"all .2s"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:3}}>
+                    <span style={{fontSize:18}}>{e.emoji}</span>
+                    <h2 style={{margin:0,fontSize:"1rem",fontWeight:700,fontFamily:"Georgia,serif"}}>{e.name}</h2>
+                  </div>
+                  <p style={{margin:"3px 0 5px",color:"#94a3b8",fontSize:12,fontStyle:"italic"}}>{e.tagline}</p>
+                  <p style={{margin:0,color:"#64748b",fontSize:11,lineHeight:1.5}}>{e.description.slice(0,90)}…</p>
+                </div>
+                <div style={{textAlign:"right",flexShrink:0,marginLeft:10}}>
+                  <div style={{fontSize:10,fontWeight:700,color:CHESS_DIFF_COLOR(e.difficulty),background:`${CHESS_DIFF_COLOR(e.difficulty)}20`,padding:"2px 9px",borderRadius:10,marginBottom:5}}>{e.difficulty}</div>
+                  <div style={{fontSize:11,color:"#475569"}}>{e.moves.length} coups</div>
+                  <div style={{fontSize:20,marginTop:4,color:e.color}}>→</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChessOpeningsView({onBack}) {
+  const [view, setView] = React.useState("list");
+  const [selected, setSelected] = React.useState(null);
+  const [filter, setFilter] = React.useState("Tous");
+  const filtered = filter==="Tous"?CHESS_OPENINGS:CHESS_OPENINGS.filter(o=>o.difficulty===filter);
+  const opening = CHESS_OPENINGS.find(o=>o.id===selected);
+  if(view==="lesson"&&opening) return <ChessLessonView opening={opening} onBack={()=>{setView("list");setSelected(null);}}/>;
+  return (
+    <div style={{minHeight:"100vh",background:"#1a1a2e",fontFamily:"'Georgia',serif",color:"#f1f5f9"}}>
+      <div style={{maxWidth:680,margin:"0 auto",padding:"20px 16px"}}>
+        <button onClick={onBack} style={{background:"#2d2d44",border:"none",color:"#94a3b8",cursor:"pointer",borderRadius:10,padding:"8px 14px",fontSize:13,fontWeight:700,fontFamily:"Georgia,serif",marginBottom:18}}>← Retour</button>
+        <div style={{textAlign:"center",marginBottom:24}}>
+          <div style={{fontSize:42,marginBottom:6}}>♟</div>
+          <h1 style={{fontSize:"1.8rem",fontWeight:800,margin:0,background:"linear-gradient(135deg,#d4af37,#f5e6a3)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontFamily:"Georgia,serif"}}>Ouvertures</h1>
+          <p style={{color:"#94a3b8",marginTop:6,fontStyle:"italic",fontSize:13}}>Apprenez les ouvertures étape par étape avec explications</p>
+        </div>
+        <div style={{display:"flex",gap:7,marginBottom:18,flexWrap:"wrap"}}>
+          {CHESS_FILTERS.map(c=>(
+            <button key={c} onClick={()=>setFilter(c)} style={{padding:"5px 16px",borderRadius:20,border:"none",cursor:"pointer",fontWeight:700,fontSize:12,fontFamily:"Georgia,serif",background:filter===c?"#d4af37":"#2d2d44",color:filter===c?"#1a1a2e":"#94a3b8"}}>{c}</button>
+          ))}
+        </div>
+        <div style={{display:"grid",gap:12}}>
+          {filtered.map(o=>(
+            <div key={o.id} onClick={()=>{setSelected(o.id);setView("lesson");}} style={{background:"#2d2d44",borderRadius:12,padding:16,cursor:"pointer",border:"1px solid #3d3d5c",borderLeft:`5px solid ${o.color}`,transition:"all .2s"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:3}}>
+                    <span style={{fontSize:18}}>{o.emoji}</span>
+                    <h2 style={{margin:0,fontSize:"1rem",fontWeight:700,fontFamily:"Georgia,serif"}}>{o.name}</h2>
+                    <span style={{fontSize:10,color:"#64748b",background:"#1a1a2e",padding:"2px 7px",borderRadius:10}}>{o.eco}</span>
+                  </div>
+                  <p style={{margin:"3px 0 5px",color:"#94a3b8",fontSize:12,fontStyle:"italic"}}>{o.tagline}</p>
+                  <p style={{margin:0,color:"#64748b",fontSize:11,lineHeight:1.5}}>{o.description.slice(0,90)}…</p>
+                </div>
+                <div style={{textAlign:"right",flexShrink:0,marginLeft:10}}>
+                  <div style={{fontSize:10,fontWeight:700,color:CHESS_DIFF_COLOR(o.difficulty),background:`${CHESS_DIFF_COLOR(o.difficulty)}20`,padding:"2px 9px",borderRadius:10,marginBottom:5}}>{o.difficulty}</div>
+                  <div style={{fontSize:11,color:"#475569"}}>{o.moves.length} coups</div>
+                  <div style={{fontSize:20,marginTop:4,color:o.color}}>→</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChessAcademy({onBack}) {
+  const [section, setSection] = React.useState("home");
+  if(section==="ouvertures") return <ChessOpeningsView onBack={()=>setSection("home")}/>;
+  if(section==="finales")    return <ChessEndingsView  onBack={()=>setSection("home")}/>;
+  return (
+    <div style={{minHeight:"100vh",background:"#1a1a2e",fontFamily:"'Georgia',serif",color:"#f1f5f9",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 16px"}}>
+      <div style={{position:"absolute",top:"15%",left:"50%",transform:"translateX(-50%)",width:320,height:200,borderRadius:"50%",background:"radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%)",filter:"blur(40px)",pointerEvents:"none"}}/>
+      <div style={{width:"100%",maxWidth:420,position:"relative",zIndex:1}}>
+        <button onClick={onBack} style={{background:"#2d2d44",border:"none",color:"#94a3b8",cursor:"pointer",borderRadius:10,padding:"8px 14px",fontSize:13,fontWeight:700,fontFamily:"Georgia,serif",marginBottom:28}}>← Accueil</button>
+        <div style={{textAlign:"center",marginBottom:32}}>
+          <div style={{fontSize:52,marginBottom:8}}>♟</div>
+          <h1 style={{fontSize:"2rem",fontWeight:800,margin:0,background:"linear-gradient(135deg,#d4af37,#f5e6a3)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontFamily:"Georgia,serif"}}>Académie des Échecs</h1>
+          <p style={{color:"#94a3b8",marginTop:8,fontSize:13,fontStyle:"italic"}}>Que voulez-vous apprendre ?</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          <button onClick={()=>setSection("ouvertures")} style={{background:"linear-gradient(135deg,#1e1e3f,#4f46e5)",border:"none",borderRadius:16,padding:"22px 20px",cursor:"pointer",textAlign:"left",boxShadow:"0 8px 32px rgba(99,102,241,0.3)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:14}}>
+              <div style={{fontSize:36,lineHeight:1}}>♟</div>
+              <div>
+                <div style={{color:"#fff",fontWeight:800,fontSize:"1.1rem",fontFamily:"Georgia,serif",marginBottom:3}}>Ouvertures</div>
+                <div style={{color:"rgba(255,255,255,0.55)",fontSize:12}}>13 ouvertures • Italienne, Sicilienne, Ruy Lopez…</div>
+              </div>
+              <div style={{marginLeft:"auto",color:"rgba(255,255,255,0.3)",fontSize:20}}>→</div>
+            </div>
+          </button>
+          <button onClick={()=>setSection("finales")} style={{background:"linear-gradient(135deg,#1a2a1a,#16a34a)",border:"none",borderRadius:16,padding:"22px 20px",cursor:"pointer",textAlign:"left",boxShadow:"0 8px 32px rgba(22,163,74,0.3)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:14}}>
+              <div style={{fontSize:36,lineHeight:1}}>♔</div>
+              <div>
+                <div style={{color:"#fff",fontWeight:800,fontSize:"1.1rem",fontFamily:"Georgia,serif",marginBottom:3}}>Mats & Finales</div>
+                <div style={{color:"rgba(255,255,255,0.55)",fontSize:12}}>6 techniques • Escalier, Étouffement, Légal…</div>
+              </div>
+              <div style={{marginLeft:"auto",color:"rgba(255,255,255,0.3)",fontSize:20}}>→</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── ROOT ───
 function App() {
   const [screen,setScreen]=useState("home");
@@ -1935,8 +2853,11 @@ function App() {
 
   if(screen==="home") return <HomeScreen user={user} isGuest={isGuest} onSignIn={()=>setIsGuest(false)} onSelectMode={c=>{
     if(c==="leitner"){setScreen("leitner");return;}
+    if(c==="echecs"){setScreen("echecs");return;}
     setCategory(c);setScreen("gamemode");
   }}/>;
+
+  if(screen==="echecs") return <ChessAcademy onBack={goHome}/>;
 
   if(screen==="leitner") return <LeitnerScreen isGuest={isGuest} onBack={goHome}/>;
 
@@ -1949,6 +2870,7 @@ function App() {
     if(category==="capitales")    return <SetupCapitales gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
     if(category==="dates")        return <SetupDates gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
     if(category==="philo")        return <SetupPhilo gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
+    if(category==="figures")      return <SetupFigures gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
   }
 
   if(screen==="result") return <ResultScreen data={resultData} isGuest={isGuest} onRetry={d=>{setRetryDeck(d);setScreen("play");}} onHome={goHome}/>;
@@ -1956,6 +2878,12 @@ function App() {
   if(screen==="play"){
     const k=retryDeck?"retry":"fresh";
     const cfg=playConfig;
+    // Figures leçon → fiches
+    if(cfg?.type==="figures"&&gameMode==="lesson")
+      return <FigureFicheScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    // Figures défi → flashcards
+    if(cfg?.type==="figures"&&gameMode==="challenge")
+      return <FigureDefiScreen key={k} config={cfg} retryDeck={retryDeck} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
     // Philo leçon → fiches
     if(cfg?.type==="philo"&&gameMode==="lesson")
       return <PhiloFicheScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
