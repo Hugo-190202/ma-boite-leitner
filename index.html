@@ -1846,12 +1846,13 @@ function CreateCustomCardView({onBack,onSave,isGuest,colors}){
   const [label,setLabel]=React.useState("");
   const [color,setColor]=React.useState(colors[0]);
   const [flipped,setFlipped]=React.useState(false);
+  const [bidirectional,setBidirectional]=React.useState(true);
 
   const canSave=front.trim()&&back.trim();
 
   const handleSave=()=>{
     if(!canSave)return;
-    onSave({front:front.trim(),back:back.trim(),label:label.trim()||"Personnel",color});
+    onSave({front:front.trim(),back:back.trim(),label:label.trim()||"Personnel",color,bidirectional});
   };
 
   return(
@@ -1941,6 +1942,35 @@ function CreateCustomCardView({onBack,onSave,isGuest,colors}){
               ))}
             </div>
           </div>
+          {/* Sens de révision */}
+          <div className="glass rounded-2xl p-4">
+            <p className="text-white/45 text-xs font-semibold uppercase tracking-widest mb-3">Sens de révision</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={()=>setBidirectional(true)}
+                className="flex flex-col items-center gap-1.5 rounded-xl py-3 px-2 transition-all"
+                style={{background:bidirectional?'rgba(99,102,241,0.25)':'rgba(255,255,255,0.05)',border:bidirectional?'1px solid rgba(99,102,241,0.5)':'1px solid transparent',cursor:'pointer'}}>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none">
+                  <rect x="0.5" y="0.5" width="11" height="17" rx="3" fill={bidirectional?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.08)"} stroke={bidirectional?"#818cf8":"rgba(255,255,255,0.2)"}/>
+                  <rect x="16.5" y="0.5" width="11" height="17" rx="3" fill={bidirectional?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.08)"} stroke={bidirectional?"#818cf8":"rgba(255,255,255,0.2)"}/>
+                  <path d="M12 9h4M14 6.5l2 2.5-2 2.5" stroke={bidirectional?"#818cf8":"rgba(255,255,255,0.25)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 9h-4M14 6.5l-2 2.5 2 2.5" stroke={bidirectional?"#818cf8":"rgba(255,255,255,0.25)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span className="text-xs font-semibold" style={{color:bidirectional?'#a5b4fc':'rgba(255,255,255,0.35)'}}>Dans les deux sens</span>
+                <span className="text-white/25 text-xs text-center leading-tight">Recto → Verso<br/>et Verso → Recto</span>
+              </button>
+              <button onClick={()=>setBidirectional(false)}
+                className="flex flex-col items-center gap-1.5 rounded-xl py-3 px-2 transition-all"
+                style={{background:!bidirectional?'rgba(99,102,241,0.25)':'rgba(255,255,255,0.05)',border:!bidirectional?'1px solid rgba(99,102,241,0.5)':'1px solid transparent',cursor:'pointer'}}>
+                <svg width="28" height="18" viewBox="0 0 28 18" fill="none">
+                  <rect x="0.5" y="0.5" width="11" height="17" rx="3" fill={!bidirectional?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.08)"} stroke={!bidirectional?"#818cf8":"rgba(255,255,255,0.2)"}/>
+                  <rect x="16.5" y="0.5" width="11" height="17" rx="3" fill={!bidirectional?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.08)"} stroke={!bidirectional?"#818cf8":"rgba(255,255,255,0.2)"}/>
+                  <path d="M12 9h4M14.5 6.5l2 2.5-2 2.5" stroke={!bidirectional?"#818cf8":"rgba(255,255,255,0.25)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span className="text-xs font-semibold" style={{color:!bidirectional?'#a5b4fc':'rgba(255,255,255,0.35)'}}>Dans un seul sens</span>
+                <span className="text-white/25 text-xs text-center leading-tight">Recto → Verso<br/>uniquement</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Save */}
@@ -1981,7 +2011,7 @@ function LeitnerScreen({onBack,isGuest}) {
       else if(t==='hist') _side=Math.random()<0.5?"date-to-evt":"evt-to-date";
       else if(t==='figures') _side="nom-to-def";
       else if(t==='chef') _side="dept-to-chef";
-      else if(t==='custom') _side=Math.random()<0.5?"front-to-back":"back-to-front";
+      else if(t==='custom') _side=(c.bidirectional!==false&&Math.random()<0.5)?"back-to-front":"front-to-back";
       else _side=Math.random()<0.5?"num-to-nom":"nom-to-num";
       return{...c,_side};
     });
