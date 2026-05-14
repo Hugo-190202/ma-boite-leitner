@@ -565,9 +565,105 @@ function getFigureCardFrontBack(card) {
   return {front:card.definition, back:card.nom, frontLabel:"Définition", backLabel:"Figure"};
 }
 
+// ─── VERBES IRRÉGULIERS ANGLAIS ───
+const IRREGULAR_VERBS = [
+  // Être & Avoir
+  {id:"be",         fr:"être",                     inf:"be",         pret:"was / were",  pp:"been",        cat:"Être & Avoir"},
+  {id:"have",       fr:"avoir",                    inf:"have",       pret:"had",         pp:"had",         cat:"Être & Avoir"},
+  // Mouvement
+  {id:"go",         fr:"aller",                    inf:"go",         pret:"went",        pp:"gone",        cat:"Mouvement"},
+  {id:"come",       fr:"venir",                    inf:"come",       pret:"came",        pp:"come",        cat:"Mouvement"},
+  {id:"run",        fr:"courir",                   inf:"run",        pret:"ran",         pp:"run",         cat:"Mouvement"},
+  {id:"fly",        fr:"voler",                    inf:"fly",        pret:"flew",        pp:"flown",       cat:"Mouvement"},
+  {id:"drive",      fr:"conduire",                 inf:"drive",      pret:"drove",       pp:"driven",      cat:"Mouvement"},
+  {id:"swim",       fr:"nager",                    inf:"swim",       pret:"swam",        pp:"swum",        cat:"Mouvement"},
+  {id:"ride",       fr:"chevaucher / pédaler",     inf:"ride",       pret:"rode",        pp:"ridden",      cat:"Mouvement"},
+  {id:"fall",       fr:"tomber",                   inf:"fall",       pret:"fell",        pp:"fallen",      cat:"Mouvement"},
+  {id:"rise",       fr:"se lever / monter",        inf:"rise",       pret:"rose",        pp:"risen",       cat:"Mouvement"},
+  {id:"sit",        fr:"s'asseoir",                inf:"sit",        pret:"sat",         pp:"sat",         cat:"Mouvement"},
+  {id:"stand",      fr:"se tenir debout",          inf:"stand",      pret:"stood",       pp:"stood",       cat:"Mouvement"},
+  // Communication
+  {id:"say",        fr:"dire",                     inf:"say",        pret:"said",        pp:"said",        cat:"Communication"},
+  {id:"tell",       fr:"raconter / dire à",        inf:"tell",       pret:"told",        pp:"told",        cat:"Communication"},
+  {id:"speak",      fr:"parler",                   inf:"speak",      pret:"spoke",       pp:"spoken",      cat:"Communication"},
+  {id:"write",      fr:"écrire",                   inf:"write",      pret:"wrote",       pp:"written",     cat:"Communication"},
+  {id:"read",       fr:"lire",                     inf:"read",       pret:"read",        pp:"read",        cat:"Communication"},
+  {id:"sing",       fr:"chanter",                  inf:"sing",       pret:"sang",        pp:"sung",        cat:"Communication"},
+  {id:"hear",       fr:"entendre",                 inf:"hear",       pret:"heard",       pp:"heard",       cat:"Communication"},
+  // Connaissance & Perception
+  {id:"see",        fr:"voir",                     inf:"see",        pret:"saw",         pp:"seen",        cat:"Connaissance & Perception"},
+  {id:"know",       fr:"savoir / connaître",       inf:"know",       pret:"knew",        pp:"known",       cat:"Connaissance & Perception"},
+  {id:"understand", fr:"comprendre",               inf:"understand", pret:"understood",  pp:"understood",  cat:"Connaissance & Perception"},
+  {id:"think",      fr:"penser",                   inf:"think",      pret:"thought",     pp:"thought",     cat:"Connaissance & Perception"},
+  {id:"feel",       fr:"ressentir",                inf:"feel",       pret:"felt",        pp:"felt",        cat:"Connaissance & Perception"},
+  {id:"find",       fr:"trouver",                  inf:"find",       pret:"found",       pp:"found",       cat:"Connaissance & Perception"},
+  {id:"forget",     fr:"oublier",                  inf:"forget",     pret:"forgot",      pp:"forgotten",   cat:"Connaissance & Perception"},
+  // Actions quotidiennes
+  {id:"do",         fr:"faire (action)",           inf:"do",         pret:"did",         pp:"done",        cat:"Actions quotidiennes"},
+  {id:"make",       fr:"faire (créer)",            inf:"make",       pret:"made",        pp:"made",        cat:"Actions quotidiennes"},
+  {id:"get",        fr:"obtenir / recevoir",       inf:"get",        pret:"got",         pp:"got",         cat:"Actions quotidiennes"},
+  {id:"give",       fr:"donner",                   inf:"give",       pret:"gave",        pp:"given",       cat:"Actions quotidiennes"},
+  {id:"take",       fr:"prendre",                  inf:"take",       pret:"took",        pp:"taken",       cat:"Actions quotidiennes"},
+  {id:"put",        fr:"mettre / poser",           inf:"put",        pret:"put",         pp:"put",         cat:"Actions quotidiennes"},
+  {id:"bring",      fr:"apporter",                 inf:"bring",      pret:"brought",     pp:"brought",     cat:"Actions quotidiennes"},
+  {id:"buy",        fr:"acheter",                  inf:"buy",        pret:"bought",      pp:"bought",      cat:"Actions quotidiennes"},
+  {id:"build",      fr:"construire",               inf:"build",      pret:"built",       pp:"built",       cat:"Actions quotidiennes"},
+  {id:"keep",       fr:"garder",                   inf:"keep",       pret:"kept",        pp:"kept",        cat:"Actions quotidiennes"},
+  {id:"let",        fr:"laisser / permettre",      inf:"let",        pret:"let",         pp:"let",         cat:"Actions quotidiennes"},
+  {id:"pay",        fr:"payer",                    inf:"pay",        pret:"paid",        pp:"paid",        cat:"Actions quotidiennes"},
+  // Changement d'état
+  {id:"become",     fr:"devenir",                  inf:"become",     pret:"became",      pp:"become",      cat:"Changement d'état"},
+  {id:"grow",       fr:"grandir / pousser",        inf:"grow",       pret:"grew",        pp:"grown",       cat:"Changement d'état"},
+  {id:"wake",       fr:"se réveiller",             inf:"wake",       pret:"woke",        pp:"woken",       cat:"Changement d'état"},
+  {id:"sleep",      fr:"dormir",                   inf:"sleep",      pret:"slept",       pp:"slept",       cat:"Changement d'état"},
+  {id:"eat",        fr:"manger",                   inf:"eat",        pret:"ate",         pp:"eaten",       cat:"Changement d'état"},
+  {id:"drink",      fr:"boire",                    inf:"drink",      pret:"drank",       pp:"drunk",       cat:"Changement d'état"},
+  {id:"break",      fr:"casser",                   inf:"break",      pret:"broke",       pp:"broken",      cat:"Changement d'état"},
+  {id:"steal",      fr:"voler (dérober)",          inf:"steal",      pret:"stole",       pp:"stolen",      cat:"Changement d'état"},
+  {id:"throw",      fr:"lancer",                   inf:"throw",      pret:"threw",       pp:"thrown",      cat:"Changement d'état"},
+  // Divers
+  {id:"win",        fr:"gagner",                   inf:"win",        pret:"won",         pp:"won",         cat:"Divers"},
+  {id:"lose",       fr:"perdre",                   inf:"lose",       pret:"lost",        pp:"lost",        cat:"Divers"},
+  {id:"sell",       fr:"vendre",                   inf:"sell",       pret:"sold",        pp:"sold",        cat:"Divers"},
+  {id:"send",       fr:"envoyer",                  inf:"send",       pret:"sent",        pp:"sent",        cat:"Divers"},
+  {id:"hold",       fr:"tenir",                    inf:"hold",       pret:"held",        pp:"held",        cat:"Divers"},
+  {id:"choose",     fr:"choisir",                  inf:"choose",     pret:"chose",       pp:"chosen",      cat:"Divers"},
+  {id:"catch",      fr:"attraper",                 inf:"catch",      pret:"caught",      pp:"caught",      cat:"Divers"},
+  {id:"cut",        fr:"couper",                   inf:"cut",        pret:"cut",         pp:"cut",         cat:"Divers"},
+  {id:"hit",        fr:"frapper",                  inf:"hit",        pret:"hit",         pp:"hit",         cat:"Divers"},
+  {id:"meet",       fr:"rencontrer",               inf:"meet",       pret:"met",         pp:"met",         cat:"Divers"},
+  {id:"hurt",       fr:"blesser",                  inf:"hurt",       pret:"hurt",        pp:"hurt",        cat:"Divers"},
+  {id:"spend",      fr:"dépenser / passer (temps)",inf:"spend",      pret:"spent",       pp:"spent",       cat:"Divers"},
+  {id:"leave",      fr:"partir / quitter",         inf:"leave",      pret:"left",        pp:"left",        cat:"Divers"},
+  {id:"begin",      fr:"commencer",                inf:"begin",      pret:"began",       pp:"begun",       cat:"Divers"},
+  {id:"cost",       fr:"coûter",                   inf:"cost",       pret:"cost",        pp:"cost",        cat:"Divers"},
+  {id:"draw",       fr:"dessiner",                 inf:"draw",       pret:"drew",        pp:"drawn",       cat:"Divers"},
+  {id:"teach",      fr:"enseigner",                inf:"teach",      pret:"taught",      pp:"taught",      cat:"Communication"},
+];
+const VERBES_GROUPES = {
+  "Être & Avoir":              ["be","have"],
+  "Mouvement":                 ["go","come","run","fly","drive","swim","ride","fall","rise","sit","stand"],
+  "Communication":             ["say","tell","speak","write","read","sing","hear","teach"],
+  "Connaissance & Perception": ["see","know","understand","think","feel","find","forget"],
+  "Actions quotidiennes":      ["do","make","get","give","take","put","bring","buy","build","keep","let","pay"],
+  "Changement d'état":         ["become","grow","wake","sleep","eat","drink","break","steal","throw"],
+  "Divers":                    ["win","lose","sell","send","hold","choose","catch","cut","hit","meet","hurt","spend","leave","begin","cost","draw"],
+};
+const VERBES_GROUPES_LIST = Object.keys(VERBES_GROUPES);
+const VERBES_CAT_COLORS = {
+  "Être & Avoir":              "#1d4ed8",
+  "Mouvement":                 "#0f766e",
+  "Communication":             "#7c3aed",
+  "Connaissance & Perception": "#b45309",
+  "Actions quotidiennes":      "#059669",
+  "Changement d'état":         "#dc2626",
+  "Divers":                    "#0284c7",
+};
+
 const MAIN_MODES = [
   {id:"departements",label:"Départements français",  icon:"🗺️",color:"#1a3a6b"},
   {id:"capitales",   label:"Capitales du monde",     icon:"🌍",color:"#1a3b1a"},
+  {id:"verbes",      label:"Verbes irréguliers EN",  icon:"🔤",color:"#0d2b5e"},
   {id:"dates",       label:"Dates historiques",      icon:"📅",color:"#3d1a00"},
   {id:"philo",       label:"Courants philosophiques",icon:"🧠",color:"#2d1a4a"},
   {id:"echecs",      label:"Académie des Échecs",    icon:"♟️",color:"#1a1a2e"},
@@ -586,19 +682,17 @@ const LEITNER_BOXES = [
   {n:5,color:"#2980b9",desc:"Tous les mois",intervalDays:30},
 ];
 function initLeitnerState() {
-  const cards = {};
-  LEITNER_CARDS.forEach(c => { cards[c.id] = {box:1, lastReviewedDate:null}; });
-  return {cards, session:1, customCards:[]};
+  return {cards:{}, session:1, customCards:[]};
 }
 function initGuestLeitnerState() {
   return {cards:{}, session:1, customCards:[]};
 }
 function getLeitnerDueCards(state) {
   const today = new Date().toISOString().slice(0,10);
-  const allCards = [...LEITNER_CARDS, ...(state.customCards||[])];
+  const allCards = [...LEITNER_CARDS.filter(c => state.cards[c.id]), ...(state.customCards||[])];
   return allCards.filter(c => {
     const s = state.cards[c.id];
-    if (!s) return true;
+    if (!s) return false;
     if (s.box === 0) return false;
     if (!s.lastReviewedDate) return true;
     const box = LEITNER_BOXES.find(b => b.n===s.box);
@@ -641,6 +735,10 @@ function addCardsToLeitnerStorage(deck, configType) {
       id = 'figstyle_'+card.id;
       if (!existingCustomIds.has(id))
         customCard = {id, type:'figures', nom:card.nom, definition:card.definition, exemple:card.exemple, effet:card.effet, categorie:card.categorie};
+    } else if (configType==='verbes') {
+      id = 'verb_'+card.id;
+      if (!existingCustomIds.has(id))
+        customCard = {id, type:'verbes', fr:card.fr, inf:card.inf, pret:card.pret, pp:card.pp, cat:card.cat};
     }
     if (id && !seen.has(id) && !newState.cards[id]) {
       const today = new Date().toISOString().slice(0,10);
@@ -667,6 +765,7 @@ function countNewLeitnerCards(deck, configType) {
     else if (configType==='philo') id = 'philo_'+card.nom;
     else if (configType==='hist') id = card.id;
     else if (configType==='figures') id = 'figstyle_'+card.id;
+    else if (configType==='verbes') id = 'verb_'+card.id;
     if (id && !seen.has(id) && !state.cards[id]) { seen.add(id); count++; }
   });
   return count;
@@ -748,6 +847,7 @@ const HOME_ICONS = {
   philo: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
   echecs: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="17" width="18" height="4" rx="1"/><rect x="6" y="13" width="12" height="4" rx="1"/><path d="M9 13V9M15 13V9"/><path d="M7 9h10"/><path d="M10 9V6M14 9V6"/><path d="M8 6h8"/></svg>,
   figures: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
+  verbes:  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="19" cy="17" r="3"/><path d="M19 14v3l2 1"/></svg>,
 };
 const HOME_CARD_STYLES = {
   leitner:     {from:'#1e3a5f', to:'#2563eb', accent:'rgba(59,130,246,0.3)',  sub:'Révision espacée intelligente'},
@@ -757,6 +857,7 @@ const HOME_CARD_STYLES = {
   philo:       {from:'#2d1a50', to:'#6d28d9', accent:'rgba(109,40,217,0.3)',  sub:'Courants & auteurs majeurs'},
   echecs:      {from:'#1a1a2e', to:'#3d3d5c', accent:'rgba(212,175,55,0.3)', sub:'Ouvertures étape par étape'},
   figures:     {from:'#4a0020', to:'#9d174d', accent:'rgba(157,23,77,0.3)',  sub:'Rhétorique & procédés littéraires'},
+  verbes:      {from:'#0d2240', to:'#1d4ed8', accent:'rgba(29,78,216,0.3)',  sub:'Infinitif · Prétérit · Participe passé'},
 };
 
 function HomeScreen({onSelectMode, user, isGuest, onSignIn}) {
@@ -1363,6 +1464,258 @@ function FigureDefiScreen({config, onBack, onEnd, retryDeck}) {
   );
 }
 
+// ─── SETUP VERBES IRRÉGULIERS ───
+function SetupVerbes({gameMode, onStart, onBack}) {
+  const [selGroupes,setSelGroupes]=useState([]);
+  const accent = gameMode==="lesson"?"#059669":"#1d4ed8";
+  const totalVerbes = selGroupes.reduce((s,g)=>s+(VERBES_GROUPES[g]?.length||0),0);
+  const toggle = g => setSelGroupes(prev=>prev.includes(g)?prev.filter(x=>x!==g):[...prev,g]);
+  return (
+    <div className="min-h-screen flex flex-col" style={{background:"linear-gradient(160deg,#060b18 0%,#0d1630 100%)"}}>
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4" style={{maxWidth:440,margin:'0 auto',width:'100%'}}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium mb-5 transition-colors" style={{cursor:'pointer'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Retour
+        </button>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{background:accent}}>
+            {gameMode==="lesson"?<BookOpen size={18} color="white"/>:<Zap size={18} color="white"/>}
+          </div>
+          <div>
+            <h1 className="text-white font-black text-xl">{gameMode==="lesson"?"Mode Leçon":"Mode Défi"}</h1>
+            <p className="text-white/40 text-xs font-medium">Verbes irréguliers anglais</p>
+          </div>
+        </div>
+        <SetupSection title="Catégories" badge={selGroupes.length>0?`${selGroupes.length} cat · ${totalVerbes} verbes`:null}>
+          <div className="rounded-xl overflow-hidden border border-white/10">
+            {VERBES_GROUPES_LIST.map((g,i)=>{
+              const count=VERBES_GROUPES[g].length;
+              return(<CheckItem key={g} label={g} count={count+" verbes"} color={VERBES_CAT_COLORS[g]} checked={selGroupes.includes(g)} onClick={()=>toggle(g)} last={i===VERBES_GROUPES_LIST.length-1}/>);
+            })}
+          </div>
+          <button onClick={()=>setSelGroupes([...VERBES_GROUPES_LIST])} className="btn-press w-full mt-2 py-2.5 rounded-xl text-white/60 hover:text-white text-xs font-semibold" style={{background:'rgba(255,255,255,0.06)',cursor:'pointer'}}>
+            {selGroupes.length===VERBES_GROUPES_LIST.length?"✓ Toutes les catégories":"Sélectionner toutes les catégories"} ({IRREGULAR_VERBS.length})
+          </button>
+        </SetupSection>
+        <button onClick={()=>selGroupes.length&&onStart({type:"verbes",groupes:selGroupes})} disabled={!selGroupes.length}
+          className="btn-press w-full py-4 rounded-2xl text-white font-bold text-base mb-4"
+          style={{background:selGroupes.length?accent:'rgba(255,255,255,0.07)',opacity:selGroupes.length?1:0.4,cursor:selGroupes.length?'pointer':'not-allowed',boxShadow:selGroupes.length?`0 8px 24px ${accent}55`:'none'}}>
+          {gameMode==="lesson"?"Commencer les fiches →":"Lancer le défi →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── VERBES FICHE (mode leçon) — flip card ───
+function VerbeFicheScreen({config, onBack, onEnd}) {
+  const [deck]=useState(()=>{
+    const ids=new Set((config?.groupes||VERBES_GROUPES_LIST).flatMap(g=>VERBES_GROUPES[g]||[]));
+    return shuffle(IRREGULAR_VERBS.filter(v=>ids.has(v.id)));
+  });
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [scores,setScores]=useState([]);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+  const color=VERBES_CAT_COLORS[card.cat]||"#1d4ed8";
+
+  const next=knew=>{
+    const ns=[...scores,knew];
+    if(idx+1>=deck.length){onEnd({deck,scores:ns,config:{type:'verbes',...(config||{})},mode:'lesson'});return;}
+    setScores(ns);setAnimating(true);
+    setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{
+      if(["ArrowUp","ArrowDown"," "].includes(e.key)){e.preventDefault();if(!flipped)setFlipped(true);}
+      if(flipped&&e.key==="ArrowRight")next(true);
+      if(flipped&&e.key==="ArrowLeft")next(false);
+    };
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[flipped,idx,scores]);
+
+  return (
+    <div className="min-h-screen flex flex-col" style={{background:`linear-gradient(160deg,#060b18 0%,${color}28 100%)`}}>
+      <div className="flex flex-col flex-1" style={{maxWidth:480,margin:'0 auto',width:'100%',padding:'20px 16px 24px'}}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Config
+          </button>
+          <div className="text-center">
+            <p className="text-white/70 font-semibold text-xs">{card.cat}</p>
+            <p className="text-white/30 text-xs">Français → Anglais</p>
+          </div>
+          <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{deck.length}</span>
+        </div>
+        {/* Progress */}
+        <div className="h-1 rounded-full overflow-hidden mb-6" style={{background:'rgba(255,255,255,0.10)'}}>
+          <div className="h-full rounded-full" style={{width:`${(idx/deck.length)*100}%`,background:'linear-gradient(90deg,rgba(255,255,255,0.5),rgba(255,255,255,0.9))',transition:'width 0.4s ease'}}/>
+        </div>
+        {/* Card flip */}
+        <div className="flex-1 flex items-center">
+          <div style={{perspective:"1200px",width:'100%'}} onClick={()=>!flipped&&setFlipped(true)}>
+            <div className="relative w-full select-none flip-card-inner" style={{height:300,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+              {/* Recto : verbe en français */}
+              <div className="absolute inset-0 rounded-3xl flip-card-face flex flex-col items-center justify-center p-7"
+                style={{background:'#ffffff',boxShadow:'0 20px 60px rgba(0,0,0,0.5)',backfaceVisibility:'hidden'}}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{color}}>Verbe en français</p>
+                <p className="font-black text-center text-gray-900" style={{fontSize:card.fr.length>20?"1.4rem":card.fr.length>12?"2rem":"2.8rem",lineHeight:1.1}}>{card.fr}</p>
+                <p className="text-xs mt-2 font-medium" style={{color}}>{card.cat}</p>
+                {!flipped&&<p className="text-gray-400 text-xs mt-5 font-medium">Toucher pour révéler</p>}
+              </div>
+              {/* Verso : 3 formes */}
+              <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col justify-center p-6"
+                style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-4">Formes anglaises</p>
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Infinitif</p>
+                    <p className="text-white font-black text-3xl">{card.inf}</p>
+                  </div>
+                  <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:10}}>
+                    <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Prétérit</p>
+                    <p className="text-white font-black text-2xl">{card.pret}</p>
+                  </div>
+                  <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:10}}>
+                    <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Participe passé</p>
+                    <p className="text-white font-black text-2xl">{card.pp}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Buttons */}
+        {flipped?(
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <button onClick={()=>next(false)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm"
+              style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',cursor:'pointer'}}>
+              <XCircle size={16}/> À revoir
+            </button>
+            <button onClick={()=>next(true)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm"
+              style={{background:'linear-gradient(135deg,#064e3b,#059669)',cursor:'pointer'}}>
+              <CheckCircle size={16}/> Je savais !
+            </button>
+          </div>
+        ):(
+          <div className="h-14 flex items-center justify-center">
+            <p className="text-white/25 text-xs font-medium">← Descendre · Monter →</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── VERBES DÉFI (flip card 3D) ───
+function VerbeDefiScreen({config, onBack, onEnd, retryDeck}) {
+  const [deck]=useState(()=>{
+    if(retryDeck) return shuffle([...retryDeck]);
+    const ids=new Set((config?.groupes||VERBES_GROUPES_LIST).flatMap(g=>VERBES_GROUPES[g]||[]));
+    return shuffle(IRREGULAR_VERBS.filter(v=>ids.has(v.id)));
+  });
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [scores,setScores]=useState([]);
+  const [animating,setAnimating]=useState(false);
+  const card=deck[idx];
+  const color=VERBES_CAT_COLORS[card.cat]||"#1d4ed8";
+
+  const next=knew=>{
+    const ns=[...scores,knew];
+    if(idx+1>=deck.length){onEnd({deck,scores:ns,config,mode:"challenge"});return;}
+    setScores(ns);setAnimating(true);
+    setTimeout(()=>{setFlipped(false);setIdx(i=>i+1);setTimeout(()=>setAnimating(false),50);},200);
+  };
+
+  useEffect(()=>{
+    const fn=e=>{
+      if(["ArrowUp","ArrowDown"," "].includes(e.key)){e.preventDefault();if(!flipped)setFlipped(true);}
+      if(flipped&&e.key==="ArrowRight")next(true);
+      if(flipped&&e.key==="ArrowLeft")next(false);
+    };
+    window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
+  },[flipped,idx,scores]);
+
+  return(
+    <div className="min-h-screen flex flex-col" style={{background:`linear-gradient(160deg,#060b18 0%,${color}28 100%)`}}>
+      <div className="flex flex-col flex-1" style={{maxWidth:480,margin:'0 auto',width:'100%',padding:'20px 16px 24px'}}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm font-medium transition-colors" style={{cursor:'pointer'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Config
+          </button>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-xs font-semibold" style={{color:'#4ade80'}}><CheckCircle size={13}/>{scores.filter(Boolean).length}</span>
+            <span className="flex items-center gap-1 text-xs font-semibold" style={{color:'#f87171'}}><XCircle size={13}/>{scores.filter(x=>!x).length}</span>
+          </div>
+          <span className="text-white/40 font-mono text-sm tabular-nums">{idx+1}/{deck.length}</span>
+        </div>
+        {/* Progress */}
+        <div className="h-1 rounded-full overflow-hidden mb-6" style={{background:'rgba(255,255,255,0.10)'}}>
+          <div className="h-full rounded-full" style={{width:`${(idx/deck.length)*100}%`,background:'linear-gradient(90deg,rgba(255,255,255,0.5),rgba(255,255,255,0.9))',transition:'width 0.4s ease'}}/>
+        </div>
+        {/* Card flip */}
+        <div className="flex-1 flex items-center">
+          <div style={{perspective:"1200px",width:'100%'}} onClick={()=>!flipped&&setFlipped(true)}>
+            <div className="relative w-full select-none flip-card-inner" style={{height:300,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+              {/* Recto : verbe en français */}
+              <div className="absolute inset-0 rounded-3xl flip-card-face flex flex-col items-center justify-center p-7"
+                style={{background:'#ffffff',boxShadow:'0 20px 60px rgba(0,0,0,0.5)',backfaceVisibility:'hidden'}}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{color}}>Verbe en français</p>
+                <p className="font-black text-center text-gray-900" style={{fontSize:card.fr.length>20?"1.4rem":card.fr.length>12?"2rem":"2.8rem",lineHeight:1.1}}>{card.fr}</p>
+                <p className="text-xs mt-2 font-medium" style={{color}}>{card.cat}</p>
+                {!flipped&&<p className="text-gray-400 text-xs mt-5 font-medium">Toucher pour révéler</p>}
+              </div>
+              {/* Verso : 3 formes */}
+              <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col justify-center p-6"
+                style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-4">Formes anglaises</p>
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Infinitif</p>
+                    <p className="text-white font-black text-3xl">{card.inf}</p>
+                  </div>
+                  <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:10}}>
+                    <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Prétérit</p>
+                    <p className="text-white font-black text-2xl">{card.pret}</p>
+                  </div>
+                  <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:10}}>
+                    <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Participe passé</p>
+                    <p className="text-white font-black text-2xl">{card.pp}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Buttons */}
+        {flipped?(
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <button onClick={()=>next(false)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm"
+              style={{background:'linear-gradient(135deg,#7f1d1d,#dc2626)',cursor:'pointer'}}>
+              <XCircle size={16}/> À revoir
+            </button>
+            <button onClick={()=>next(true)} className="btn-press py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm"
+              style={{background:'linear-gradient(135deg,#064e3b,#059669)',cursor:'pointer'}}>
+              <CheckCircle size={16}/> Je savais !
+            </button>
+          </div>
+        ):(
+          <div className="h-14 flex items-center justify-center">
+            <p className="text-white/25 text-xs font-medium">← Descendre · Monter →</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── PHILO FICHE (mode leçon) ───
 function PhiloFicheScreen({config, onBack, onEnd}) {
   const [deck]=useState(()=>{
@@ -1781,7 +2134,7 @@ function ResultScreen({data, onRetry, onHome, isGuest}) {
           <h2 className="text-white text-6xl font-black tracking-tight">{pct}<span className="text-3xl">%</span></h2>
           <p className="text-white/50 text-base mt-1 font-medium">{known} / {deck.length} correctes</p>
           <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-            <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{config.type==="dept"?"Départements":config.type==="philo"?"Philosophie":config.type==="hist"?"Dates historiques":config.type==="figures"?"Figures de style":"Capitales"}</span>
+            <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{config.type==="dept"?"Départements":config.type==="philo"?"Philosophie":config.type==="hist"?"Dates historiques":config.type==="figures"?"Figures de style":config.type==="verbes"?"Verbes irréguliers":"Capitales"}</span>
             <span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium">{mode==="lesson"?"Leçon":"Défi"}</span>
             {elapsed&&<span className="glass text-white/55 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1"><Clock size={10}/>{fmt(elapsed)}</span>}
           </div>
@@ -1794,7 +2147,7 @@ function ResultScreen({data, onRetry, onHome, isGuest}) {
             <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto">
               {toReview.map((d,i)=>(
                 <span key={i} className="text-white/80 text-xs px-3 py-1.5 rounded-full font-medium" style={{background:'rgba(239,68,68,0.2)',border:'1px solid rgba(239,68,68,0.25)'}}>
-                  {config.type==="dept"&&config.subject==="chef"?`${d.num} – ${d.nom} → ${d.chef}`:config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:config.type==="hist"?`${d.date} – ${d.evenement.substring(0,35)}…`:config.type==="figures"?d.nom:`${d.pays} → ${d.capitale}`}
+                  {config.type==="dept"&&config.subject==="chef"?`${d.num} – ${d.nom} → ${d.chef}`:config.type==="dept"?`${d.num} – ${d.nom}`:config.type==="philo"?d.nom:config.type==="hist"?`${d.date} – ${d.evenement.substring(0,35)}…`:config.type==="figures"?d.nom:config.type==="verbes"?`${d.fr} → ${d.inf}`:`${d.pays} → ${d.capitale}`}
                 </span>
               ))}
             </div>
@@ -2012,6 +2365,7 @@ function LeitnerScreen({onBack,isGuest}) {
       else if(t==='philo') _side=Math.random()<0.5?"nom-to-back":"back-to-nom";
       else if(t==='hist') _side=Math.random()<0.5?"date-to-evt":"evt-to-date";
       else if(t==='figures') _side="nom-to-def";
+      else if(t==='verbes') _side="fr-to-forms";
       else if(t==='chef') _side="dept-to-chef";
       else if(t==='custom') _side=(c.bidirectional!==false&&Math.random()<0.5)?"back-to-front":"front-to-back";
       else _side=Math.random()<0.5?"num-to-nom":"nom-to-num";
@@ -2057,7 +2411,7 @@ function LeitnerScreen({onBack,isGuest}) {
     window.addEventListener("keydown",fn);return()=>window.removeEventListener("keydown",fn);
   },[view,flipped,idx]);
 
-  const allLeitnerCards=[...LEITNER_CARDS,...(state.customCards||[])];
+  const allLeitnerCards=[...LEITNER_CARDS.filter(c=>state.cards[c.id]),...(state.customCards||[])];
   const boxCounts=LEITNER_BOXES.map(b=>({...b,count:allLeitnerCards.filter(c=>{const s=state.cards[c.id];return(s!==undefined?s.box:1)===b.n;}).length}));
   const dueCount=getLeitnerDueCards(state).length;
   const totalCards=allLeitnerCards.length;
@@ -2094,8 +2448,9 @@ function LeitnerScreen({onBack,isGuest}) {
     if(allLeitnerCards.some(c=>c.type==='cap'&&activeIds.has(c.id)))     tags.push({label:'Capitales',        color:'#1a3b1a'});
     if(allLeitnerCards.some(c=>c.type==='philo'&&activeIds.has(c.id)))  tags.push({label:'Philosophie',      color:'#5b21b6'});
     if(allLeitnerCards.some(c=>c.type==='hist'&&activeIds.has(c.id)))   tags.push({label:'Dates historiques', color:'#7d3a00'});
-    if(allLeitnerCards.some(c=>c.type==='figures'&&activeIds.has(c.id)))tags.push({label:'Figures de style', color:'#831843'});
-    if(allLeitnerCards.some(c=>c.type==='custom'&&activeIds.has(c.id)))  tags.push({label:'Mes cartes',       color:'#0f766e'});
+    if(allLeitnerCards.some(c=>c.type==='figures'&&activeIds.has(c.id)))tags.push({label:'Figures de style',    color:'#831843'});
+    if(allLeitnerCards.some(c=>c.type==='verbes'&&activeIds.has(c.id))) tags.push({label:'Verbes irréguliers',  color:'#1d4ed8'});
+    if(allLeitnerCards.some(c=>c.type==='custom'&&activeIds.has(c.id)))  tags.push({label:'Mes cartes',         color:'#0f766e'});
 
     return tags.sort((a,b)=>a.label.localeCompare(b.label));
   })();
@@ -2387,6 +2742,10 @@ function LeitnerScreen({onBack,isGuest}) {
       if(card._side==='date-to-evt'){front=card.date;back=card.evenement;frontLabel="Date";backLabel="Événement";}
       else{front=card.evenement;back=card.date;frontLabel="Événement";backLabel="Date";}
       color=PERIODE_COLORS[card.periode]||"#7d5a00";
+    }else if(t==='verbes'){
+      front=card.fr; back=card.inf;
+      frontLabel="Verbe en français"; backLabel="Formes anglaises";
+      color=VERBES_CAT_COLORS[card.cat]||"#1d4ed8";
     }else if(t==='chef'){
       front=`${card.nom} — N°${card.num}`;
       back=card.chef;
@@ -2416,7 +2775,7 @@ function LeitnerScreen({onBack,isGuest}) {
               Pause
             </button>
             <div className="text-center">
-              <p className="text-white/60 text-xs font-semibold">{t==='hist'?card.periode:t==='cap'?card.continent:t==='philo'?card.periode||"":t==='figures'?card.categorie:t==='custom'?card.label||"Personnel":card.region}</p>
+              <p className="text-white/60 text-xs font-semibold">{t==='hist'?card.periode:t==='cap'?card.continent:t==='philo'?card.periode||"":t==='figures'?card.categorie:t==='verbes'?card.cat:t==='custom'?card.label||"Personnel":card.region}</p>
               <div className="flex items-center justify-center gap-1 mt-1">
                 {LEITNER_BOXES.map(b=>(
                   <div key={b.n} className="flex items-center justify-center rounded-full font-black" style={{width:18,height:18,background:curBox===b.n?b.color:"rgba(255,255,255,0.12)",color:"white",fontSize:8,border:curBox===b.n?`2px solid rgba(255,255,255,0.4)`:'none'}}>
@@ -2434,13 +2793,14 @@ function LeitnerScreen({onBack,isGuest}) {
           {/* Card flip */}
           <div className="flex-1 flex items-center">
             <div style={{perspective:"1200px",width:'100%'}} onClick={()=>!flipped&&setFlipped(true)}>
-              <div className="relative w-full select-none flip-card-inner" style={{height:t==='figures'?320:220,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
+              <div className="relative w-full select-none flip-card-inner" style={{height:t==='figures'?320:t==='verbes'?300:220,opacity:animating?0:1,transform:flipped?"rotateY(180deg)":"rotateY(0deg)"}}>
                 {/* Recto */}
                 <div className="absolute inset-0 rounded-3xl flip-card-face flex flex-col items-center justify-center p-7"
                   style={{background:'#ffffff',boxShadow:'0 20px 60px rgba(0,0,0,0.5)',backfaceVisibility:'hidden'}}>
                   <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{color}}>{frontLabel}</p>
                   <p className="font-black text-center text-gray-900" style={{fontSize:front.length>25?"1.1rem":front.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{front}</p>
                   {t==='figures'&&<p className="text-xs mt-2 font-medium" style={{color}}>{card.categorie}</p>}
+                  {t==='verbes'&&<p className="text-xs mt-2 font-medium" style={{color}}>{card.cat}</p>}
                   {!flipped&&<p className="text-gray-400 text-xs mt-5 font-medium">Toucher pour révéler</p>}
                 </div>
                 {/* Verso */}
@@ -2454,11 +2814,30 @@ function LeitnerScreen({onBack,isGuest}) {
                         <p className="text-white/90 text-sm italic leading-relaxed">{backExtra}</p>
                       </div>
                     </div>
-                  : <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col items-center justify-center p-7"
-                      style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
-                      <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/65">{backLabel}</p>
-                      <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.1rem":back.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{back}</p>
-                    </div>
+                  : t==='verbes'
+                    ? <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col justify-center p-6"
+                        style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                        <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/60">Formes anglaises</p>
+                        <div className="flex flex-col gap-2">
+                          <div>
+                            <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Infinitif</p>
+                            <p className="text-white font-black text-2xl">{card.inf}</p>
+                          </div>
+                          <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:8}}>
+                            <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Prétérit</p>
+                            <p className="text-white font-black text-2xl">{card.pret}</p>
+                          </div>
+                          <div style={{borderTop:'1px solid rgba(255,255,255,0.2)',paddingTop:8}}>
+                            <p className="text-white/55 text-xs font-semibold uppercase tracking-widest mb-0.5">Participe passé</p>
+                            <p className="text-white font-black text-xl">{card.pp}</p>
+                          </div>
+                        </div>
+                      </div>
+                    : <div className="absolute inset-0 rounded-3xl flip-card-face flip-card-back flex flex-col items-center justify-center p-7"
+                        style={{background:color,boxShadow:`0 20px 60px ${color}55`,backfaceVisibility:'hidden'}}>
+                        <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-white/65">{backLabel}</p>
+                        <p className="font-black text-white text-center" style={{fontSize:back.length>25?"1.1rem":back.length>15?"1.6rem":"2.8rem",lineHeight:1.1}}>{back}</p>
+                      </div>
                 }
               </div>
             </div>
@@ -3158,6 +3537,7 @@ function App() {
     if(category==="dates")        return <SetupDates gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
     if(category==="philo")        return <SetupPhilo gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
     if(category==="figures")      return <SetupFigures gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
+    if(category==="verbes")       return <SetupVerbes gameMode={gameMode} onStart={startPlay} onBack={goBack}/>;
   }
 
   if(screen==="result") return <ResultScreen data={resultData} isGuest={isGuest} onRetry={d=>{setRetryDeck(d);setScreen("play");}} onHome={goHome}/>;
@@ -3171,6 +3551,12 @@ function App() {
     // Figures défi → flashcards
     if(cfg?.type==="figures"&&gameMode==="challenge")
       return <FigureDefiScreen key={k} config={cfg} retryDeck={retryDeck} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    // Verbes leçon → fiches
+    if(cfg?.type==="verbes"&&gameMode==="lesson")
+      return <VerbeFicheScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
+    // Verbes défi → flashcards
+    if(cfg?.type==="verbes"&&gameMode==="challenge")
+      return <VerbeDefiScreen key={k} config={cfg} retryDeck={retryDeck} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
     // Philo leçon → fiches
     if(cfg?.type==="philo"&&gameMode==="lesson")
       return <PhiloFicheScreen key={k} config={cfg} onBack={()=>setScreen("setup")} onEnd={d=>{setResultData(d);setScreen("result");}}/>;
